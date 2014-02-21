@@ -106,14 +106,11 @@ abstract class TaskSpec extends ObjectBehavior
                 function ($args) {
                     return $args[1];
                 }
-            )
-            ->shouldBeCalled();
+            );
     }
 
     protected function mock_logger(LoggerInterface $logger)
     {
-        $logger->log(Argument::type('string'), Argument::type('string'))
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
     }
 }

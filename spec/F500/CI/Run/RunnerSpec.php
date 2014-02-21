@@ -39,13 +39,8 @@ class RunnerSpec extends ObjectBehavior
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite.yml';
 
-        $configurator->loadConfig(Argument::type('string'))
-            ->willReturn(array())
-            ->shouldBeCalled();
-
-        $configurator->setup(Argument::type('string'), Argument::type('array'))
-            ->willReturn($build)
-            ->shouldBeCalled();
+        $configurator->loadConfig(Argument::type('string'))->willReturn(array());
+        $configurator->setup(Argument::type('string'), Argument::type('array'))->willReturn($build);
 
         $this->setup($filename)->shouldReturn($build);
     }
@@ -55,9 +50,7 @@ class RunnerSpec extends ObjectBehavior
         $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
 
-        $build->initialize($dispatcherArg, $loggerArg)
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $build->initialize($dispatcherArg, $loggerArg)->willReturn(true);
 
         $this->initialize($build)->shouldReturn(true);
     }
@@ -67,9 +60,7 @@ class RunnerSpec extends ObjectBehavior
         $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
 
-        $build->run($dispatcherArg, $loggerArg)
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $build->run($dispatcherArg, $loggerArg)->willReturn(true);
 
         $this->run($build)->shouldReturn(true);
     }
@@ -79,9 +70,7 @@ class RunnerSpec extends ObjectBehavior
         $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
 
-        $build->cleanup($dispatcherArg, $loggerArg)
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $build->cleanup($dispatcherArg, $loggerArg)->willReturn(true);
 
         $this->cleanup($build)->shouldReturn(true);
     }

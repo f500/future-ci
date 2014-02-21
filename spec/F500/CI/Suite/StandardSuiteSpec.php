@@ -69,21 +69,16 @@ class StandardSuiteSpec extends ObjectBehavior
 
     function it_runs_itself(Task $task, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
-        $task->run($dispatcher, $logger)
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $task->run($dispatcher, $logger)->willReturn(true);
 
         $dispatcher->dispatch(Argument::type('string'), Argument::type('Symfony\Component\EventDispatcher\Event'))
             ->will(
                 function ($args) {
                     return $args[1];
                 }
-            )
-            ->shouldBeCalled();
+            );
 
-        $logger->log(Argument::type('string'), Argument::type('string'))
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
 
         $this->addTask('some_task', $task);
         $this->run($dispatcher, $logger)->shouldReturn(true);

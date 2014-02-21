@@ -30,21 +30,16 @@ class StandardBuildSpec extends ObjectBehavior
 
     function it_runs_itself(Suite $suite, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
-        $suite->run($dispatcher, $logger)
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $suite->run($dispatcher, $logger)->willReturn(true);
 
         $dispatcher->dispatch(Argument::type('string'), Argument::type('Symfony\Component\EventDispatcher\Event'))
             ->will(
                 function ($args) {
                     return $args[1];
                 }
-            )
-            ->shouldBeCalled();
+            );
 
-        $logger->log(Argument::type('string'), Argument::type('string'))
-            ->willReturn(true)
-            ->shouldBeCalled();
+        $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
 
         $this->run($dispatcher, $logger)->shouldReturn(true);
     }

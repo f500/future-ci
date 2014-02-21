@@ -1,0 +1,46 @@
+{
+    "name": "f500/ci",
+    "description": "A Continuous Integration tool by Future500 B.V.",
+    "keywords": ["f500", "future500", "ci"],
+    "license": "proprietary",
+    "authors": [
+        { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
+        { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }
+    ],
+    "minimum-stability": "stable",
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-0": {
+            "F500": "./src/",
+            "spec": "./"
+        }
+    },
+
+    "require": {
+        "php": ">=5.3.3",
+        "cilex/console-service-provider": "~1.0",
+        "igorw/config-service-provider": "~1.2",
+        "monolog/monolog": "~1.7",
+        "neutron/silex-filesystem-provider": "~1.0",
+        "silex/silex": "~1.1",
+        "symfony/console": "~2.4",
+        "symfony/process": "~2.4"
+    },
+    "require-dev": {
+        "jamesmoss/toml": "~0.1",
+        "phpspec/phpspec": "2.0.*@dev",
+        "symfony/yaml": "~2.4"
+    },
+    "suggest": {
+        "jamesmoss/toml": "~0.1",
+        "symfony/yaml": "~2.4"
+    },
+
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.0.1-dev"
+        }
+    }
+}

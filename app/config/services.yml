@@ -1,0 +1,13 @@
+debug: %debug%
+
+console.name:    Future CI
+console.version: 0.0.1
+
+monolog.logfile: %root_dir%/var/logs/app.dev.log
+monolog.level:   debug
+monolog.name:    F500ci
+
+f500ci.runner.suites_dir: %root_dir%/var/suites
+f500ci.runner.builds_dir: %root_dir%/var/builds
+
+f500ci.renderer.view_dir: %root_dir%/app/views

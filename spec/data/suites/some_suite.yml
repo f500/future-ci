@@ -1,0 +1,9 @@
+name: Test Suite
+
+tasks:
+  some_task:
+    name:  Some Task
+    class: F500\CI\Task\DummyTask
+  other_task:
+    name:  Other Task
+    class: F500\CI\Task\DummyTask

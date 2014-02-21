@@ -1,0 +1,20 @@
+{
+    "name": "f500ci",
+    "description": "A Continuous Integration tool by Future500 B.V.",
+    "version": "0.0.1-dev",
+    "license": "proprietary",
+    "contributors": [
+        { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
+        { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }
+    ],
+
+    "devDependencies": {
+        "grunt": "~0.4.2",
+        "grunt-banner": "~0.2.0",
+        "grunt-contrib-concat": "~0.3.0",
+        "grunt-contrib-less": "~0.9.0",
+        "grunt-contrib-uglify": "~0.3.0",
+        "grunt-contrib-watch": "~0.5.3",
+        "load-grunt-tasks": "~0.3.0"
+    }
+}

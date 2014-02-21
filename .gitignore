@@ -1,0 +1,11 @@
+.idea/workspace.xml
+app/config/parameters.yml
+bin/*
+node_modules/*
+var/builds/*
+var/logs/*
+var/suites/*
+vendor/*
+web/assets/css/*
+web/assets/js/*
+web/bower_components/*

@@ -1,0 +1,25 @@
+{
+    "name": "f500ci",
+    "description": "A Continuous Integration tool by Future500 B.V.",
+    "version": "0.0.1-dev",
+    "private": true,
+    "license": "proprietary",
+    "authors": [
+        { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
+        { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }
+    ],
+
+    "main": [
+        "src/F500/CI/Resources/assets/js/app.js"
+    ],
+
+    "dependencies": {
+        "bootstrap": "~3.1",
+        "font-awesome": "~4.0",
+        "html5shiv": "~3.7",
+        "jquery": "~1.11",
+        "respond": "~1.4"
+    },
+
+    "devDependencies": {}
+}

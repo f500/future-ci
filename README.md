@@ -15,7 +15,7 @@ Install dependencies:
 
     $ composer.phar install
     $ npm install
-    $ bundle install
+    $ bower install
 
 Install and watch assets:
 

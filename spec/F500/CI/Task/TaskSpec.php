@@ -97,6 +97,7 @@ abstract class TaskSpec extends ObjectBehavior
         $process->run()->shouldBeCalled();
         $process->getCommandLine()->willReturn("'ls' '-l'");
         $process->isSuccessful()->willReturn(true);
+        $process->getOutput()->willReturn(".\n..");
     }
 
     protected function mock_dispatcher(EventDispatcherInterface $dispatcher)
@@ -112,5 +113,6 @@ abstract class TaskSpec extends ObjectBehavior
     protected function mock_logger(LoggerInterface $logger)
     {
         $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
+        $logger->log(Argument::type('string'), Argument::type('string'), Argument::type('array'))->willReturn(true);
     }
 }

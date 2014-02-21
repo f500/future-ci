@@ -55,6 +55,8 @@ class CodeceptionTask extends BaseTask
         }
 
         if ($action == 'run') {
+            $command->addArg('--no-exit');
+
             foreach ($options['env'] as $env) {
                 $command->addArg('--env=' . $env);
             }

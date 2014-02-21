@@ -31,7 +31,11 @@ class AnsibleWrapper extends BaseWrapper
             $ansibleCommand->addArg('--private-key=' . $options['private_key']);
         }
         if (!empty($options['sudo'])) {
-            $ansibleCommand->addArg('--sudo');
+            if ($options['sudo'] === true || $options['sudo'] === 'true') {
+                $ansibleCommand->addArg('--sudo');
+            } else {
+                $ansibleCommand->addArg('--sudo-user=' . $options['sudo']);
+            }
         }
         if (!empty($options['module_path'])) {
             $ansibleCommand->addArg('--module-path=' . $options['module_path']);

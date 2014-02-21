@@ -173,13 +173,17 @@ abstract class BaseTask implements Task
         $process->run();
 
         if ($process->isSuccessful()) {
-            $logger->log(LogLevel::INFO, sprintf('[%s] Succeeded: %s', $command->getId(), $command->stringify(true)));
+            $logger->log(
+                LogLevel::INFO,
+                sprintf('[%s] Succeeded: %s', $command->getId(), $command->stringify(true)),
+                array('out' => $this->formatOutput($process->getOutput()))
+            );
         } else {
             $logger->log(
                 LogLevel::ERROR,
                 sprintf('[%s] Failed: %s', $command->getId(), $command->stringify(true)),
                 array(
-                    'rc' => $process->getExitCode(),
+                    'rc'  => $process->getExitCode(),
                     'out' => $this->formatOutput($process->getOutput()),
                     'err' => $this->formatOutput($process->getErrorOutput())
                 )

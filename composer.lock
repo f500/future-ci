@@ -947,12 +947,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/phpspec.git",
-                "reference": "97dff5f5035d340ff19b986c720af725b1588e8c"
+                "reference": "c41c96dcadf2bcaacaa342a84e794254c5bb763a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/97dff5f5035d340ff19b986c720af725b1588e8c",
-                "reference": "97dff5f5035d340ff19b986c720af725b1588e8c",
+                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/c41c96dcadf2bcaacaa342a84e794254c5bb763a",
+                "reference": "c41c96dcadf2bcaacaa342a84e794254c5bb763a",
                 "shasum": ""
             },
             "require": {
@@ -1011,7 +1011,7 @@
                 "testing",
                 "tests"
             ],
-            "time": "2014-02-21 11:21:00"
+            "time": "2014-02-23 20:29:41"
         },
         {
             "name": "phpspec/prophecy",

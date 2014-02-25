@@ -12,10 +12,7 @@
         "bin-dir": "bin"
     },
     "autoload": {
-        "psr-0": {
-            "F500": "./src/",
-            "spec": "./"
-        }
+        "psr-0": { "F500": "./src/" }
     },
 
     "require": {

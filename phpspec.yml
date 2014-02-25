@@ -1,0 +1,3 @@
+formatter.name: pretty
+extensions:
+  - F500\PhpSpec\Extension\AutoloadExtension

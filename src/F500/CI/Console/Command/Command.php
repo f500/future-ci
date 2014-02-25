@@ -23,5 +23,4 @@ class Command extends BaseCommand
     {
         return $this->getApplication()->getService($name);
     }
-
 }

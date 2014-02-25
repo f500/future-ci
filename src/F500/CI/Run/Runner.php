@@ -3,25 +3,9 @@
 namespace F500\CI\Run;
 
 use F500\CI\Build\Build;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Runner
 {
-
-    const DEFAULT_SUITE_CLASS = 'F500\CI\Suite\StandardSuite';
-
-    const DEFAULT_BUILD_CLASS = 'F500\CI\Build\StandardBuild';
-
-    /**
-     * @var string
-     */
-    protected $suitesDir;
-
-    /**
-     * @var string
-     */
-    protected $buildsDir;
 
     /**
      * @var Configurator
@@ -29,35 +13,18 @@ class Runner
     protected $configurator;
 
     /**
-     * @var EventDispatcherInterface
+     * @var Toolkit
      */
-    protected $dispatcher;
+    protected $toolkit;
 
     /**
-     * @var LoggerInterface
+     * @param Configurator $configurator
+     * @param Toolkit      $toolkit
      */
-    protected $logger;
-
-    /**
-     * @param string                   $suitesDir
-     * @param string                   $buildsDir
-     * @param Configurator             $configurator
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     */
-    public function __construct(
-        $suitesDir,
-        $buildsDir,
-        Configurator $configurator,
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
-    ) {
-        $this->suitesDir = realpath($suitesDir);
-        $this->buildsDir = realpath($buildsDir);
-
+    public function __construct(Configurator $configurator, Toolkit $toolkit)
+    {
         $this->configurator = $configurator;
-        $this->dispatcher   = $dispatcher;
-        $this->logger       = $logger;
+        $this->toolkit      = $toolkit;
     }
 
     /**
@@ -66,10 +33,6 @@ class Runner
      */
     public function setup($filename)
     {
-        if (substr($filename, 0, 1) != '/') {
-            $filename = $this->suitesDir . '/' . $filename;
-        }
-
         $config  = $this->configurator->loadConfig($filename);
         $suiteCn = substr($filename, 0, strrpos($filename, '.'));
 
@@ -82,7 +45,7 @@ class Runner
      */
     public function initialize(Build $build)
     {
-        return $build->initialize($this->dispatcher, $this->logger);
+        return $build->initialize($this->toolkit);
     }
 
     /**
@@ -91,7 +54,7 @@ class Runner
      */
     public function run(Build $build)
     {
-        return $build->run($this->dispatcher, $this->logger);
+        return $build->run($this->toolkit);
     }
 
     /**
@@ -100,6 +63,6 @@ class Runner
      */
     public function cleanup(Build $build)
     {
-        return $build->cleanup($this->dispatcher, $this->logger);
+        return $build->cleanup($this->toolkit);
     }
 }

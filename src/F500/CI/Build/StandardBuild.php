@@ -4,10 +4,9 @@ namespace F500\CI\Build;
 
 use F500\CI\Event\BuildEvent;
 use F500\CI\Event\Events;
+use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class StandardBuild implements Build
 {
@@ -30,6 +29,8 @@ class StandardBuild implements Build
     {
         $this->cn    = $cn;
         $this->suite = $suite;
+
+        $suite->setActiveBuild($this);
     }
 
     /**
@@ -41,39 +42,44 @@ class StandardBuild implements Build
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @return Suite
+     */
+    public function getSuite()
+    {
+        return $this->suite;
+    }
+
+    /**
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function initialize(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function initialize(Toolkit $toolkit)
     {
         return true;
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function run(Toolkit $toolkit)
     {
-        $logger->log(LogLevel::DEBUG, sprintf('Build "%s" started.', $this->getCn()));
-        $dispatcher->dispatch(Events::BuildStarted, new BuildEvent($this));
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" started.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::BuildStarted, new BuildEvent($this));
 
-        $result = $this->suite->run($dispatcher, $logger);
+        $result = $this->suite->run($toolkit);
 
-        $dispatcher->dispatch(Events::BuildFinished, new BuildEvent($this));
-        $logger->log(LogLevel::DEBUG, sprintf('Build "%s" finished.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::BuildFinished, new BuildEvent($this));
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" finished.', $this->getCn()));
 
         return $result;
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function cleanup(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function cleanup(Toolkit $toolkit)
     {
         return true;
     }

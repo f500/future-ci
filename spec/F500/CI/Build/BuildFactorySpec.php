@@ -5,9 +5,16 @@ namespace spec\F500\CI\Build;
 use F500\CI\Suite\Suite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Symfony\Component\Filesystem\Filesystem;
 
 class BuildFactorySpec extends ObjectBehavior
 {
+
+    function let(Filesystem $filesystem)
+    {
+        /** @noinspection PhpParamsInspection */
+        $this->beConstructedWith($filesystem);
+    }
 
     function it_is_initializable()
     {

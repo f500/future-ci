@@ -4,10 +4,9 @@ namespace spec\F500\CI\Run;
 
 use F500\CI\Build\Build;
 use F500\CI\Run\Configurator;
+use F500\CI\Run\Toolkit;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RunnerSpec extends ObjectBehavior
 {
@@ -20,14 +19,10 @@ class RunnerSpec extends ObjectBehavior
 
     function let(
         Configurator $configurator,
-        EventDispatcherInterface $dispatcher,
-        LoggerInterface $logger
+        Toolkit $toolkit
     ) {
-        $suitesDir = __DIR__ . '/../../../data/suites';
-        $buildsDir = __DIR__ . '/../../../data/builds';
-
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith($suitesDir, $buildsDir, $configurator, $dispatcher, $logger);
+        $this->beConstructedWith($configurator, $toolkit);
     }
 
     function it_is_initializable()
@@ -45,33 +40,24 @@ class RunnerSpec extends ObjectBehavior
         $this->setup($filename)->shouldReturn($build);
     }
 
-    function it_initializes_a_build(Build $build)
+    function it_initializes_a_build(Build $build, Toolkit $toolkit)
     {
-        $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
+        $build->initialize($toolkit)->willReturn(true);
 
-        $build->initialize($dispatcherArg, $loggerArg)->willReturn(true);
-
-        $this->initialize($build)->shouldReturn(true);
+        $this->initialize($build, $toolkit)->shouldReturn(true);
     }
 
-    function it_runs_a_build(Build $build)
+    function it_runs_a_build(Build $build, Toolkit $toolkit)
     {
-        $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
+        $build->run($toolkit)->willReturn(true);
 
-        $build->run($dispatcherArg, $loggerArg)->willReturn(true);
-
-        $this->run($build)->shouldReturn(true);
+        $this->run($build, $toolkit)->shouldReturn(true);
     }
 
-    function it_cleans_up_a_build(Build $build)
+    function it_cleans_up_a_build(Build $build, Toolkit $toolkit)
     {
-        $dispatcherArg = Argument::type('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $loggerArg     = Argument::type('Psr\Log\LoggerInterface');
+        $build->cleanup($toolkit)->willReturn(true);
 
-        $build->cleanup($dispatcherArg, $loggerArg)->willReturn(true);
-
-        $this->cleanup($build)->shouldReturn(true);
+        $this->cleanup($build, $toolkit)->shouldReturn(true);
     }
 }

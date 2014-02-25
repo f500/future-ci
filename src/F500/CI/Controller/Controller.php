@@ -17,5 +17,4 @@ class Controller
     {
         $this->app = $app;
     }
-
 }

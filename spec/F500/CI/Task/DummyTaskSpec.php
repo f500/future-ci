@@ -2,8 +2,7 @@
 
 namespace spec\F500\CI\Task;
 
-use F500\CI\Command\Command;
-use F500\CI\Command\CommandFactory;
+use F500\CI\Run\Toolkit;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -17,11 +16,14 @@ class DummyTaskSpec extends TaskSpec
         $this->shouldImplement('F500\CI\Task\Task');
     }
 
-    function it_runs_itself(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    function it_runs_itself(Toolkit $toolkit, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
-        $this->mock_dispatcher($dispatcher);
-        $this->mock_logger($logger);
+        $toolkit->getDispatcher()->willReturn($dispatcher);
+        $toolkit->getLogger()->willReturn($logger);
 
-        $this->run($dispatcher, $logger)->shouldReturn(true);
+//        $this->mock_dispatcher($dispatcher);
+//        $this->mock_logger($logger);
+
+        $this->run($toolkit)->shouldReturn(true);
     }
 }

@@ -3,14 +3,11 @@
 namespace F500\CI\Task;
 
 use F500\CI\Command\Command;
-use F500\CI\Command\CommandFactory;
 use F500\CI\Event\Events;
 use F500\CI\Event\TaskEvent;
-use F500\CI\Process\ProcessFactory;
-use F500\CI\Wrapper\Wrapper;
-use Psr\Log\LoggerInterface;
+use F500\CI\Run\Toolkit;
+use F500\CI\Suite\Suite;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 abstract class BaseTask implements Task
 {
@@ -19,6 +16,11 @@ abstract class BaseTask implements Task
      * @var string
      */
     protected $cn;
+
+    /**
+     * @var Suite
+     */
+    protected $suite;
 
     /**
      * @var string
@@ -31,33 +33,22 @@ abstract class BaseTask implements Task
     protected $options;
 
     /**
-     * @var Wrapper[]
+     * @var string[]
      */
     protected $wrappers;
 
     /**
-     * @var CommandFactory
+     * @param string $cn
+     * @param Suite  $suite
      */
-    protected $commandFactory;
-
-    /**
-     * @var ProcessFactory
-     */
-    protected $processFactory;
-
-    /**
-     * @param string         $cn
-     * @param CommandFactory $commandFactory
-     * @param ProcessFactory $processFactory
-     */
-    public function __construct($cn, CommandFactory $commandFactory, ProcessFactory $processFactory)
+    public function __construct($cn, Suite $suite)
     {
         $this->cn       = $cn;
+        $this->suite    = $suite;
         $this->options  = array();
         $this->wrappers = array();
 
-        $this->commandFactory = $commandFactory;
-        $this->processFactory = $processFactory;
+        $suite->addTask($cn, $this);
     }
 
     /**
@@ -66,6 +57,14 @@ abstract class BaseTask implements Task
     public function getCn()
     {
         return $this->cn;
+    }
+
+    /**
+     * @return Suite
+     */
+    public function getSuite()
+    {
+        return $this->suite;
     }
 
     /**
@@ -104,7 +103,7 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @return Wrapper[]
+     * @return string[]
      */
     public function getWrappers()
     {
@@ -112,17 +111,16 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param string  $cn
-     * @param Wrapper $wrapper
+     * @param string[] $cns
      * @throws \InvalidArgumentException
      */
-    public function addWrapper($cn, Wrapper $wrapper)
+    public function setWrappers($cns)
     {
-        if (isset($this->wrappers[$cn])) {
-            throw new \InvalidArgumentException(sprintf('Wrapper "%s" already added.', $cn));
+        if (($unique = array_unique($cns)) != $cns) {
+            throw new \InvalidArgumentException('Duplicate wrappers passed.');
         }
 
-        $this->wrappers[$cn] = $wrapper;
+        $this->wrappers = $unique;
     }
 
     /**
@@ -134,80 +132,33 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      */
-    protected function startRun(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    protected function startRun(Toolkit $toolkit)
     {
-        $logger->log(LogLevel::DEBUG, sprintf('Task "%s" started.', $this->getCn()));
-        $dispatcher->dispatch(Events::TaskStarted, new TaskEvent($this));
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Task "%s" started.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::TaskStarted, new TaskEvent($this));
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      */
-    protected function finishRun(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    protected function finishRun(Toolkit $toolkit)
     {
-        $dispatcher->dispatch(Events::TaskFinished, new TaskEvent($this));
-        $logger->log(LogLevel::DEBUG, sprintf('Task "%s" finished.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::TaskFinished, new TaskEvent($this));
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Task "%s" finished.', $this->getCn()));
     }
 
     /**
-     * @param Command         $command
-     * @param LoggerInterface $logger
-     * @return bool
+     * @param Command $command
+     * @return Command
      */
-    protected function execute(Command $command, LoggerInterface $logger)
+    protected function wrapCommand(Command $command)
     {
-        foreach ($this->getWrappers() as $wrapper) {
-            $command = $wrapper->wrap($command);
+        foreach ($this->getWrappers() as $wrapperCn) {
+            $command = $this->getSuite()->getWrapper($wrapperCn)->wrap($command);
         }
 
-        $logger->log(LogLevel::INFO, sprintf('[%s] Executing: %s', $command->getId(), $command->stringify(true)));
-
-        $process = $this->processFactory->create($command->getArgs(), $command->getCwd(), $command->getEnv());
-
-        $logger->log(LogLevel::DEBUG, sprintf('[%s] Raw command: %s', $command->getId(), $process->getCommandLine()));
-
-        $process->run();
-
-        if ($process->isSuccessful()) {
-            $logger->log(
-                LogLevel::INFO,
-                sprintf('[%s] Succeeded: %s', $command->getId(), $command->stringify(true)),
-                array('out' => $this->formatOutput($process->getOutput()))
-            );
-        } else {
-            $logger->log(
-                LogLevel::ERROR,
-                sprintf('[%s] Failed: %s', $command->getId(), $command->stringify(true)),
-                array(
-                    'rc'  => $process->getExitCode(),
-                    'out' => $this->formatOutput($process->getOutput()),
-                    'err' => $this->formatOutput($process->getErrorOutput())
-                )
-            );
-        }
-
-        return $process->isSuccessful();
-    }
-
-    /**
-     * @param string $errors
-     * @return string|array
-     */
-    protected function formatOutput($errors)
-    {
-        $errors = preg_split('/[\n\r]/', $errors);
-        $errors = array_map('trim', $errors);
-        $errors = array_filter($errors, 'strlen');
-        $errors = array_values($errors);
-
-        if (count($errors) == 1) {
-            return reset($errors);
-        } else {
-            return $errors;
-        }
+        return $command;
     }
 }

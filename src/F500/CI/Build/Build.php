@@ -2,9 +2,8 @@
 
 namespace F500\CI\Build;
 
+use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 interface Build
 {
@@ -20,23 +19,25 @@ interface Build
     public function getCn();
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     * @return bool
+     * @return Suite
      */
-    public function initialize(EventDispatcherInterface $dispatcher, LoggerInterface $logger);
+    public function getSuite();
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger);
+    public function initialize(Toolkit $toolkit);
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function cleanup(EventDispatcherInterface $dispatcher, LoggerInterface $logger);
+    public function run(Toolkit $toolkit);
+
+    /**
+     * @param Toolkit $toolkit
+     * @return bool
+     */
+    public function cleanup(Toolkit $toolkit);
 }

@@ -2,22 +2,21 @@
 
 namespace F500\CI\Task;
 
-use Psr\Log\LoggerInterface;
+use F500\CI\Run\Toolkit;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DummyTask extends BaseTask
 {
+
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function run(Toolkit $toolkit)
     {
-        $this->startRun($dispatcher, $logger);
-        $logger->log(LogLevel::INFO, 'Doing nothing (dummy task).');
-        $this->finishRun($dispatcher, $logger);
+        $this->startRun($toolkit);
+        $toolkit->getLogger()->log(LogLevel::INFO, 'Doing nothing (dummy task).');
+        $this->finishRun($toolkit);
 
         return true;
     }

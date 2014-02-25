@@ -2,6 +2,8 @@
 
 namespace F500\CI\Command;
 
+use F500\CI\Process\ProcessFactory;
+
 class CommandFactory
 {
 
@@ -11,11 +13,18 @@ class CommandFactory
     protected $commandClass;
 
     /**
-     * @param string $commandClass
+     * @var ProcessFactory
      */
-    public function __construct($commandClass)
+    protected $processFactory;
+
+    /**
+     * @param string         $commandClass
+     * @param ProcessFactory $processFactory
+     */
+    public function __construct($commandClass, ProcessFactory $processFactory)
     {
-        $this->commandClass = $commandClass;
+        $this->commandClass   = $commandClass;
+        $this->processFactory = $processFactory;
     }
 
     /**
@@ -30,7 +39,7 @@ class CommandFactory
             throw new \RuntimeException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        $command = new $class();
+        $command = new $class($this->processFactory);
 
         if (!$command instanceof Command) {
             throw new \RuntimeException(sprintf(

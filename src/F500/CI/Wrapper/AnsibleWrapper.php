@@ -3,19 +3,44 @@
 namespace F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
+use F500\CI\Command\CommandFactory;
 
 class AnsibleWrapper extends BaseWrapper
 {
 
     /**
-     * @param Command $command
+     * @param Command        $command
+     * @param CommandFactory $commandFactory
      * @return Command
+     * @throws \RuntimeException
      */
-    public function wrap(Command $command)
+    public function wrap(Command $command, CommandFactory $commandFactory)
     {
         $options = $this->getOptions();
 
-        $ansibleCommand = new Command();
+        if (empty($options['bin'])) {
+            throw new \RuntimeException(sprintf(
+                'Wrapper "%s" in suite "%s" has no "bin" configured.',
+                $this->getCn(),
+                $this->getSuite()->getCn()
+            ));
+        }
+        if (empty($options['host'])) {
+            throw new \RuntimeException(sprintf(
+                'Wrapper "%s" in suite "%s" has no "host" configured.',
+                $this->getCn(),
+                $this->getSuite()->getCn()
+            ));
+        }
+        if (empty($options['inventory'])) {
+            throw new \RuntimeException(sprintf(
+                'Wrapper "%s" in suite "%s" has no "inventory" configured.',
+                $this->getCn(),
+                $this->getSuite()->getCn()
+            ));
+        }
+
+        $ansibleCommand = $commandFactory->create();
 
         $ansibleCommand->addArg($options['bin']);
         $ansibleCommand->addArg($options['host']);
@@ -64,17 +89,14 @@ class AnsibleWrapper extends BaseWrapper
         $script = array();
 
         foreach ($command->getEnv() as $name => $value) {
-            // $script[] = $name . '=' . escapeshellarg($value);
             $script[] = $name . '=' . escapeshellcmd($value);
         }
 
         foreach ($command->getArgs() as $arg) {
-            // $script[] = escapeshellarg($arg);
             $script[] = escapeshellcmd($arg);
         }
 
         if ($command->getCwd()) {
-            // $script[] = 'chdir=' . escapeshellarg($command->getCwd());
             $script[] = 'chdir=' . escapeshellcmd($command->getCwd());
         }
 

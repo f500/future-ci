@@ -22,7 +22,9 @@ class ConfiguratorSpec extends ObjectBehavior
         TaskFactory $taskFactory,
         WrapperFactory $wrapperFactory
     ) {
-        $this->beConstructedWith($buildFactory, $suiteFactory, $taskFactory, $wrapperFactory);
+        $suitesDir = __DIR__ . '/../../../data/suites';
+
+        $this->beConstructedWith($suitesDir, $buildFactory, $suiteFactory, $taskFactory, $wrapperFactory);
     }
 
     function it_is_initializable()
@@ -88,21 +90,20 @@ class ConfiguratorSpec extends ObjectBehavior
         WrapperFactory $wrapperFactory,
         Wrapper $wrapper
     ) {
-        $buildFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($build);
         $suiteFactory->create(Argument::type('string'), Argument::type('string'))->willReturn($suite);
-        $taskFactory->create(Argument::type('string'), Argument::type('string'))->willReturn($task);
-        $wrapperFactory->create(Argument::type('string'), Argument::type('string'))->willReturn($wrapper);
+        $buildFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($build);
+        $taskFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($task);
+        $wrapperFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($wrapper);
 
         $build->getCn()->willReturn('some_suite.2014.02.20.09.00.00');
 
         $suite->getCn()->willReturn('some_suite');
         $suite->setName(Argument::type('string'))->shouldBeCalled();
-        $suite->addTask(Argument::type('string'), $task)->shouldBeCalled();
 
         $task->getCn()->willReturn('some_task');
         $task->setName(Argument::type('string'))->shouldBeCalled();
+        $task->setWrappers(Argument::type('array'))->shouldBeCalled();
         $task->setOptions(Argument::type('array'))->shouldBeCalled();
-        $task->addWrapper(Argument::type('string'), $wrapper)->shouldBeCalled();
 
         $wrapper->getCn()->willReturn('some_wrapper');
         $wrapper->setOptions(Argument::type('array'))->shouldBeCalled();

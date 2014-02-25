@@ -2,11 +2,13 @@
 
 namespace spec\F500\CI\Suite;
 
+use F500\CI\Build\Build;
+use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
+use F500\CI\Wrapper\Wrapper;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class StandardSuiteSpec extends ObjectBehavior
@@ -36,6 +38,13 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->getName()->shouldReturn('Some Suite');
     }
 
+    function it_has_an_active_build_after_setting_it(Build $build)
+    {
+        $this->setActiveBuild($build);
+
+        $this->getActiveBuild()->shouldReturn($build);
+    }
+
     function it_can_add_a_task_to_itself(Task $task)
     {
         $this->addTask('some_task', $task);
@@ -48,39 +57,45 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->addTask('some_task', $task);
 
         $this->shouldThrow('InvalidArgumentException')->during(
-            'addTask', array('some_task', $task)
+            'addTask',
+            array('some_task', $task)
         );
     }
 
-    function it_can_remove_a_task_from_itself(Task $task)
+    function it_can_add_a_wrapper_to_itself(Wrapper $wrapper)
     {
-        $this->addTask('some_task', $task);
-        $this->removeTask('some_task');
+        $this->addWrapper('some_wrapper', $wrapper);
 
-        $this->getTasks()->shouldReturn(array());
+        $this->getWrappers()->shouldReturn(array('some_wrapper' => $wrapper));
+        $this->getWrapper('some_wrapper')->shouldReturn($wrapper);
     }
 
-    function it_fails_removing_a_task_when_the_cn_does_not_exist()
+    function it_fails_adding_a_wrapper_when_cn_already_exists(Wrapper $wrapper)
+    {
+        $this->addWrapper('some_wrapper', $wrapper);
+
+        $this->shouldThrow('InvalidArgumentException')->during(
+            'addWrapper',
+            array('some_wrapper', $wrapper)
+        );
+    }
+
+    function it_does_not_have_a_wrapper_that_has_not_been_added()
     {
         $this->shouldThrow('InvalidArgumentException')->during(
-            'removeTask', array('some_task')
+            'getWrapper',
+            array('some_wrapper')
         );
     }
 
-    function it_runs_itself(Task $task, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    function it_runs_itself(Task $task, Toolkit $toolkit, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
     {
-        $task->run($dispatcher, $logger)->willReturn(true);
+        $toolkit->getDispatcher()->willReturn($dispatcher);
+        $toolkit->getLogger()->willReturn($logger);
 
-        $dispatcher->dispatch(Argument::type('string'), Argument::type('Symfony\Component\EventDispatcher\Event'))
-            ->will(
-                function ($args) {
-                    return $args[1];
-                }
-            );
-
-        $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
+        $task->run($toolkit)->willReturn(true);
 
         $this->addTask('some_task', $task);
-        $this->run($dispatcher, $logger)->shouldReturn(true);
+        $this->run($toolkit)->shouldReturn(true);
     }
 }

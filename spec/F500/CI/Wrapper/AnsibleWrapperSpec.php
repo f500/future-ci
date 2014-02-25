@@ -3,7 +3,7 @@
 namespace spec\F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
-use PhpSpec\ObjectBehavior;
+use F500\CI\Command\CommandFactory;
 use Prophecy\Argument;
 
 class AnsibleWrapperSpec extends WrapperSpec
@@ -22,12 +22,31 @@ class AnsibleWrapperSpec extends WrapperSpec
         'verbose'     => 0
     );
 
-    function it_can_wrap_a_command(Command $command)
+    function it_can_wrap_a_command_in_a_new_command(CommandFactory $commandFactory, Command $oldCommand, Command $newCommand)
     {
-        $command->getArgs()->willReturn(array('ls -l'));
-        $command->getCwd()->willReturn('/tmp');
-        $command->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
+        $oldCommand->getArgs()->willReturn(array('ls', '-l'));
+        $oldCommand->getCwd()->willReturn('/tmp');
+        $oldCommand->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
 
-        $this->wrap($command)->shouldHaveType('F500\CI\Command\Command');
+        $this->mock_new_command($commandFactory, $newCommand);
+
+        $this->setOptions(array('host' => 'localhost', 'inventory' => '/etc/ansible/hosts'));
+
+        $wrappedCommand = $this->wrap($oldCommand, $commandFactory);
+        $wrappedCommand->shouldImplement('F500\CI\Command\Command');
+        $wrappedCommand->getArgs()->shouldReturn(
+            array(
+                '/usr/bin/ansible',
+                'localhost',
+                '--inventory-file=/etc/ansible/hosts',
+                '--timeout=10',
+                '-m',
+                'shell',
+                '-a',
+                'PATH=/usr/local/bin:/usr/bin:/bin ls -l chdir=/tmp'
+            )
+        );
+        $wrappedCommand->getCwd()->shouldReturn(null);
+        $wrappedCommand->getEnv()->shouldReturn(array());
     }
 }

@@ -2,12 +2,13 @@
 
 namespace F500\CI\Suite;
 
+use F500\CI\Build\Build;
 use F500\CI\Event\Events;
 use F500\CI\Event\SuiteEvent;
+use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
-use Psr\Log\LoggerInterface;
+use F500\CI\Wrapper\Wrapper;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class StandardSuite implements Suite
 {
@@ -23,9 +24,19 @@ class StandardSuite implements Suite
     protected $name;
 
     /**
+     * @var Build
+     */
+    protected $activeBuild;
+
+    /**
      * @var Task[]
      */
     protected $tasks;
+
+    /**
+     * @var Wrapper[]
+     */
+    protected $wrappers;
 
     /**
      * @param string $cn
@@ -61,6 +72,22 @@ class StandardSuite implements Suite
     }
 
     /**
+     * @return Build
+     */
+    public function getActiveBuild()
+    {
+        return $this->activeBuild;
+    }
+
+    /**
+     * @param Build $build
+     */
+    public function setActiveBuild(Build $build)
+    {
+        $this->activeBuild = $build;
+    }
+
+    /**
      * @return Task[]
      */
     public function getTasks()
@@ -83,38 +110,60 @@ class StandardSuite implements Suite
     }
 
     /**
-     * @param string $cn
-     * @throws \InvalidArgumentException
+     * @return Wrapper[]
      */
-    public function removeTask($cn)
+    public function getWrappers()
     {
-        if (!isset($this->tasks[$cn])) {
-            throw new \InvalidArgumentException(sprintf('Task "%s" not added.', $cn));
-        }
-
-        unset($this->tasks[$cn]);
+        return $this->wrappers;
     }
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     * @return mixed
+     * @param string $cn
+     * @return Wrapper
+     * @throws \InvalidArgumentException
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function getWrapper($cn)
     {
-        $logger->log(LogLevel::DEBUG, sprintf('Suite "%s" started.', $this->getCn()));
-        $dispatcher->dispatch(Events::SuiteStarted, new SuiteEvent($this));
+        if (!isset($this->wrappers[$cn])) {
+            throw new \InvalidArgumentException(sprintf('Wrapper "%s" hasn\'t been added.', $cn));
+        }
+
+        return $this->wrappers[$cn];
+    }
+
+    /**
+     * @param string  $cn
+     * @param Wrapper $wrapper
+     * @throws \InvalidArgumentException
+     */
+    public function addWrapper($cn, Wrapper $wrapper)
+    {
+        if (isset($this->wrappers[$cn])) {
+            throw new \InvalidArgumentException(sprintf('Wrapper "%s" already added.', $cn));
+        }
+
+        $this->wrappers[$cn] = $wrapper;
+    }
+
+    /**
+     * @param Toolkit $toolkit
+     * @return bool
+     */
+    public function run(Toolkit $toolkit)
+    {
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Suite "%s" started.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::SuiteStarted, new SuiteEvent($this));
 
         $result = true;
         foreach ($this->getTasks() as $task) {
-            if (!$task->run($dispatcher, $logger)) {
+            if (!$task->run($toolkit)) {
                 $result = false;
                 break;
             }
         }
 
-        $dispatcher->dispatch(Events::SuiteFinished, new SuiteEvent($this));
-        $logger->log(LogLevel::DEBUG, sprintf('Suite "%s" finished.', $this->getCn()));
+        $toolkit->getDispatcher()->dispatch(Events::SuiteFinished, new SuiteEvent($this));
+        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Suite "%s" finished.', $this->getCn()));
 
         return $result;
     }

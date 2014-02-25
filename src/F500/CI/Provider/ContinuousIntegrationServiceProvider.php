@@ -134,7 +134,7 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
                 }
 
                 $class    = $app['f500ci.factory.build.class'];
-                $instance = new $class();
+                $instance = new $class($app['filesystem']);
 
                 if (!$instance instanceof BuildFactory) {
                     throw new \RuntimeException('"f500ci.factory.build" should be an instance of F500\CI\Build\BuildFactory.');

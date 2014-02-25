@@ -2,9 +2,10 @@
 
 namespace F500\CI\Suite;
 
+use F500\CI\Build\Build;
+use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use F500\CI\Wrapper\Wrapper;
 
 interface Suite
 {
@@ -30,6 +31,16 @@ interface Suite
     public function setName($name);
 
     /**
+     * @return Build
+     */
+    public function getActiveBuild();
+
+    /**
+     * @param Build $build
+     */
+    public function setActiveBuild(Build $build);
+
+    /**
      * @return Task[]
      */
     public function getTasks();
@@ -42,15 +53,25 @@ interface Suite
     public function addTask($cn, Task $task);
 
     /**
-     * @param string $cn
-     * @throws \InvalidArgumentException
+     * @return Wrapper[]
      */
-    public function removeTask($cn);
+    public function getWrappers();
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
-     * @return mixed
+     * @param string $cn
+     * @return Wrapper
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger);
+    public function getWrapper($cn);
+
+    /**
+     * @param string  $cn
+     * @param Wrapper $wrapper
+     */
+    public function addWrapper($cn, Wrapper $wrapper);
+
+    /**
+     * @param Toolkit $toolkit
+     * @return bool
+     */
+    public function run(Toolkit $toolkit);
 }

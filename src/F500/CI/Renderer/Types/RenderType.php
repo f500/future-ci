@@ -12,9 +12,8 @@ interface RenderType
 
     /**
      * @param string $template
-     * @param array $variables
+     * @param array  $variables
      * @return string
      */
     public function render($template, array $variables = array());
-
 }

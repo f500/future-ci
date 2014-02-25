@@ -2,45 +2,25 @@
 
 namespace F500\CI\Task;
 
-use F500\CI\Command\CommandFactory;
-use F500\CI\Process\ProcessFactory;
+use F500\CI\Suite\Suite;
 
 class TaskFactory
 {
 
     /**
-     * @var CommandFactory
-     */
-    protected $commandFactory;
-
-    /**
-     * @var ProcessFactory
-     */
-    protected $processFactory;
-
-    /**
-     * @param CommandFactory $commandFactory
-     * @param ProcessFactory $processFactory
-     */
-    public function __construct(CommandFactory $commandFactory, ProcessFactory $processFactory)
-    {
-        $this->commandFactory = $commandFactory;
-        $this->processFactory = $processFactory;
-    }
-
-    /**
      * @param string $class
      * @param string $cn
+     * @param Suite  $suite
      * @return Task
      * @throws \InvalidArgumentException
      */
-    public function create($class, $cn)
+    public function create($class, $cn, Suite $suite)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Class "%s" for task "%s" does not exist.', $class, $cn));
         }
 
-        $task = new $class($cn, $this->commandFactory, $this->processFactory);
+        $task = new $class($cn, $suite);
 
         if (!$task instanceof Task) {
             throw new \InvalidArgumentException(sprintf(

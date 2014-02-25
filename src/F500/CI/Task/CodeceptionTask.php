@@ -3,63 +3,127 @@
 namespace F500\CI\Task;
 
 use F500\CI\Command\Command;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use F500\CI\Command\CommandFactory;
+use F500\CI\Run\Toolkit;
 
 class CodeceptionTask extends BaseTask
 {
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger)
+    public function run(Toolkit $toolkit)
     {
-        $this->startRun($dispatcher, $logger);
+        $this->startRun($toolkit);
 
         $result = true;
-        if ($result && !$this->execute($this->getCommand('build'), $logger)) {
+        if ($result && !$this->runBuild($toolkit)) {
             $result = false;
         }
-        if ($result && !$this->execute($this->getCommand('run'), $logger)) {
+        if ($result && !$this->runRun($toolkit)) {
             $result = false;
         }
 
-        $this->finishRun($dispatcher, $logger);
+        $this->finishRun($toolkit);
 
         return $result;
     }
 
     /**
-     * @param $action
-     * @return Command
+     * @param Toolkit $toolkit
+     * @return bool
      */
-    protected function getCommand($action)
+    protected function runBuild(Toolkit $toolkit)
+    {
+        $command = $this->createCommand($toolkit->getCommandFactory());
+        $command->addArg('build');
+
+        $command = $this->wrapCommand($command);
+
+        return $command->execute($toolkit->getLogger());
+    }
+
+    /**
+     * @param Toolkit $toolkit
+     * @return bool
+     */
+    protected function runRun(Toolkit $toolkit)
     {
         $options = $this->getOptions();
-        $command = $this->commandFactory->create();
+
+        $specificSuite = null;
+        $specificTest  = null;
+
+        $command = $this->createCommand($toolkit->getCommandFactory());
+        $command->addArg('run');
+        $command->addArg('--json');
+        $command->addArg('--silent');
+        $command->addArg('--no-exit');
+
+        if (!empty($options['coverage'])) {
+            $command->addArg('--coverage');
+        }
+
+        if (!empty($options['suite'])) {
+            $specificSuite = $options['suite'];
+        } elseif (!empty($options['skip_suites'])) {
+            foreach ($options['skip_suites'] as $suite) {
+                $command->addArg('--skip=' . $suite);
+            }
+        }
+
+        if (!empty($options['test'])) {
+            $specificTest = $options['test'];
+        }
+
+        if (!empty($options['groups'])) {
+            foreach ($options['groups'] as $group) {
+                $command->addArg('--group=' . $group);
+            }
+        } elseif (!empty($options['skip_groups'])) {
+            foreach ($options['skip_groups'] as $suite) {
+                $command->addArg('--skip-group=' . $suite);
+            }
+        }
+
+        if (!empty($options['envs'])) {
+            foreach ($options['envs'] as $env) {
+                $command->addArg('--env=' . $env);
+            }
+        }
+
+        if ($specificSuite) {
+            $command->addArg($specificSuite);
+        }
+        if ($specificTest) {
+            $command->addArg($specificTest);
+        }
+
+        $command = $this->wrapCommand($command);
+
+        return $command->execute($toolkit->getLogger());
+    }
+
+    /**
+     * @param CommandFactory $commandFactory
+     * @return Command
+     */
+    protected function createCommand(CommandFactory $commandFactory)
+    {
+        $options = $this->getOptions();
+        $command = $commandFactory->create();
 
         $command->addArg($options['bin']);
         $command->addArg('--no-ansi');
         $command->addArg('--no-interaction');
 
-        if ($options['verbose']) {
-            $command->addArg('--' . str_repeat('v', $options['verbose']));
-        }
-
-        $command->addArg($action);
-
         if ($options['config']) {
             $command->addArg('--config=' . $options['config']);
         }
 
-        if ($action == 'run') {
-            $command->addArg('--no-exit');
-
-            foreach ($options['env'] as $env) {
-                $command->addArg('--env=' . $env);
-            }
+        if ($options['verbose']) {
+            $command->addArg('--' . str_repeat('v', $options['verbose']));
         }
 
         if ($options['cwd']) {
@@ -84,7 +148,13 @@ class CodeceptionTask extends BaseTask
             'bin'         => '/usr/bin/env codecept',
             'config'      => null,
             'verbose'     => 0,
-            'env'         => array()
+            'coverage'    => false,
+            'suite'       => null,
+            'test'        => null,
+            'groups'      => array(),
+            'envs'        => array(),
+            'skip_suites' => array(),
+            'skip-groups' => array()
         );
     }
 }

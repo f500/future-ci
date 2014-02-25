@@ -23,6 +23,11 @@ class Configurator
     const DEFAULT_BUILD_CLASS = 'F500\CI\Build\StandardBuild';
 
     /**
+     * @var string
+     */
+    protected $suitesDir;
+
+    /**
      * @var BuildFactory
      */
     protected $buildFactory;
@@ -43,28 +48,25 @@ class Configurator
     protected $wrapperFactory;
 
     /**
-     * @var Wrapper[]
-     */
-    protected $wrapperInstances;
-
-    /**
+     * @param string         $suitesDir
      * @param BuildFactory   $buildFactory
      * @param SuiteFactory   $suiteFactory
      * @param TaskFactory    $taskFactory
      * @param WrapperFactory $wrapperFactory
      */
     public function __construct(
+        $suitesDir,
         BuildFactory $buildFactory,
         SuiteFactory $suiteFactory,
         TaskFactory $taskFactory,
         WrapperFactory $wrapperFactory
     ) {
+        $this->suitesDir = realpath($suitesDir);
+
         $this->buildFactory   = $buildFactory;
         $this->suiteFactory   = $suiteFactory;
         $this->taskFactory    = $taskFactory;
         $this->wrapperFactory = $wrapperFactory;
-
-        $this->wrapperInstances = array();
     }
 
     /**
@@ -96,6 +98,9 @@ class Configurator
      */
     public function loadConfig($filename)
     {
+        if (substr($filename, 0, 1) != '/') {
+            $filename = $this->suitesDir . '/' . $filename;
+        }
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException(sprintf('Config file "%s" does not exist.', $filename));
         }
@@ -170,10 +175,8 @@ class Configurator
             $wrapperClass = $wrapperConfig['class'];
             unset($wrapperConfig['class']);
 
-            $wrapper = $this->wrapperFactory->create($wrapperClass, $wrapperCn);
+            $wrapper = $this->wrapperFactory->create($wrapperClass, $wrapperCn, $suite);
             $this->configureWrapper($wrapper, $wrapperConfig);
-
-            $this->wrapperInstances[$wrapperCn] = $wrapper;
         }
 
         foreach ($config['tasks'] as $taskCn => $taskConfig) {
@@ -188,10 +191,8 @@ class Configurator
             $taskClass = $taskConfig['class'];
             unset($taskConfig['class']);
 
-            $task = $this->taskFactory->create($taskClass, $taskCn);
+            $task = $this->taskFactory->create($taskClass, $taskCn, $suite);
             $this->configureTask($task, $taskConfig);
-
-            $suite->addTask($taskCn, $task);
         }
     }
 
@@ -214,14 +215,7 @@ class Configurator
                 throw new \RuntimeException(sprintf('Wrappers in task "%s" should be an array.', $task->getCn()));
             }
 
-            foreach ($config['wrappers'] as $wrapperCn) {
-                if (!isset($this->wrapperInstances[$wrapperCn])) {
-                    throw new \RuntimeException(sprintf('Wrapper "%s" in task "%s" is not configured.', $wrapperCn, $task->getCn()));
-                }
-
-                $task->addWrapper($wrapperCn, $this->wrapperInstances[$wrapperCn]);
-            }
-
+            $task->setWrappers($config['wrappers']);
             unset($config['wrappers']);
         }
 
@@ -237,5 +231,4 @@ class Configurator
     {
         $wrapper->setOptions($config);
     }
-
 }

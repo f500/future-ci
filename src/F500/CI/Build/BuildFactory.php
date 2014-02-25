@@ -3,9 +3,23 @@
 namespace F500\CI\Build;
 
 use F500\CI\Suite\Suite;
+use Symfony\Component\Filesystem\Filesystem;
 
 class BuildFactory
 {
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @param Filesystem $filesystem
+     */
+    public function __construct(Filesystem $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
 
     /**
      * @param string $class
@@ -20,7 +34,7 @@ class BuildFactory
             throw new \InvalidArgumentException(sprintf('Class "%s" for build "%s" does not exist.', $class, $cn));
         }
 
-        $build = new $class($cn, $suite);
+        $build = new $class($cn, $suite, $this->filesystem);
 
         if (!$build instanceof Build) {
             throw new \InvalidArgumentException(sprintf(

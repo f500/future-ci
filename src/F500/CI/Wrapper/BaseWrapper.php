@@ -2,6 +2,8 @@
 
 namespace F500\CI\Wrapper;
 
+use F500\CI\Suite\Suite;
+
 abstract class BaseWrapper implements Wrapper
 {
 
@@ -11,17 +13,26 @@ abstract class BaseWrapper implements Wrapper
     protected $cn;
 
     /**
+     * @var Suite
+     */
+    protected $suite;
+
+    /**
      * @var array
      */
     protected $options;
 
     /**
      * @param string $cn
+     * @param Suite  $suite
      */
-    public function __construct($cn)
+    public function __construct($cn, Suite $suite)
     {
         $this->cn      = $cn;
+        $this->suite   = $suite;
         $this->options = array();
+
+        $suite->addWrapper($cn, $this);
     }
 
     /**
@@ -30,6 +41,14 @@ abstract class BaseWrapper implements Wrapper
     public function getCn()
     {
         return $this->cn;
+    }
+
+    /**
+     * @return Suite
+     */
+    public function getSuite()
+    {
+        return $this->suite;
     }
 
     /**

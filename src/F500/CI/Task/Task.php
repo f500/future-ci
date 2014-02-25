@@ -2,26 +2,27 @@
 
 namespace F500\CI\Task;
 
-use F500\CI\Command\CommandFactory;
-use F500\CI\Process\ProcessFactory;
-use F500\CI\Wrapper\Wrapper;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use F500\CI\Run\Toolkit;
+use F500\CI\Suite\Suite;
 
 interface Task
 {
 
     /**
-     * @param string         $cn
-     * @param CommandFactory $commandFactory
-     * @param ProcessFactory $processFactory
+     * @param string $cn
+     * @param Suite  $suite
      */
-    public function __construct($cn, CommandFactory $commandFactory, ProcessFactory $processFactory);
+    public function __construct($cn, Suite $suite);
 
     /**
      * @return string
      */
     public function getCn();
+
+    /**
+     * @return Suite
+     */
+    public function getSuite();
 
     /**
      * @return string
@@ -44,20 +45,18 @@ interface Task
     public function setOptions(array $options);
 
     /**
-     * @return Wrapper[]
+     * @return string[]
      */
     public function getWrappers();
 
     /**
-     * @param string  $cn
-     * @param Wrapper $wrapper
+     * @param string[] $cns
      */
-    public function addWrapper($cn, Wrapper $wrapper);
+    public function setWrappers($cns);
 
     /**
-     * @param EventDispatcherInterface $dispatcher
-     * @param LoggerInterface          $logger
+     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(EventDispatcherInterface $dispatcher, LoggerInterface $logger);
+    public function run(Toolkit $toolkit);
 }

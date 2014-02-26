@@ -8,16 +8,16 @@ module.exports = function(grunt) {
             css: '/*!\n' +
                 ' * Future CI v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
                 ' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-                ' * Licensed under <%= _.pluck(pkg.licenses, "type") %> (<%= _.pluck(pkg.licenses, "url") %>)\n' +
+                ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n' +
                 ' *\n' +
                 ' * Bootstrap v3.1.1 (http://getbootstrap.com)\n' +
-                ' * Copyright 2013 Twitter, Inc.\n' +
-                ' * Licensed under http://www.apache.org/licenses/LICENSE-2.0\n' +
+                ' * Copyright 2011-2014 Twitter, Inc.\n' +
+                ' * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n' +
                 ' */\n',
             js:  '/*!\n' +
                 ' * Future CI v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
                 ' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-                ' * Licensed under <%= _.pluck(pkg.licenses, "type") %> (<%= _.pluck(pkg.licenses, "url") %>)\n' +
+                ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n' +
                 ' */\n'
         },
 

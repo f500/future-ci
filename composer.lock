@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "4a77f1d4a5bf4a074338db650a4bb195",
+    "hash": "05e5a9f3a2062ce8f9a39a05e4daef93",
     "packages": [
         {
             "name": "cilex/console-service-provider",

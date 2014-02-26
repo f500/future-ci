@@ -1,11 +1,24 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Task;
 
 use F500\CI\Suite\Suite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/**
+ * Class TaskFactorySpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Task
+ */
 class TaskFactorySpec extends ObjectBehavior
 {
 

@@ -5,27 +5,16 @@
  * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
  */
 
-namespace F500\CI\Event;
+namespace %namespace%;
 
 /**
- * Class Events
+ * Class %name%
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
- * @package   F500\CI\Event
+ * @package   %namespace%
  */
-class Events
+class %name%
 {
-    const BuildStarted = 'BuildStarted';
-
-    const BuildFinished = 'BuildFinished';
-
-    const SuiteStarted = 'SuiteStarted';
-
-    const SuiteFinished = 'SuiteFinished';
-
-    const TaskStarted = 'TaskStarted';
-
-    const TaskFinished = 'TaskFinished';
 }

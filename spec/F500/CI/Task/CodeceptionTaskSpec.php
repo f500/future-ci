@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Task;
 
 use F500\CI\Command\Command;
@@ -9,20 +14,28 @@ use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Class CodeceptionTaskSpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Task
+ */
 class CodeceptionTaskSpec extends TaskSpec
 {
 
     protected $defaultOptions = array(
-        'cwd' => null,
+        'cwd'         => null,
         'environment' => array(),
-        'bin' => '/usr/bin/env codecept',
-        'config' => null,
-        'verbose' => 0,
-        'coverage' => false,
-        'suite' => null,
-        'test' => null,
-        'groups' => array(),
-        'envs' => array(),
+        'bin'         => '/usr/bin/env codecept',
+        'config'      => null,
+        'verbose'     => 0,
+        'coverage'    => false,
+        'suite'       => null,
+        'test'        => null,
+        'groups'      => array(),
+        'envs'        => array(),
         'skip_suites' => array(),
         'skip-groups' => array()
     );

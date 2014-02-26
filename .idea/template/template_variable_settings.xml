@@ -1,0 +1,8 @@
+<component name="ProjectTemplateVariables">
+  <templateVariables>
+    <variable name="PROJECT_COPYRIGHT">2014 Future500 B.V.</variable>
+    <variable name="PROJECT_AUTHOR">Jasper N. Brouwer &lt;jasper@future500.nl&gt;</variable>
+    <variable name="PROJECT_LICENSE_TYPE">MIT</variable>
+    <variable name="PROJECT_LICENSE_URL">https://github.com/Future500BV/future-ci/blob/master/LICENSE</variable>
+  </templateVariables>
+</component>

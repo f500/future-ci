@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace F500\CI\Provider;
 
 use F500\CI\Renderer\Types\RenderType;
@@ -7,6 +12,14 @@ use F500\CI\Renderer\ViewRenderer;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
+/**
+ * Class ViewRendererServiceProvider
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   F500\CI\Provider
+ */
 class ViewRendererServiceProvider implements ServiceProviderInterface
 {
 

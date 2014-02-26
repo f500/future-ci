@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Build;
 
 use F500\CI\Run\Toolkit;
@@ -10,6 +15,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+/**
+ * Class StandardBuildSpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Build
+ */
 class StandardBuildSpec extends ObjectBehavior
 {
 

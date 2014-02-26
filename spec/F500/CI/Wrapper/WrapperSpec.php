@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
@@ -8,12 +13,21 @@ use F500\CI\Suite\Suite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/**
+ * Class WrapperSpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Wrapper
+ */
 abstract class WrapperSpec extends ObjectBehavior
 {
 
     protected $defaultOptions = array();
 
     protected $accumulatedArgs = array();
+
     protected $accumulatedEnvs = array();
 
     function let(Suite $suite)
@@ -60,7 +74,7 @@ abstract class WrapperSpec extends ObjectBehavior
 
     function mock_new_command(CommandFactory $commandFactory, Command $command)
     {
-        $accumulatedArgs = &$this->accumulatedArgs;
+        $accumulatedArgs = & $this->accumulatedArgs;
 
         $command->getArgs()->willReturn(array());
         $command->addArg(Argument::type('string'))->will(
@@ -77,7 +91,7 @@ abstract class WrapperSpec extends ObjectBehavior
             }
         );
 
-        $accumulatedEnvs = &$this->accumulatedEnvs;
+        $accumulatedEnvs = & $this->accumulatedEnvs;
 
         $command->getEnv()->willReturn(array());
         $command->addEnv(Argument::type('string'), Argument::type('string'))->will(

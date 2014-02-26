@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Run;
 
 use F500\CI\Build\Build;
@@ -13,6 +18,14 @@ use F500\CI\Wrapper\WrapperFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
+/**
+ * Class ConfiguratorSpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Run
+ */
 class ConfiguratorSpec extends ObjectBehavior
 {
 

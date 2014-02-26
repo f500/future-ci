@@ -1,11 +1,24 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ */
+
 namespace spec\F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
 use Prophecy\Argument;
 
+/**
+ * Class AnsibleWrapperSpec
+ *
+ * @author    Jasper N. Brouwer <jasper@future500.nl>
+ * @copyright 2014 Future500 B.V.
+ * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @package   spec\F500\CI\Wrapper
+ */
 class AnsibleWrapperSpec extends WrapperSpec
 {
 
@@ -22,8 +35,11 @@ class AnsibleWrapperSpec extends WrapperSpec
         'verbose'     => 0
     );
 
-    function it_can_wrap_a_command_in_a_new_command(CommandFactory $commandFactory, Command $oldCommand, Command $newCommand)
-    {
+    function it_can_wrap_a_command_in_a_new_command(
+        CommandFactory $commandFactory,
+        Command $oldCommand,
+        Command $newCommand
+    ) {
         $oldCommand->getArgs()->willReturn(array('ls', '-l'));
         $oldCommand->getCwd()->willReturn('/tmp');
         $oldCommand->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));

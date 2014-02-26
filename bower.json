@@ -3,7 +3,7 @@
     "description": "A Continuous Integration tool by Future500 B.V.",
     "version": "0.0.1-dev",
     "private": true,
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
         { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }

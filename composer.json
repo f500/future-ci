@@ -2,7 +2,7 @@
     "name": "f500/ci",
     "description": "A Continuous Integration tool by Future500 B.V.",
     "keywords": ["f500", "future500", "ci"],
-    "license": "proprietary",
+    "license": "MIT",
     "authors": [
         { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
         { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }

@@ -1,8 +1,10 @@
 {
     "name": "f500ci",
     "description": "A Continuous Integration tool by Future500 B.V.",
+    "homepage": "https://github.com/Future500BV/future-ci",
     "version": "0.0.1-dev",
-    "license": "proprietary",
+    "license": { "type": "MIT", "url": "https://github.com/Future500BV/future-ci/blob/master/LICENSE" },
+    "author": "Future500 B.V.",
     "contributors": [
         { "name": "Jasper N. Brouwer",  "email": "jasper@future500.nl" },
         { "name": "Ramon de la Fuente", "email": "ramon@future500.nl"  }

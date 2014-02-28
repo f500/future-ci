@@ -7,9 +7,13 @@
 
 namespace spec\F500\CI\Task;
 
+use F500\CI\Build\Build;
 use F500\CI\Command\Command;
+use F500\CI\Command\CommandExecutor;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Command\StoreResultCommand;
 use F500\CI\Run\Toolkit;
+use F500\CI\Suite\Suite;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -30,6 +34,7 @@ class CodeceptionTaskSpec extends TaskSpec
         'environment' => array(),
         'bin'         => '/usr/bin/env codecept',
         'config'      => null,
+        'log_dir'     => 'tests/_log',
         'verbose'     => 0,
         'coverage'    => false,
         'suite'       => null,
@@ -53,20 +58,31 @@ class CodeceptionTaskSpec extends TaskSpec
     }
 
     function it_runs_itself(
+        Suite $suite,
+        Build $build,
         Toolkit $toolkit,
         CommandFactory $commandFactory,
+        CommandExecutor $executor,
         Command $command,
+        StoreResultCommand $storeResultCommand,
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger
     ) {
+        $suite->getProjectDir()->willReturn('/path/to/project');
+        $suite->getActiveBuild()->willReturn($build);
+
+        $build->getBuildDir()->willReturn(realpath(__DIR__ . '/../../../data/builds'));
+
         $toolkit->getCommandFactory()->willReturn($commandFactory);
         $toolkit->getDispatcher()->willReturn($dispatcher);
         $toolkit->getLogger()->willReturn($logger);
 
-        $commandFactory->create()->willReturn($command);
+        $commandFactory->createCommand()->willReturn($command);
+        $commandFactory->createStoreResultCommand()->willReturn($storeResultCommand);
 
-        $command->addArg(Argument::type('string'))->shouldBeCalled();
-        $command->execute($logger)->willReturn(true);
+        $toolkit->getCommandExecutor()->willReturn($executor);
+
+        $executor->execute(Argument::type('F500\CI\Command\Command'), $logger)->willReturn(true);
 
         $this->run($toolkit)->shouldReturn(true);
     }

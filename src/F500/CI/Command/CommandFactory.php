@@ -7,8 +7,6 @@
 
 namespace F500\CI\Command;
 
-use F500\CI\Process\ProcessFactory;
-
 /**
  * Class CommandFactory
  *
@@ -26,25 +24,25 @@ class CommandFactory
     protected $commandClass;
 
     /**
-     * @var ProcessFactory
+     * @var string
      */
-    protected $processFactory;
+    protected $storeResultCommandClass;
 
     /**
-     * @param string         $commandClass
-     * @param ProcessFactory $processFactory
+     * @param string $commandClass
+     * @param string $storeResultCommandClass
      */
-    public function __construct($commandClass, ProcessFactory $processFactory)
+    public function __construct($commandClass, $storeResultCommandClass)
     {
-        $this->commandClass   = $commandClass;
-        $this->processFactory = $processFactory;
+        $this->commandClass            = $commandClass;
+        $this->storeResultCommandClass = $storeResultCommandClass;
     }
 
     /**
      * @return Command
      * @throws \RuntimeException
      */
-    public function create()
+    public function createCommand()
     {
         $class = $this->commandClass;
 
@@ -52,11 +50,35 @@ class CommandFactory
             throw new \RuntimeException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        $command = new $class($this->processFactory);
+        $command = new $class();
 
         if (!$command instanceof Command) {
             throw new \RuntimeException(sprintf(
                 'Class "%s" should be an instance of F500\CI\Command\Command.',
+                $class
+            ));
+        }
+
+        return $command;
+    }
+
+    /**
+     * @return StoreResultCommand
+     * @throws \RuntimeException
+     */
+    public function createStoreResultCommand()
+    {
+        $class = $this->storeResultCommandClass;
+
+        if (!class_exists($class)) {
+            throw new \RuntimeException(sprintf('Class "%s" does not exist.', $class));
+        }
+
+        $command = new $class();
+
+        if (!$command instanceof StoreResultCommand) {
+            throw new \RuntimeException(sprintf(
+                'Class "%s" should be an instance of F500\CI\Command\StoreResultCommand.',
                 $class
             ));
         }

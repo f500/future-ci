@@ -7,9 +7,10 @@
 
 namespace F500\CI\Run;
 
+use F500\CI\Command\CommandExecutor;
 use F500\CI\Command\CommandFactory;
-use F500\CI\Process\ProcessFactory;
-use Psr\Log\LoggerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -35,9 +36,9 @@ class Toolkit
     protected $commandFactory;
 
     /**
-     * @var ProcessFactory
+     * @var CommandExecutor
      */
-    protected $processFactory;
+    protected $commandExecutor;
 
     /**
      * @var EventDispatcherInterface
@@ -50,33 +51,46 @@ class Toolkit
     protected $filesystem;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     protected $logger;
 
     /**
+     * @var
+     */
+    protected $buildLogHandler;
+
+    /**
      * @param string                   $buildsDir
      * @param CommandFactory           $commandFactory
-     * @param ProcessFactory           $processFactory
+     * @param CommandExecutor          $commandExecutor
      * @param EventDispatcherInterface $dispatcher
      * @param Filesystem               $filesystem
-     * @param LoggerInterface          $logger
+     * @param Logger                   $logger
      */
     public function __construct(
         $buildsDir,
         CommandFactory $commandFactory,
-        ProcessFactory $processFactory,
+        CommandExecutor $commandExecutor,
         EventDispatcherInterface $dispatcher,
         Filesystem $filesystem,
-        LoggerInterface $logger
+        Logger $logger
     ) {
         $this->buildsDir = realpath($buildsDir);
 
-        $this->commandFactory = $commandFactory;
-        $this->processFactory = $processFactory;
-        $this->dispatcher     = $dispatcher;
-        $this->filesystem     = $filesystem;
-        $this->logger         = $logger;
+        $this->commandFactory  = $commandFactory;
+        $this->commandExecutor = $commandExecutor;
+        $this->dispatcher      = $dispatcher;
+        $this->filesystem      = $filesystem;
+        $this->logger          = $logger;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuildsDir()
+    {
+        return $this->buildsDir;
     }
 
     /**
@@ -88,11 +102,11 @@ class Toolkit
     }
 
     /**
-     * @return ProcessFactory
+     * @return CommandExecutor
      */
-    public function getProcessFactory()
+    public function getCommandExecutor()
     {
-        return $this->processFactory;
+        return $this->commandExecutor;
     }
 
     /**
@@ -112,10 +126,37 @@ class Toolkit
     }
 
     /**
-     * @return LoggerInterface
+     * @return Logger
      */
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * @param string $logfile
+     * @throws \RuntimeException
+     */
+    public function activateBuildLogHandler($logfile)
+    {
+        if ($this->buildLogHandler) {
+            throw new \RuntimeException('Build log already activated.');
+        }
+
+        $this->buildLogHandler = new StreamHandler($logfile);
+        $this->getLogger()->pushHandler($this->buildLogHandler);
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function deactivateBuildLogHandler()
+    {
+        if (!$this->buildLogHandler) {
+            throw new \RuntimeException('Build log not activated.');
+        }
+
+        $this->getLogger()->popHandler();
+        $this->buildLogHandler = null;
     }
 }

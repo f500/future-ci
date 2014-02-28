@@ -25,9 +25,9 @@ class StandardBuild implements Build
 {
 
     /**
-     * @var string
+     * @var \DateTimeImmutable
      */
-    protected $cn;
+    protected $date;
 
     /**
      * @var Suite
@@ -35,12 +35,16 @@ class StandardBuild implements Build
     protected $suite;
 
     /**
-     * @param string $cn
-     * @param Suite  $suite
+     * @var string
      */
-    public function __construct($cn, Suite $suite)
+    protected $buildDir;
+
+    /**
+     * @param Suite $suite
+     */
+    public function __construct(Suite $suite)
     {
-        $this->cn    = $cn;
+        $this->date  = new \DateTimeImmutable();
         $this->suite = $suite;
 
         $suite->setActiveBuild($this);
@@ -51,7 +55,15 @@ class StandardBuild implements Build
      */
     public function getCn()
     {
-        return $this->cn;
+        return $this->getSuite()->getCn() . $this->getDate()->format('.Y.m.d.H.i.s');
+    }
+
+    /**
+     * @return \DateTimeImmutable
+     */
+    public function getDate()
+    {
+        return $this->date;
     }
 
     /**
@@ -63,12 +75,66 @@ class StandardBuild implements Build
     }
 
     /**
+     * @return string
+     * @throws \RuntimeException
+     */
+    public function getBuildDir()
+    {
+        if (!$this->buildDir) {
+            throw new \RuntimeException('Build has not been initialized yet.');
+        }
+
+        return $this->buildDir;
+    }
+
+    /**
      * @param Toolkit $toolkit
      * @return bool
+     * @throws \RuntimeException
      */
     public function initialize(Toolkit $toolkit)
     {
-        return true;
+        try {
+            $this->buildDir = $toolkit->getBuildsDir() . '/' . $this->getCn();
+
+            $toolkit->getFilesystem()->mkdir($this->buildDir);
+            if (!$toolkit->getFilesystem()->exists($this->buildDir)) {
+                $toolkit->getLogger()->log(
+                    LogLevel::ERROR,
+                    sprintf('Cannot create dir "%s".', $this->buildDir),
+                    array('build' => $this->getCn())
+                );
+
+                return false;
+            }
+
+            foreach ($this->getSuite()->getTasks() as $task) {
+                $dir = $this->buildDir . '/' . $task->getCn();
+
+                $toolkit->getFilesystem()->mkdir($dir);
+                if (!$toolkit->getFilesystem()->exists($dir)) {
+                    $toolkit->getLogger()->log(
+                        LogLevel::ERROR,
+                        sprintf('Cannot create dir "%s".', $dir),
+                        array('build' => $this->getCn())
+                    );
+
+                    return false;
+                }
+            }
+
+            $toolkit->activateBuildLogHandler($this->buildDir . '/build.log');
+
+            return true;
+        } catch (\Exception $e) {
+            $toolkit->getLogger()->log(
+                LogLevel::CRITICAL,
+                sprintf('An exception occurred during initialize: %s', $e->getMessage()),
+                array('build' => $this->getCn())
+            );
+
+            return false;
+        }
     }
 
     /**
@@ -77,15 +143,25 @@ class StandardBuild implements Build
      */
     public function run(Toolkit $toolkit)
     {
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" started.', $this->getCn()));
-        $toolkit->getDispatcher()->dispatch(Events::BuildStarted, new BuildEvent($this));
+        try {
+            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" started.', $this->getCn()));
+            $toolkit->getDispatcher()->dispatch(Events::BuildStarted, new BuildEvent($this));
 
-        $result = $this->suite->run($toolkit);
+            $result = $this->suite->run($toolkit);
 
-        $toolkit->getDispatcher()->dispatch(Events::BuildFinished, new BuildEvent($this));
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" finished.', $this->getCn()));
+            $toolkit->getDispatcher()->dispatch(Events::BuildFinished, new BuildEvent($this));
+            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" finished.', $this->getCn()));
 
-        return $result;
+            return $result;
+        } catch (\Exception $e) {
+            $toolkit->getLogger()->log(
+                LogLevel::CRITICAL,
+                sprintf('An exception occurred during run: %s', $e->getMessage()),
+                array('build' => $this->getCn())
+            );
+
+            return false;
+        }
     }
 
     /**
@@ -94,6 +170,18 @@ class StandardBuild implements Build
      */
     public function cleanup(Toolkit $toolkit)
     {
-        return true;
+        try {
+            $toolkit->deactivateBuildLogHandler();
+
+            return true;
+        } catch (\Exception $e) {
+            $toolkit->getLogger()->log(
+                LogLevel::CRITICAL,
+                sprintf('An exception occurred during cleanup: %s', $e->getMessage()),
+                array('build' => $this->getCn())
+            );
+
+            return false;
+        }
     }
 }

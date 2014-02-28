@@ -9,6 +9,7 @@ namespace F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Command\StoreResultCommand;
 
 /**
  * Class AnsibleWrapper
@@ -53,7 +54,12 @@ class AnsibleWrapper extends BaseWrapper
             ));
         }
 
-        $ansibleCommand = $commandFactory->create();
+        if ($command instanceof StoreResultCommand) {
+            $ansibleCommand = $commandFactory->createStoreResultCommand();
+            $ansibleCommand->setResultDirs($command->getSourceDir(), $command->getDestinationDir(), false);
+        } else {
+            $ansibleCommand = $commandFactory->createCommand();
+        }
 
         $ansibleCommand->addArg($options['bin']);
         $ansibleCommand->addArg($options['host']);
@@ -85,10 +91,17 @@ class AnsibleWrapper extends BaseWrapper
             $ansibleCommand->addArg('-' . str_repeat('v', $options['verbose']));
         }
 
-        $ansibleCommand->addArg('-m');
-        $ansibleCommand->addArg('shell');
-        $ansibleCommand->addArg('-a');
-        $ansibleCommand->addArg($this->buildScript($command));
+        if ($command instanceof StoreResultCommand) {
+            $ansibleCommand->addArg('-m');
+            $ansibleCommand->addArg('synchronize');
+            $ansibleCommand->addArg('-a');
+            $ansibleCommand->addArg($this->buildStoreResultScript($command));
+        } else {
+            $ansibleCommand->addArg('-m');
+            $ansibleCommand->addArg('shell');
+            $ansibleCommand->addArg('-a');
+            $ansibleCommand->addArg($this->buildScript($command));
+        }
 
         return $ansibleCommand;
     }
@@ -117,12 +130,33 @@ class AnsibleWrapper extends BaseWrapper
     }
 
     /**
+     * @param StoreResultCommand $command
+     * @return array
+     */
+    protected function buildStoreResultScript(StoreResultCommand $command)
+    {
+        $options = $this->getOptions();
+
+        $script = array(
+            'archive=yes',
+            'delete=no',
+            'dest=' . $command->getDestinationDir(),
+            'mode=pull',
+            'rsync_path=' . $options['rsync_bin'],
+            'src=' . $command->getSourceDir()
+        );
+
+        return implode(' ', $script);
+    }
+
+    /**
      * @return array
      */
     protected function getDefaultOptions()
     {
         return array(
             'bin'         => '/usr/bin/ansible',
+            'rsync_bin'   => '/usr/bin/rsync',
             'host'        => null,
             'inventory'   => null,
             'limit'       => null,

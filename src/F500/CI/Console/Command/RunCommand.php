@@ -7,6 +7,7 @@
 
 namespace F500\CI\Console\Command;
 
+use F500\CI\Event\Subscriber\ConsoleOutputSubscriber;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -35,6 +36,15 @@ class RunCommand extends Command
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
+     */
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
+        $this->getService('dispatcher')->addSubscriber(new ConsoleOutputSubscriber($output));
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -44,6 +54,14 @@ class RunCommand extends Command
         $runner = $this->getService('f500ci.runner');
 
         $build = $runner->setup($filename);
+
+        $output->writeln(
+            sprintf(
+                'Running build <fg=green>%s</fg=green> (<fg=green>%s</fg=green>):',
+                $build->getDate()->format('Y-m-d H:i:s'),
+                $build->getSuite()->getCn()
+            )
+        );
 
         $runner->initialize($build);
         $runner->run($build);

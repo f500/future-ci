@@ -7,10 +7,6 @@
 
 namespace F500\CI\Command;
 
-use F500\CI\Process\ProcessFactory;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-
 /**
  * Class Command
  *
@@ -52,26 +48,11 @@ class Command
      */
     protected $output;
 
-    /**
-     * @var array
-     */
-    protected $errorOutput;
-
-    /**
-     * @var ProcessFactory
-     */
-    protected $processFactory;
-
-    /**
-     * @param ProcessFactory $processFactory
-     */
-    public function __construct(ProcessFactory $processFactory)
+    public function __construct()
     {
         $this->id   = base_convert(round(microtime(true) * 1000), 10, 36);
         $this->args = array();
         $this->env  = array();
-
-        $this->processFactory = $processFactory;
     }
 
     /**
@@ -148,74 +129,43 @@ class Command
 
     /**
      * @return int
+     * @throws \RuntimeException
      */
     public function getResultCode()
     {
+        if ($this->resultCode === null) {
+            throw new \RuntimeException('Command has not been executed yet.');
+        }
+
         return $this->resultCode;
     }
 
     /**
      * @return array
+     * @throws \RuntimeException
      */
     public function getOutput()
     {
+        if ($this->output === null) {
+            throw new \RuntimeException('Command has not been executed yet.');
+        }
+
         return $this->output;
     }
 
     /**
-     * @return array
+     * @param int    $resultCode
+     * @param string $output
      */
-    public function getErrorOutput()
+    public function setResult($resultCode, $output)
     {
-        return $this->errorOutput;
+        $this->resultCode = $resultCode;
+        $this->output     = $output;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @return bool
-     */
-    public function execute(LoggerInterface $logger)
+    public function clearResult()
     {
-        $logger->log(LogLevel::INFO, sprintf('[%s] Executing: %s', $this->getId(), $this->stringify(true)));
-
-        $process = $this->processFactory->create($this->getArgs(), $this->getCwd(), $this->getEnv());
-
-        $logger->log(LogLevel::DEBUG, sprintf('[%s] Raw command: %s', $this->getId(), $process->getCommandLine()));
-
-        $process->run();
-
-        $this->resultCode  = $process->getExitCode();
-        $this->output      = $this->formatOutput($process->getOutput());
-        $this->errorOutput = $this->formatOutput($process->getErrorOutput());
-
-        if ($process->isSuccessful()) {
-            $logger->log(
-                LogLevel::INFO,
-                sprintf('[%s] Succeeded: %s', $this->getId(), $this->stringify(true)),
-                array('rc' => $this->resultCode, 'out' => $this->output, 'err' => $this->errorOutput)
-            );
-        } else {
-            $logger->log(
-                LogLevel::ERROR,
-                sprintf('[%s] Failed: %s', $this->getId(), $this->stringify(true)),
-                array('rc' => $this->resultCode, 'out' => $this->output, 'err' => $this->errorOutput)
-            );
-        }
-
-        return $process->isSuccessful();
-    }
-
-    /**
-     * @param string $errors
-     * @return string|array
-     */
-    protected function formatOutput($errors)
-    {
-        $errors = preg_split('/[\n\r]/', $errors);
-        $errors = array_map('trim', $errors);
-        $errors = array_filter($errors, 'strlen');
-        $errors = array_values($errors);
-
-        return $errors;
+        $this->resultCode = null;
+        $this->output     = null;
     }
 }

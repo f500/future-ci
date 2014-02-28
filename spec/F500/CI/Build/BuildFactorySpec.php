@@ -10,7 +10,6 @@ namespace spec\F500\CI\Build;
 use F500\CI\Suite\Suite;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class BuildFactorySpec
@@ -23,12 +22,6 @@ use Symfony\Component\Filesystem\Filesystem;
 class BuildFactorySpec extends ObjectBehavior
 {
 
-    function let(Filesystem $filesystem)
-    {
-        /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith($filesystem);
-    }
-
     function it_is_initializable()
     {
         $this->shouldHaveType('F500\CI\Build\BuildFactory');
@@ -36,7 +29,7 @@ class BuildFactorySpec extends ObjectBehavior
 
     function it_creates_a_build(Suite $suite)
     {
-        $build = $this->create('F500\CI\Build\StandardBuild', 'some_build', $suite);
+        $build = $this->create('F500\CI\Build\StandardBuild', $suite);
         $build->shouldHaveType('F500\CI\Build\StandardBuild');
         $build->shouldImplement('F500\CI\Build\Build');
     }
@@ -45,7 +38,7 @@ class BuildFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'create',
-            array('NonExistent\Build', 'some_build', $suite)
+            array('NonExistent\Build', $suite)
         );
     }
 
@@ -53,7 +46,7 @@ class BuildFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'create',
-            array('StdClass', 'some_build', $suite)
+            array('StdClass', $suite)
         );
     }
 }

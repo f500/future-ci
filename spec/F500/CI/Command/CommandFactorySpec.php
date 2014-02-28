@@ -7,7 +7,6 @@
 
 namespace spec\F500\CI\Command;
 
-use F500\CI\Process\ProcessFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -22,10 +21,10 @@ use Prophecy\Argument;
 class CommandFactorySpec extends ObjectBehavior
 {
 
-    function let(ProcessFactory $processFactory)
+    function let()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('F500\CI\Command\Command', $processFactory);
+        $this->beConstructedWith('F500\CI\Command\Command', 'F500\CI\Command\StoreResultCommand');
     }
 
     function it_is_initializable()
@@ -35,16 +34,31 @@ class CommandFactorySpec extends ObjectBehavior
 
     function it_creates_a_command()
     {
-        $this->create()->shouldHaveType('F500\CI\Command\Command');
+        $this->createCommand()->shouldHaveType('F500\CI\Command\Command');
     }
 
-    function it_fails_to_create_a_command_when_class_does_not_exist(ProcessFactory $processFactory)
+    function it_fails_to_create_a_command_when_class_does_not_exist()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('NonExistent\Command', $processFactory);
+        $this->beConstructedWith('NonExistent\Command', 'F500\CI\Command\StoreResultCommand');
 
         $this->shouldThrow('RuntimeException')->during(
-            'create'
+            'createCommand'
+        );
+    }
+
+    function it_creates_a_store_result_command()
+    {
+        $this->createStoreResultCommand()->shouldHaveType('F500\CI\Command\StoreResultCommand');
+    }
+
+    function it_fails_to_create_a_store_result_command_when_class_does_not_exist()
+    {
+        /** @noinspection PhpParamsInspection */
+        $this->beConstructedWith('F500\CI\Command\Command', 'NonExistent\StoreResultCommand');
+
+        $this->shouldThrow('RuntimeException')->during(
+            'createStoreResultCommand'
         );
     }
 }

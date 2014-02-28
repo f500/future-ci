@@ -8,7 +8,6 @@
 namespace F500\CI\Build;
 
 use F500\CI\Suite\Suite;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class BuildFactory
@@ -22,38 +21,23 @@ class BuildFactory
 {
 
     /**
-     * @var Filesystem
-     */
-    protected $filesystem;
-
-    /**
-     * @param Filesystem $filesystem
-     */
-    public function __construct(Filesystem $filesystem)
-    {
-        $this->filesystem = $filesystem;
-    }
-
-    /**
      * @param string $class
-     * @param string $cn
      * @param Suite  $suite
      * @return Build
      * @throws \InvalidArgumentException
      */
-    public function create($class, $cn, Suite $suite)
+    public function create($class, Suite $suite)
     {
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" for build "%s" does not exist.', $class, $cn));
+            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
-        $build = new $class($cn, $suite, $this->filesystem);
+        $build = new $class($suite);
 
         if (!$build instanceof Build) {
             throw new \InvalidArgumentException(sprintf(
-                'Class "%s" for build "%s" should implement F500\CI\Build\Build.',
-                $class,
-                $cn
+                'Class "%s" should implement F500\CI\Build\Build.',
+                $class
             ));
         }
 

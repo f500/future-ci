@@ -37,6 +37,9 @@ class CodeceptionTask extends BaseTask
         if ($result && !$this->runRun($toolkit)) {
             $result = false;
         }
+        if ($result && !$this->runStoreResult($toolkit)) {
+            $result = false;
+        }
 
         $this->finishRun($toolkit);
 
@@ -52,9 +55,9 @@ class CodeceptionTask extends BaseTask
         $command = $this->createCommand($toolkit->getCommandFactory());
         $command->addArg('build');
 
-        $command = $this->wrapCommand($command);
+        $command = $this->wrapCommand($command, $toolkit->getCommandFactory());
 
-        return $command->execute($toolkit->getLogger());
+        return $toolkit->getCommandExecutor()->execute($command, $toolkit->getLogger());
     }
 
     /**
@@ -113,9 +116,28 @@ class CodeceptionTask extends BaseTask
             $command->addArg($specificTest);
         }
 
-        $command = $this->wrapCommand($command);
+        $command = $this->wrapCommand($command, $toolkit->getCommandFactory());
 
-        return $command->execute($toolkit->getLogger());
+        return $toolkit->getCommandExecutor()->execute($command, $toolkit->getLogger());
+    }
+
+    /**
+     * @param Toolkit $toolkit
+     * @return bool
+     */
+    protected function runStoreResult(Toolkit $toolkit)
+    {
+        $options = $this->getOptions();
+
+        $sourceDir      = $this->getSuite()->getProjectDir() . '/' . $options['log_dir'];
+        $destinationDir = $this->getSuite()->getActiveBuild()->getBuildDir() . '/' . $this->getCn();
+
+        $command = $toolkit->getCommandFactory()->createStoreResultCommand();
+        $command->setResultDirs($sourceDir, $destinationDir);
+
+        $command = $this->wrapCommand($command, $toolkit->getCommandFactory());
+
+        return $toolkit->getCommandExecutor()->execute($command, $toolkit->getLogger());
     }
 
     /**
@@ -125,7 +147,7 @@ class CodeceptionTask extends BaseTask
     protected function createCommand(CommandFactory $commandFactory)
     {
         $options = $this->getOptions();
-        $command = $commandFactory->create();
+        $command = $commandFactory->createCommand();
 
         $command->addArg($options['bin']);
         $command->addArg('--no-ansi');
@@ -160,6 +182,7 @@ class CodeceptionTask extends BaseTask
             'environment' => array(),
             'bin'         => '/usr/bin/env codecept',
             'config'      => null,
+            'log_dir'     => 'tests/_log',
             'verbose'     => 0,
             'coverage'    => false,
             'suite'       => null,

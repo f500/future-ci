@@ -9,6 +9,7 @@ namespace spec\F500\CI\Wrapper;
 
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Command\StoreResultCommand;
 use Prophecy\Argument;
 
 /**
@@ -24,6 +25,7 @@ class AnsibleWrapperSpec extends WrapperSpec
 
     protected $defaultOptions = array(
         'bin'         => '/usr/bin/ansible',
+        'rsync_bin'   => '/usr/bin/rsync',
         'host'        => null,
         'inventory'   => null,
         'limit'       => null,
@@ -60,6 +62,37 @@ class AnsibleWrapperSpec extends WrapperSpec
                 'shell',
                 '-a',
                 'PATH=/usr/local/bin:/usr/bin:/bin ls -l chdir=/tmp'
+            )
+        );
+        $wrappedCommand->getCwd()->shouldReturn(null);
+        $wrappedCommand->getEnv()->shouldReturn(array());
+    }
+
+    function it_can_wrap_a_store_result_command_in_a_new_command(
+        CommandFactory $commandFactory,
+        StoreResultCommand $oldCommand,
+        StoreResultCommand $newCommand
+    ) {
+        $oldCommand->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
+        $oldCommand->getSourceDir()->willReturn('/path/to/source/');
+        $oldCommand->getDestinationDir()->willReturn('/path/to/destination/');
+
+        $this->mock_new_store_result_command($commandFactory, $newCommand);
+
+        $this->setOptions(array('host' => 'localhost', 'inventory' => '/etc/ansible/hosts'));
+
+        $wrappedCommand = $this->wrap($oldCommand, $commandFactory);
+        $wrappedCommand->shouldImplement('F500\CI\Command\StoreResultCommand');
+        $wrappedCommand->getArgs()->shouldReturn(
+            array(
+                '/usr/bin/ansible',
+                'localhost',
+                '--inventory-file=/etc/ansible/hosts',
+                '--timeout=10',
+                '-m',
+                'synchronize',
+                '-a',
+                'archive=yes delete=no dest=/path/to/destination/ mode=pull rsync_path=/usr/bin/rsync src=/path/to/source/'
             )
         );
         $wrappedCommand->getCwd()->shouldReturn(null);

@@ -8,6 +8,7 @@
 namespace F500\CI\Task;
 
 use F500\CI\Command\Command;
+use F500\CI\Command\CommandFactory;
 use F500\CI\Event\Events;
 use F500\CI\Event\TaskEvent;
 use F500\CI\Run\Toolkit;
@@ -163,13 +164,14 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param Command $command
+     * @param Command        $command
+     * @param CommandFactory $commandFactory
      * @return Command
      */
-    protected function wrapCommand(Command $command)
+    protected function wrapCommand(Command $command, CommandFactory $commandFactory)
     {
         foreach ($this->getWrappers() as $wrapperCn) {
-            $command = $this->getSuite()->getWrapper($wrapperCn)->wrap($command);
+            $command = $this->getSuite()->getWrapper($wrapperCn)->wrap($command, $commandFactory);
         }
 
         return $command;

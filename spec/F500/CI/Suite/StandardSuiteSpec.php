@@ -51,6 +51,13 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->getName()->shouldReturn('Some Suite');
     }
 
+    function it_has_a_project_dir_after_setting_it()
+    {
+        $this->setProjectDir('/path/to/project');
+
+        $this->getProjectDir()->shouldReturn('/path/to/project');
+    }
+
     function it_has_an_active_build_after_setting_it(Build $build)
     {
         $this->setActiveBuild($build);

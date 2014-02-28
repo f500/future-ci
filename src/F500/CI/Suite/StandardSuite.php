@@ -37,6 +37,11 @@ class StandardSuite implements Suite
     protected $name;
 
     /**
+     * @var string
+     */
+    protected $projectDir;
+
+    /**
      * @var Build
      */
     protected $activeBuild;
@@ -82,6 +87,22 @@ class StandardSuite implements Suite
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectDir()
+    {
+        return $this->projectDir;
+    }
+
+    /**
+     * @param string $dir
+     */
+    public function setProjectDir($dir)
+    {
+        $this->projectDir = $dir;
     }
 
     /**

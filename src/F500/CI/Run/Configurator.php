@@ -93,12 +93,10 @@ class Configurator
         $buildClass = $config['build_class'];
         unset($config['suite_class'], $config['build_class']);
 
-        $buildCn = $suiteCn . date('.Y.m.d.H.i.s');
-
         $suite = $this->suiteFactory->create($suiteClass, $suiteCn);
         $this->configureSuite($suite, $config);
 
-        $build = $this->buildFactory->create($buildClass, $buildCn, $suite);
+        $build = $this->buildFactory->create($buildClass, $suite);
         $this->configureBuild($build, $config);
 
         return $build;
@@ -162,6 +160,10 @@ class Configurator
             throw new \RuntimeException(sprintf('Suite "%s" has no name configured.', $suite->getCn()));
         }
 
+        if (empty($config['project_dir'])) {
+            throw new \RuntimeException(sprintf('Suite "%s" has no project_dir configured.', $suite->getCn()));
+        }
+
         if (empty($config['tasks'])) {
             throw new \RuntimeException(sprintf('Suite "%s" has no tasks configured.', $suite->getCn()));
         } elseif (!is_array($config['tasks'])) {
@@ -175,6 +177,7 @@ class Configurator
         }
 
         $suite->setName($config['name']);
+        $suite->setProjectDir($config['project_dir']);
 
         foreach ($config['wrappers'] as $wrapperCn => $wrapperConfig) {
             if (empty($wrapperConfig['class'])) {

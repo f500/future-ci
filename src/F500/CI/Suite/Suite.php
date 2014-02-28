@@ -44,6 +44,16 @@ interface Suite
     public function setName($name);
 
     /**
+     * @return string
+     */
+    public function getProjectDir();
+
+    /**
+     * @param string $dir
+     */
+    public function setProjectDir($dir);
+
+    /**
      * @return Build
      */
     public function getActiveBuild();

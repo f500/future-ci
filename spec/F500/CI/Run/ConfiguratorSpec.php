@@ -103,8 +103,8 @@ class ConfiguratorSpec extends ObjectBehavior
         WrapperFactory $wrapperFactory,
         Wrapper $wrapper
     ) {
+        $buildFactory->create(Argument::type('string'), $suite)->willReturn($build);
         $suiteFactory->create(Argument::type('string'), Argument::type('string'))->willReturn($suite);
-        $buildFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($build);
         $taskFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($task);
         $wrapperFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($wrapper);
 
@@ -112,6 +112,7 @@ class ConfiguratorSpec extends ObjectBehavior
 
         $suite->getCn()->willReturn('some_suite');
         $suite->setName(Argument::type('string'))->shouldBeCalled();
+        $suite->setProjectDir(Argument::type('string'))->shouldBeCalled();
 
         $task->getCn()->willReturn('some_task');
         $task->setName(Argument::type('string'))->shouldBeCalled();
@@ -124,6 +125,7 @@ class ConfiguratorSpec extends ObjectBehavior
         $suiteCn     = 'some_suite';
         $suiteConfig = array(
             'name'        => 'Blank Suite',
+            'project_dir' => '/path/to/project',
             'suite_class' => 'F500\CI\Suite\StandardSuite',
             'build_class' => 'F500\CI\Build\StandardBuild',
             'tasks'       => array(

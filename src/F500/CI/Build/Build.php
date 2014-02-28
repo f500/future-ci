@@ -21,10 +21,9 @@ use F500\CI\Suite\Suite;
 interface Build
 {
     /**
-     * @param string $cn
-     * @param Suite  $suite
+     * @param Suite $suite
      */
-    public function __construct($cn, Suite $suite);
+    public function __construct(Suite $suite);
 
     /**
      * @return string
@@ -32,9 +31,19 @@ interface Build
     public function getCn();
 
     /**
+     * @return \DateTimeImmutable
+     */
+    public function getDate();
+
+    /**
      * @return Suite
      */
     public function getSuite();
+
+    /**
+     * @return string
+     */
+    public function getBuildDir();
 
     /**
      * @param Toolkit $toolkit

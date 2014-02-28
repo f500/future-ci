@@ -158,7 +158,7 @@ class CodeceptionTask extends BaseTask
         }
 
         if ($options['verbose']) {
-            $command->addArg('--' . str_repeat('v', $options['verbose']));
+            $command->addArg('-' . str_repeat('v', $options['verbose']));
         }
 
         if ($options['cwd']) {

@@ -2,7 +2,7 @@
 
 /**
  * This file is part of the Future CI package.
- * Future CI is licensed under MIT (https://github.com/Future500BV/future-ci/blob/master/LICENSE).
+ * Future CI is licensed under MIT (https://github.com/f500/future-ci/blob/master/LICENSE).
  */
 
 namespace spec\F500\CI\Event\Subscriber;
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
- * @license   https://github.com/Future500BV/future-ci/blob/master/LICENSE MIT
+ * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
  * @package   spec\F500\CI\Event\Subscriber
  */
 class ConsoleOutputSubscriberSpec extends ObjectBehavior

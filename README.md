@@ -8,7 +8,7 @@ Development
 
 Clone the repository:
 
-    $ git clone git@github.com:Future500BV/future-ci.git future-ci
+    $ git clone git@github.com:f500/future-ci.git future-ci
     $ git checkout develop
 
 Install dependencies:
@@ -25,6 +25,6 @@ Install and watch assets:
 License
 -------
 
-[The MIT License (MIT)](https://github.com/Future500BV/future-ci/blob/master/LICENSE)
+[The MIT License (MIT)](https://github.com/f500/future-ci/blob/master/LICENSE)
 
 Copyright (c) 2014 Future500 B.V.

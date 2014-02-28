@@ -10,6 +10,7 @@ namespace F500\CI\Suite;
 use F500\CI\Build\Build;
 use F500\CI\Event\Events;
 use F500\CI\Event\SuiteEvent;
+use F500\CI\Metadata\SuiteMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
 use F500\CI\Wrapper\Wrapper;
@@ -55,6 +56,11 @@ class StandardSuite implements Suite
      * @var Wrapper[]
      */
     protected $wrappers;
+
+    /**
+     * @var SuiteMetadata
+     */
+    protected $metadata;
 
     /**
      * @param string $cn
@@ -177,6 +183,22 @@ class StandardSuite implements Suite
         }
 
         $this->wrappers[$cn] = $wrapper;
+    }
+
+    /**
+     * @return SuiteMetadata
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param SuiteMetadata $metadata
+     */
+    public function setMetadata(SuiteMetadata $metadata)
+    {
+        $this->metadata = $metadata;
     }
 
     /**

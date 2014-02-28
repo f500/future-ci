@@ -9,6 +9,7 @@ namespace F500\CI\Build;
 
 use F500\CI\Event\BuildEvent;
 use F500\CI\Event\Events;
+use F500\CI\Metadata\BuildMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 use Psr\Log\LogLevel;
@@ -33,6 +34,11 @@ class StandardBuild implements Build
      * @var Suite
      */
     protected $suite;
+
+    /**
+     * @var BuildMetadata
+     */
+    protected $metadata;
 
     /**
      * @var string
@@ -72,6 +78,22 @@ class StandardBuild implements Build
     public function getSuite()
     {
         return $this->suite;
+    }
+
+    /**
+     * @return BuildMetadata
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param BuildMetadata $metadata
+     */
+    public function setMetadata(BuildMetadata $metadata)
+    {
+        $this->metadata = $metadata;
     }
 
     /**
@@ -125,6 +147,9 @@ class StandardBuild implements Build
 
             $toolkit->activateBuildLogHandler($this->buildDir . '/build.log');
 
+            $toolkit->getDispatcher()->dispatch(Events::BuildInitialized, new BuildEvent($this));
+            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" initialized.', $this->getCn()));
+
             return true;
         } catch (\Exception $e) {
             $toolkit->getLogger()->log(
@@ -172,6 +197,9 @@ class StandardBuild implements Build
     {
         try {
             $toolkit->deactivateBuildLogHandler();
+
+            $toolkit->getDispatcher()->dispatch(Events::BuildCleanedUp, new BuildEvent($this));
+            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" cleaned up.', $this->getCn()));
 
             return true;
         } catch (\Exception $e) {

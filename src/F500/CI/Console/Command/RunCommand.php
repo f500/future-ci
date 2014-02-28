@@ -8,6 +8,7 @@
 namespace F500\CI\Console\Command;
 
 use F500\CI\Event\Subscriber\ConsoleOutputSubscriber;
+use F500\CI\Event\Subscriber\TimerSubscriber;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,7 +40,10 @@ class RunCommand extends Command
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->getService('dispatcher')->addSubscriber(new ConsoleOutputSubscriber($output));
+        $dispatcher = $this->getService('dispatcher');
+
+        $dispatcher->addSubscriber(new ConsoleOutputSubscriber($output));
+        $dispatcher->addSubscriber(new TimerSubscriber());
     }
 
     /**
@@ -55,16 +59,10 @@ class RunCommand extends Command
 
         $build = $runner->setup($filename);
 
-        $output->writeln(
-            sprintf(
-                'Running build <fg=green>%s</fg=green> (<fg=green>%s</fg=green>):',
-                $build->getDate()->format('Y-m-d H:i:s'),
-                $build->getSuite()->getCn()
-            )
-        );
-
         $runner->initialize($build);
         $runner->run($build);
         $runner->cleanup($build);
+
+        $output->writeln('');
     }
 }

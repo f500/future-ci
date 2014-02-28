@@ -7,6 +7,7 @@
 
 namespace F500\CI\Build;
 
+use F500\CI\Metadata\BuildMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 
@@ -39,6 +40,16 @@ interface Build
      * @return Suite
      */
     public function getSuite();
+
+    /**
+     * @return BuildMetadata
+     */
+    public function getMetadata();
+
+    /**
+     * @param BuildMetadata $metadata
+     */
+    public function setMetadata(BuildMetadata $metadata);
 
     /**
      * @return string

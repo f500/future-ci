@@ -9,6 +9,7 @@ namespace F500\CI\Run;
 
 use F500\CI\Build\Build;
 use F500\CI\Build\BuildFactory;
+use F500\CI\Metadata\MetadataFactory;
 use F500\CI\Suite\Suite;
 use F500\CI\Suite\SuiteFactory;
 use F500\CI\Task\Task;
@@ -61,25 +62,33 @@ class Configurator
     protected $wrapperFactory;
 
     /**
-     * @param string         $suitesDir
-     * @param BuildFactory   $buildFactory
-     * @param SuiteFactory   $suiteFactory
-     * @param TaskFactory    $taskFactory
-     * @param WrapperFactory $wrapperFactory
+     * @var MetadataFactory
+     */
+    protected $metadataFactory;
+
+    /**
+     * @param string          $suitesDir
+     * @param BuildFactory    $buildFactory
+     * @param SuiteFactory    $suiteFactory
+     * @param TaskFactory     $taskFactory
+     * @param WrapperFactory  $wrapperFactory
+     * @param MetadataFactory $metadataFactory
      */
     public function __construct(
         $suitesDir,
         BuildFactory $buildFactory,
         SuiteFactory $suiteFactory,
         TaskFactory $taskFactory,
-        WrapperFactory $wrapperFactory
+        WrapperFactory $wrapperFactory,
+        MetadataFactory $metadataFactory
     ) {
         $this->suitesDir = realpath($suitesDir);
 
-        $this->buildFactory   = $buildFactory;
-        $this->suiteFactory   = $suiteFactory;
-        $this->taskFactory    = $taskFactory;
-        $this->wrapperFactory = $wrapperFactory;
+        $this->buildFactory    = $buildFactory;
+        $this->suiteFactory    = $suiteFactory;
+        $this->taskFactory     = $taskFactory;
+        $this->wrapperFactory  = $wrapperFactory;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
@@ -146,7 +155,7 @@ class Configurator
      */
     protected function configureBuild(Build $build, $config)
     {
-        // TODO: write logic here
+        $this->metadataFactory->createBuildMetadata($build);
     }
 
     /**
@@ -175,6 +184,8 @@ class Configurator
         } elseif (!is_array($config['wrappers'])) {
             throw new \RuntimeException(sprintf('Wrappers in suite "%s" should be an array.', $suite->getCn()));
         }
+
+        $this->metadataFactory->createSuiteMetadata($suite);
 
         $suite->setName($config['name']);
         $suite->setProjectDir($config['project_dir']);
@@ -222,6 +233,8 @@ class Configurator
         if (empty($config['name'])) {
             throw new \RuntimeException(sprintf('Task "%s" has no name configured.', $task->getCn()));
         }
+
+        $this->metadataFactory->createTaskMetadata($task);
 
         $task->setName($config['name']);
         unset($config['name']);

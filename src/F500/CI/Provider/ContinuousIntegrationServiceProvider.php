@@ -10,6 +10,7 @@ namespace F500\CI\Provider;
 use F500\CI\Build\BuildFactory;
 use F500\CI\Command\CommandExecutor;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Metadata\MetadataFactory;
 use F500\CI\Process\ProcessFactory;
 use F500\CI\Run\Configurator;
 use F500\CI\Run\Runner;
@@ -52,8 +53,8 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
 
                 $class    = $app['f500ci.runner.class'];
                 $instance = new $class(
-                    $app['f500ci.configurator'],
-                    $app['f500ci.toolkit']
+                    $app['f500ci.run_configurator'],
+                    $app['f500ci.run_toolkit']
                 );
 
                 if (!$instance instanceof Runner) {
@@ -64,47 +65,48 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['f500ci.configurator.class'] = 'F500\CI\Run\Configurator';
-        $app['f500ci.configurator']       = $app->share(
+        $app['f500ci.run_configurator.class'] = 'F500\CI\Run\Configurator';
+        $app['f500ci.run_configurator']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.configurator.class'])) {
-                    throw new \RuntimeException('"f500ci.configurator.class" should be configured.');
+                if (empty($app['f500ci.run_configurator.class'])) {
+                    throw new \RuntimeException('"f500ci.run_configurator.class" should be configured.');
                 }
                 if (empty($app['f500ci.builds_dir'])) {
                     throw new \RuntimeException('"f500ci.builds_dir" should be configured.');
                 }
 
-                $class    = $app['f500ci.configurator.class'];
+                $class    = $app['f500ci.run_configurator.class'];
                 $instance = new $class(
                     $app['f500ci.suites_dir'],
-                    $app['f500ci.factory.build'],
-                    $app['f500ci.factory.suite'],
-                    $app['f500ci.factory.task'],
-                    $app['f500ci.factory.wrapper']
+                    $app['f500ci.build_factory'],
+                    $app['f500ci.suite_factory'],
+                    $app['f500ci.task_factory'],
+                    $app['f500ci.wrapper_factory'],
+                    $app['f500ci.metadata_factory']
                 );
 
                 if (!$instance instanceof Configurator) {
-                    throw new \RuntimeException('"f500ci.factory.command" should be an instance of F500\CI\Run\Configurator.');
+                    throw new \RuntimeException('"f500ci.command_factory" should be an instance of F500\CI\Run\Configurator.');
                 }
 
                 return $instance;
             }
         );
 
-        $app['f500ci.toolkit.class'] = 'F500\CI\Run\Toolkit';
-        $app['f500ci.toolkit']       = $app->share(
+        $app['f500ci.run_toolkit.class'] = 'F500\CI\Run\Toolkit';
+        $app['f500ci.run_toolkit']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.toolkit.class'])) {
-                    throw new \RuntimeException('"f500ci.toolkit.class" should be configured.');
+                if (empty($app['f500ci.run_toolkit.class'])) {
+                    throw new \RuntimeException('"f500ci.run_toolkit.class" should be configured.');
                 }
                 if (empty($app['f500ci.builds_dir'])) {
                     throw new \RuntimeException('"f500ci.builds_dir" should be configured.');
                 }
 
-                $class    = $app['f500ci.toolkit.class'];
+                $class    = $app['f500ci.run_toolkit.class'];
                 $instance = new $class(
                     $app['f500ci.builds_dir'],
-                    $app['f500ci.factory.command'],
+                    $app['f500ci.command_factory'],
                     $app['f500ci.command_executor'],
                     $app['dispatcher'],
                     $app['filesystem'],
@@ -112,7 +114,36 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
                 );
 
                 if (!$instance instanceof Toolkit) {
-                    throw new \RuntimeException('"f500ci.factory.command" should be an instance of F500\CI\Run\Toolkit.');
+                    throw new \RuntimeException('"f500ci.run_toolkit" should be an instance of F500\CI\Run\Toolkit.');
+                }
+
+                return $instance;
+            }
+        );
+
+        $app['f500ci.command_factory.class']                      = 'F500\CI\Command\CommandFactory';
+        $app['f500ci.command_factory.command_class']              = 'F500\CI\Command\Command';
+        $app['f500ci.command_factory.store_result_command_class'] = 'F500\CI\Command\StoreResultCommand';
+        $app['f500ci.command_factory']                            = $app->share(
+            function () use ($app) {
+                if (empty($app['f500ci.command_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.command_factory.class" should be configured.');
+                }
+                if (empty($app['f500ci.command_factory.command_class'])) {
+                    throw new \RuntimeException('"f500ci.command_factory.command_class" should be configured.');
+                }
+                if (empty($app['f500ci.command_factory.store_result_command_class'])) {
+                    throw new \RuntimeException('"f500ci.command_factory.store_result_command_class" should be configured.');
+                }
+
+                $class    = $app['f500ci.command_factory.class'];
+                $instance = new $class(
+                    $app['f500ci.command_factory.command_class'],
+                    $app['f500ci.command_factory.store_result_command_class']
+                );
+
+                if (!$instance instanceof CommandFactory) {
+                    throw new \RuntimeException('"f500ci.command_factory" should be an instance of F500\CI\Command\CommandFactory.');
                 }
 
                 return $instance;
@@ -128,7 +159,7 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
 
                 $class    = $app['f500ci.command_executor.class'];
                 $instance = new $class(
-                    $app['f500ci.factory.process']
+                    $app['f500ci.process_factory']
                 );
 
                 if (!$instance instanceof CommandExecutor) {
@@ -139,123 +170,119 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $app['f500ci.factory.command.class']                      = 'F500\CI\Command\CommandFactory';
-        $app['f500ci.factory.command.command_class']              = 'F500\CI\Command\Command';
-        $app['f500ci.factory.command.store_result_command_class'] = 'F500\CI\Command\StoreResultCommand';
-        $app['f500ci.factory.command']                            = $app->share(
+        $app['f500ci.process_factory.class']         = 'F500\CI\Process\ProcessFactory';
+        $app['f500ci.process_factory.builder_class'] = 'Symfony\Component\Process\ProcessBuilder';
+        $app['f500ci.process_factory']               = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.factory.command.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.command.class" should be configured.');
+                if (empty($app['f500ci.process_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.process_factory.class" should be configured.');
                 }
-                if (empty($app['f500ci.factory.command.command_class'])) {
-                    throw new \RuntimeException('"f500ci.factory.command.command_class" should be configured.');
-                }
-                if (empty($app['f500ci.factory.command.store_result_command_class'])) {
-                    throw new \RuntimeException('"f500ci.factory.command.store_result_command_class" should be configured.');
+                if (empty($app['f500ci.process_factory.builder_class'])) {
+                    throw new \RuntimeException('"f500ci.process_factory.builder_class" should be configured.');
                 }
 
-                $class    = $app['f500ci.factory.command.class'];
-                $instance = new $class(
-                    $app['f500ci.factory.command.command_class'],
-                    $app['f500ci.factory.command.store_result_command_class']
-                );
-
-                if (!$instance instanceof CommandFactory) {
-                    throw new \RuntimeException('"f500ci.factory.command" should be an instance of F500\CI\Command\CommandFactory.');
-                }
-
-                return $instance;
-            }
-        );
-
-        $app['f500ci.factory.process.class']         = 'F500\CI\Process\ProcessFactory';
-        $app['f500ci.factory.process.builder_class'] = 'Symfony\Component\Process\ProcessBuilder';
-        $app['f500ci.factory.process']               = $app->share(
-            function () use ($app) {
-                if (empty($app['f500ci.factory.process.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.process.class" should be configured.');
-                }
-                if (empty($app['f500ci.factory.process.builder_class'])) {
-                    throw new \RuntimeException('"f500ci.factory.process.builder_class" should be configured.');
-                }
-
-                $class    = $app['f500ci.factory.process.class'];
-                $instance = new $class($app['f500ci.factory.process.builder_class']);
+                $class    = $app['f500ci.process_factory.class'];
+                $instance = new $class($app['f500ci.process_factory.builder_class']);
 
                 if (!$instance instanceof ProcessFactory) {
-                    throw new \RuntimeException('"f500ci.factory.process" should be an instance of F500\CI\Process\ProcessFactory.');
+                    throw new \RuntimeException('"f500ci.process_factory" should be an instance of F500\CI\Process\ProcessFactory.');
                 }
 
                 return $instance;
             }
         );
 
-        $app['f500ci.factory.build.class'] = 'F500\CI\Build\BuildFactory';
-        $app['f500ci.factory.build']       = $app->share(
+        $app['f500ci.build_factory.class'] = 'F500\CI\Build\BuildFactory';
+        $app['f500ci.build_factory']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.factory.build.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.build.class" should be configured.');
+                if (empty($app['f500ci.build_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.build_factory.class" should be configured.');
                 }
 
-                $class    = $app['f500ci.factory.build.class'];
+                $class    = $app['f500ci.build_factory.class'];
                 $instance = new $class();
 
                 if (!$instance instanceof BuildFactory) {
-                    throw new \RuntimeException('"f500ci.factory.build" should be an instance of F500\CI\Build\BuildFactory.');
+                    throw new \RuntimeException('"f500ci.build_factory" should be an instance of F500\CI\Build\BuildFactory.');
                 }
 
                 return $instance;
             }
         );
 
-        $app['f500ci.factory.suite.class'] = 'F500\CI\Suite\SuiteFactory';
-        $app['f500ci.factory.suite']       = $app->share(
+        $app['f500ci.suite_factory.class'] = 'F500\CI\Suite\SuiteFactory';
+        $app['f500ci.suite_factory']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.factory.suite.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.suite.class" should be configured.');
+                if (empty($app['f500ci.suite_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.suite_factory.class" should be configured.');
                 }
 
-                $class    = $app['f500ci.factory.suite.class'];
+                $class    = $app['f500ci.suite_factory.class'];
                 $instance = new $class();
 
                 if (!$instance instanceof SuiteFactory) {
-                    throw new \RuntimeException('"f500ci.factory.suite" should be an instance of F500\CI\Suite\SuiteFactory.');
+                    throw new \RuntimeException('"f500ci.suite_factory" should be an instance of F500\CI\Suite\SuiteFactory.');
                 }
 
                 return $instance;
             }
         );
 
-        $app['f500ci.factory.task.class'] = 'F500\CI\Task\TaskFactory';
-        $app['f500ci.factory.task']       = $app->share(
+        $app['f500ci.task_factory.class'] = 'F500\CI\Task\TaskFactory';
+        $app['f500ci.task_factory']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.factory.task.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.task.class" should be configured.');
+                if (empty($app['f500ci.task_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.task_factory.class" should be configured.');
                 }
 
-                $class    = $app['f500ci.factory.task.class'];
-                $instance = new $class($app['f500ci.factory.command'], $app['f500ci.factory.process']);
+                $class    = $app['f500ci.task_factory.class'];
+                $instance = new $class($app['f500ci.command_factory'], $app['f500ci.process_factory']);
 
                 if (!$instance instanceof TaskFactory) {
-                    throw new \RuntimeException('"f500ci.factory.task" should be an instance of F500\CI\Task\TaskFactory.');
+                    throw new \RuntimeException('"f500ci.task_factory" should be an instance of F500\CI\Task\TaskFactory.');
                 }
 
                 return $instance;
             }
         );
 
-        $app['f500ci.factory.wrapper.class'] = 'F500\CI\Wrapper\WrapperFactory';
-        $app['f500ci.factory.wrapper']       = $app->share(
+        $app['f500ci.wrapper_factory.class'] = 'F500\CI\Wrapper\WrapperFactory';
+        $app['f500ci.wrapper_factory']       = $app->share(
             function () use ($app) {
-                if (empty($app['f500ci.factory.wrapper.class'])) {
-                    throw new \RuntimeException('"f500ci.factory.wrapper.class" should be configured.');
+                if (empty($app['f500ci.wrapper_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.wrapper_factory.class" should be configured.');
                 }
 
-                $class    = $app['f500ci.factory.wrapper.class'];
+                $class    = $app['f500ci.wrapper_factory.class'];
                 $instance = new $class();
 
                 if (!$instance instanceof WrapperFactory) {
-                    throw new \RuntimeException('"f500ci.factory.wrapper" should be an instance of F500\CI\Wrapper\WrapperFactory.');
+                    throw new \RuntimeException('"f500ci.wrapper_factory" should be an instance of F500\CI\Wrapper\WrapperFactory.');
+                }
+
+                return $instance;
+            }
+        );
+
+        $app['f500ci.metadata_factory.class']                = 'F500\CI\Metadata\MetadataFactory';
+        $app['f500ci.metadata_factory.build_metadata_class'] = 'F500\CI\Metadata\BuildMetadata';
+        $app['f500ci.metadata_factory.suite_metadata_class'] = 'F500\CI\Metadata\SuiteMetadata';
+        $app['f500ci.metadata_factory.task_metadata_class']  = 'F500\CI\Metadata\TaskMetadata';
+        $app['f500ci.metadata_factory']                      = $app->share(
+            function () use ($app) {
+                if (empty($app['f500ci.metadata_factory.class'])) {
+                    throw new \RuntimeException('"f500ci.metadata_factory.class" should be configured.');
+                }
+
+                $class    = $app['f500ci.metadata_factory.class'];
+                $instance = new $class(
+                    $app['f500ci.metadata_factory.build_metadata_class'],
+                    $app['f500ci.metadata_factory.suite_metadata_class'],
+                    $app['f500ci.metadata_factory.task_metadata_class']
+                );
+
+                if (!$instance instanceof MetadataFactory) {
+                    throw new \RuntimeException('"f500ci.metadata_factory" should be an instance of F500\CI\Metadata\MetadataFactory.');
                 }
 
                 return $instance;

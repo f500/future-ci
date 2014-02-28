@@ -7,6 +7,7 @@
 
 namespace F500\CI\Task;
 
+use F500\CI\Metadata\TaskMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 
@@ -66,6 +67,16 @@ interface Task
      * @param string[] $cns
      */
     public function setWrappers($cns);
+
+    /**
+     * @return TaskMetadata
+     */
+    public function getMetadata();
+
+    /**
+     * @param TaskMetadata $metadata
+     */
+    public function setMetadata(TaskMetadata $metadata);
 
     /**
      * @param Toolkit $toolkit

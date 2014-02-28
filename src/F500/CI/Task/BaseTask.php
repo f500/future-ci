@@ -11,6 +11,8 @@ use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
 use F500\CI\Event\Events;
 use F500\CI\Event\TaskEvent;
+use F500\CI\Metadata\Metadata;
+use F500\CI\Metadata\TaskMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 use Psr\Log\LogLevel;
@@ -50,6 +52,11 @@ abstract class BaseTask implements Task
      * @var string[]
      */
     protected $wrappers;
+
+    /**
+     * @var Metadata
+     */
+    protected $metadata;
 
     /**
      * @param string $cn
@@ -135,6 +142,22 @@ abstract class BaseTask implements Task
         }
 
         $this->wrappers = $unique;
+    }
+
+    /**
+     * @return TaskMetadata
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param TaskMetadata $metadata
+     */
+    public function setMetadata(TaskMetadata $metadata)
+    {
+        $this->metadata = $metadata;
     }
 
     /**

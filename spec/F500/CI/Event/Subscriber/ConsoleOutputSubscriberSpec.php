@@ -7,8 +7,13 @@
 
 namespace spec\F500\CI\Event\Subscriber;
 
+use F500\CI\Build\Build;
+use F500\CI\Event\BuildEvent;
 use F500\CI\Event\SuiteEvent;
 use F500\CI\Event\TaskEvent;
+use F500\CI\Metadata\BuildMetadata;
+use F500\CI\Metadata\SuiteMetadata;
+use F500\CI\Metadata\TaskMetadata;
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
@@ -38,6 +43,21 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $this->shouldImplement('Symfony\Component\EventDispatcher\EventSubscriberInterface');
     }
 
+    function it_outputs_when_build_started_event_is_dispatched(
+        Build $build,
+        BuildEvent $event,
+        Suite $suite,
+        \DateTimeImmutable $date,
+        OutputInterface $output
+    ) {
+        $event->getBuild()->willReturn($build);
+        $build->getSuite()->willReturn($suite);
+        $build->getDate()->willReturn($date);
+        $output->writeln(Argument::type('string'))->shouldBeCalled();
+
+        $this->onBuildStarted($event);
+    }
+
     function it_outputs_when_suite_started_event_is_dispatched(Suite $suite, SuiteEvent $event, OutputInterface $output)
     {
         $event->getSuite()->willReturn($suite);
@@ -45,18 +65,6 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $output->writeln(Argument::type('string'))->shouldBeCalled();
 
         $this->onSuiteStarted($event);
-    }
-
-    function it_outputs_when_suite_finished_event_is_dispatched(
-        Suite $suite,
-        SuiteEvent $event,
-        OutputInterface $output
-    ) {
-        $event->getSuite()->willReturn($suite);
-        $suite->getName()->willReturn('Some Suite');
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
-
-        $this->onSuiteFinished($event);
     }
 
     function it_outputs_when_task_started_event_is_dispatched(Task $task, TaskEvent $event, OutputInterface $output)
@@ -68,12 +76,44 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $this->onTaskStarted($event);
     }
 
-    function it_outputs_when_task_finished_event_is_dispatched(Task $task, TaskEvent $event, OutputInterface $output)
-    {
+    function it_outputs_when_task_finished_event_is_dispatched(
+        Task $task,
+        TaskEvent $event,
+        TaskMetadata $metadata,
+        OutputInterface $output
+    ) {
         $event->getTask()->willReturn($task);
+        $task->getMetadata()->willReturn($metadata);
         $task->getName()->willReturn('Some Task');
         $output->writeln(Argument::type('string'))->shouldBeCalled();
 
         $this->onTaskFinished($event);
+    }
+
+    function it_outputs_when_suite_finished_event_is_dispatched(
+        Suite $suite,
+        SuiteEvent $event,
+        SuiteMetadata $metadata,
+        OutputInterface $output
+    ) {
+        $event->getSuite()->willReturn($suite);
+        $suite->getMetadata()->willReturn($metadata);
+        $suite->getName()->willReturn('Some Suite');
+        $output->writeln(Argument::type('string'))->shouldBeCalled();
+
+        $this->onSuiteFinished($event);
+    }
+
+    function it_outputs_when_build_finished_event_is_dispatched(
+        Build $build,
+        BuildEvent $event,
+        BuildMetadata $metadata,
+        OutputInterface $output
+    ) {
+        $event->getBuild()->willReturn($build);
+        $build->getMetadata()->willReturn($metadata);
+        $output->writeln(Argument::type('string'))->shouldBeCalled();
+
+        $this->onBuildFinished($event);
     }
 }

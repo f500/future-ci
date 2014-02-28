@@ -9,6 +9,10 @@ namespace spec\F500\CI\Run;
 
 use F500\CI\Build\Build;
 use F500\CI\Build\BuildFactory;
+use F500\CI\Metadata\BuildMetadata;
+use F500\CI\Metadata\MetadataFactory;
+use F500\CI\Metadata\SuiteMetadata;
+use F500\CI\Metadata\TaskMetadata;
 use F500\CI\Suite\Suite;
 use F500\CI\Suite\SuiteFactory;
 use F500\CI\Task\Task;
@@ -33,11 +37,19 @@ class ConfiguratorSpec extends ObjectBehavior
         BuildFactory $buildFactory,
         SuiteFactory $suiteFactory,
         TaskFactory $taskFactory,
-        WrapperFactory $wrapperFactory
+        WrapperFactory $wrapperFactory,
+        MetadataFactory $metadataFactory
     ) {
         $suitesDir = __DIR__ . '/../../../data/suites';
 
-        $this->beConstructedWith($suitesDir, $buildFactory, $suiteFactory, $taskFactory, $wrapperFactory);
+        $this->beConstructedWith(
+            $suitesDir,
+            $buildFactory,
+            $suiteFactory,
+            $taskFactory,
+            $wrapperFactory,
+            $metadataFactory
+        );
     }
 
     function it_is_initializable()
@@ -95,18 +107,45 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_sets_up_a_build(
         BuildFactory $buildFactory,
-        Build $build,
         SuiteFactory $suiteFactory,
-        Suite $suite,
         TaskFactory $taskFactory,
-        Task $task,
         WrapperFactory $wrapperFactory,
-        Wrapper $wrapper
+        MetadataFactory $metadataFactory,
+        Build $build,
+        Suite $suite,
+        Task $task,
+        Wrapper $wrapper,
+        BuildMetadata $buildMetadata,
+        SuiteMetadata $suiteMetadata,
+        TaskMetadata $taskMetadata
     ) {
-        $buildFactory->create(Argument::type('string'), $suite)->willReturn($build);
-        $suiteFactory->create(Argument::type('string'), Argument::type('string'))->willReturn($suite);
-        $taskFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($task);
-        $wrapperFactory->create(Argument::type('string'), Argument::type('string'), $suite)->willReturn($wrapper);
+        $buildFactory->create(Argument::type('string'), $suite)
+            ->willReturn($build)
+            ->shouldBeCalled();
+
+        $suiteFactory->create(Argument::type('string'), Argument::type('string'))
+            ->willReturn($suite)
+            ->shouldBeCalled();
+
+        $taskFactory->create(Argument::type('string'), Argument::type('string'), $suite)
+            ->willReturn($task)
+            ->shouldBeCalled();
+
+        $wrapperFactory->create(Argument::type('string'), Argument::type('string'), $suite)
+            ->willReturn($wrapper)
+            ->shouldBeCalled();
+
+        $metadataFactory->createBuildMetadata($build)
+            ->willReturn($buildMetadata)
+            ->shouldBeCalled();
+
+        $metadataFactory->createSuiteMetadata($suite)
+            ->willReturn($suiteMetadata)
+            ->shouldBeCalled();
+
+        $metadataFactory->createTaskMetadata($task)
+            ->willReturn($taskMetadata)
+            ->shouldBeCalled();
 
         $build->getCn()->willReturn('some_suite.2014.02.20.09.00.00');
 
@@ -129,13 +168,8 @@ class ConfiguratorSpec extends ObjectBehavior
             'suite_class' => 'F500\CI\Suite\StandardSuite',
             'build_class' => 'F500\CI\Build\StandardBuild',
             'tasks'       => array(
-                'some_task'  => array(
+                'some_task' => array(
                     'name'        => 'Some Task',
-                    'class'       => 'F500\CI\Task\DummyTask',
-                    'some_option' => 'foobar'
-                ),
-                'other_task' => array(
-                    'name'        => 'Other Task',
                     'class'       => 'F500\CI\Task\DummyTask',
                     'some_option' => 'foobar',
                     'wrappers'    => array('some_wrapper')

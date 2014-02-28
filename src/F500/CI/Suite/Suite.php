@@ -8,6 +8,7 @@
 namespace F500\CI\Suite;
 
 use F500\CI\Build\Build;
+use F500\CI\Metadata\SuiteMetadata;
 use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
 use F500\CI\Wrapper\Wrapper;
@@ -91,6 +92,16 @@ interface Suite
      * @param Wrapper $wrapper
      */
     public function addWrapper($cn, Wrapper $wrapper);
+
+    /**
+     * @return SuiteMetadata
+     */
+    public function getMetadata();
+
+    /**
+     * @param SuiteMetadata $metadata
+     */
+    public function setMetadata(SuiteMetadata $metadata);
 
     /**
      * @param Toolkit $toolkit

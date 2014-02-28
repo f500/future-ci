@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title>Future CI</title>
+    <parser>
+        <default-package-name>F500\CI</default-package-name>
+        <target>/Users/jasper/Development/docs/data/parser</target>
+    </parser>
+    <transformer>
+        <target>/Users/jasper/Development/docs/data/transformer</target>
+    </transformer>
+    <files>
+        <directory>src</directory>
+    </files>
+    <logging>
+        <level>notice</level>
+        <paths>
+            <default>/Users/jasper/Development/docs/log/{DATE}.log</default>
+        </paths>
+    </logging>
+</phpdoc>

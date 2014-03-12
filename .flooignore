@@ -1,4 +1,6 @@
+.git
 .idea/misc.xml
+.idea/template/template_variable_settings.xml
 .idea/workspace.xml
 app/config/parameters.yml
 bin/*

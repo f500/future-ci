@@ -6,7 +6,7 @@
 
 namespace F500\CI\Command;
 
-use F500\CI\Process\ProcessFactory;
+use F500\CI\Command\Process\ProcessFactory;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -41,7 +41,7 @@ class CommandExecutor
      */
     public function execute(Command $command, LoggerInterface $logger)
     {
-        $process = $this->processFactory->create($command->getArgs(), $command->getCwd(), $command->getEnv());
+        $process = $this->processFactory->createProcess($command->getArgs(), $command->getCwd(), $command->getEnv());
 
         $logger->log(LogLevel::INFO, sprintf('[%s] Executing: %s', $command->getId(), $command->stringify(true)));
         $logger->log(LogLevel::DEBUG, sprintf('[%s] Raw command: %s', $command->getId(), $process->getCommandLine()));
@@ -54,8 +54,8 @@ class CommandExecutor
             $process->isSuccessful() ? LogLevel::INFO : LogLevel::ERROR,
             sprintf(
                 '[%s] %s: %s',
-                $process->isSuccessful() ? 'Succeeded' : 'Failed',
                 $command->getId(),
+                $process->isSuccessful() ? 'Succeeded' : 'Failed',
                 $command->stringify(true)
             ),
             array(

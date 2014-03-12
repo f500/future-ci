@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "05e5a9f3a2062ce8f9a39a05e4daef93",
+    "hash": "b964a20cd64201d9fd2d686a59fd35dc",
     "packages": [
         {
             "name": "cilex/console-service-provider",
@@ -187,50 +187,6 @@
                 "psr-3"
             ],
             "time": "2013-11-14 19:48:31"
-        },
-        {
-            "name": "neutron/silex-filesystem-provider",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/romainneutron/Silex-Filesystem-Service-Provider.git",
-                "reference": "98771524bba1ffa58373c4c06d438f5fb5442ff4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/romainneutron/Silex-Filesystem-Service-Provider/zipball/98771524bba1ffa58373c4c06d438f5fb5442ff4",
-                "reference": "98771524bba1ffa58373c4c06d438f5fb5442ff4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "silex/silex": ">=1.0",
-                "symfony/filesystem": ">=2.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Neutron": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Romain Neutron",
-                    "email": "imprec@gmail.com",
-                    "homepage": "http://www.lickmychip.com/"
-                }
-            ],
-            "description": "A Silex Provider for Symfony Filesystem component",
-            "keywords": [
-                "filesystem",
-                "silex",
-                "temporary-filesystem"
-            ],
-            "time": "2012-11-08 21:07:08"
         },
         {
             "name": "pimple/pimple",
@@ -947,12 +903,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/phpspec.git",
-                "reference": "c41c96dcadf2bcaacaa342a84e794254c5bb763a"
+                "reference": "9f72dd2ea9f860572b7ce7f229e043e667f34564"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/c41c96dcadf2bcaacaa342a84e794254c5bb763a",
-                "reference": "c41c96dcadf2bcaacaa342a84e794254c5bb763a",
+                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/9f72dd2ea9f860572b7ce7f229e043e667f34564",
+                "reference": "9f72dd2ea9f860572b7ce7f229e043e667f34564",
                 "shasum": ""
             },
             "require": {
@@ -966,7 +922,8 @@
             },
             "require-dev": {
                 "behat/behat": "~2.5",
-                "bossa/phpspec2-expect": "dev-master"
+                "bossa/phpspec2-expect": "dev-master",
+                "symfony/filesystem": "~2.1"
             },
             "suggest": {
                 "phpspec/nyan-formatters": "~1.0 – Adds Nyan formatters"
@@ -1011,7 +968,7 @@
                 "testing",
                 "tests"
             ],
-            "time": "2014-02-23 20:29:41"
+            "time": "2014-03-04 20:57:45"
         },
         {
             "name": "phpspec/prophecy",

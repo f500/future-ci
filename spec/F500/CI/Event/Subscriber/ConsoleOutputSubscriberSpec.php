@@ -8,13 +8,9 @@
 namespace spec\F500\CI\Event\Subscriber;
 
 use F500\CI\Build\Build;
-use F500\CI\Event\BuildEvent;
-use F500\CI\Event\SuiteEvent;
-use F500\CI\Event\TaskEvent;
-use F500\CI\Metadata\BuildMetadata;
-use F500\CI\Metadata\SuiteMetadata;
-use F500\CI\Metadata\TaskMetadata;
-use F500\CI\Suite\Suite;
+use F500\CI\Build\Result;
+use F500\CI\Event\BuildRunEvent;
+use F500\CI\Event\TaskRunEvent;
 use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -43,77 +39,132 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $this->shouldImplement('Symfony\Component\EventDispatcher\EventSubscriberInterface');
     }
 
-    function it_outputs_when_build_started_event_is_dispatched(
+    function it_writes_output_when_a_build_has_started(
+        BuildRunEvent $event,
         Build $build,
-        BuildEvent $event,
-        Suite $suite,
         \DateTimeImmutable $date,
         OutputInterface $output
     ) {
         $event->getBuild()->willReturn($build);
-        $build->getSuite()->willReturn($suite);
+
+        $build->getName()->willReturn('Some Suite');
         $build->getDate()->willReturn($date);
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
 
         $this->onBuildStarted($event);
+
+        $output->writeln(Argument::type('string'))->shouldHaveBeenCalled();
     }
 
-    function it_outputs_when_suite_started_event_is_dispatched(Suite $suite, SuiteEvent $event, OutputInterface $output)
-    {
-        $event->getSuite()->willReturn($suite);
-        $suite->getName()->willReturn('Some Suite');
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
-
-        $this->onSuiteStarted($event);
-    }
-
-    function it_outputs_when_task_started_event_is_dispatched(Task $task, TaskEvent $event, OutputInterface $output)
+    function it_writes_output_when_a_task_has_started(Task $task, TaskRunEvent $event, OutputInterface $output)
     {
         $event->getTask()->willReturn($task);
+
         $task->getName()->willReturn('Some Task');
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
 
         $this->onTaskStarted($event);
+
+        $output->write(Argument::type('string'))->shouldHaveBeenCalled();
     }
 
-    function it_outputs_when_task_finished_event_is_dispatched(
+    function it_writes_successful_output_when_a_task_has_finished(
         Task $task,
-        TaskEvent $event,
-        TaskMetadata $metadata,
+        TaskRunEvent $event,
+        Result $result,
         OutputInterface $output
     ) {
         $event->getTask()->willReturn($task);
-        $task->getMetadata()->willReturn($metadata);
-        $task->getName()->willReturn('Some Task');
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
+        $event->getResult()->willReturn($result);
+
+        $result->getOverallTaskResult($task)->willReturn(Result::SUCCESSFUL);
+        $result->getElapsedTaskTime($task)->willReturn(123456789);
 
         $this->onTaskFinished($event);
+
+        $output->writeln(Argument::containingString('successful'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_outputs_when_suite_finished_event_is_dispatched(
-        Suite $suite,
-        SuiteEvent $event,
-        SuiteMetadata $metadata,
+    function it_writes_failed_output_when_a_task_has_finished(
+        Task $task,
+        TaskRunEvent $event,
+        Result $result,
         OutputInterface $output
     ) {
-        $event->getSuite()->willReturn($suite);
-        $suite->getMetadata()->willReturn($metadata);
-        $suite->getName()->willReturn('Some Suite');
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
+        $event->getTask()->willReturn($task);
+        $event->getResult()->willReturn($result);
 
-        $this->onSuiteFinished($event);
+        $result->getOverallTaskResult($task)->willReturn(Result::FAILED);
+        $result->getElapsedTaskTime($task)->willReturn(123456789);
+
+        $this->onTaskFinished($event);
+
+        $output->writeln(Argument::containingString('failed'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_outputs_when_build_finished_event_is_dispatched(
-        Build $build,
-        BuildEvent $event,
-        BuildMetadata $metadata,
+    function it_writes_incomplete_output_when_a_task_has_finished(
+        Task $task,
+        TaskRunEvent $event,
+        Result $result,
         OutputInterface $output
     ) {
-        $event->getBuild()->willReturn($build);
-        $build->getMetadata()->willReturn($metadata);
-        $output->writeln(Argument::type('string'))->shouldBeCalled();
+        $event->getTask()->willReturn($task);
+        $event->getResult()->willReturn($result);
+
+        $result->getOverallTaskResult($task)->willReturn(Result::INCOMPLETE);
+        $result->getElapsedTaskTime($task)->willReturn(123456789);
+
+        $this->onTaskFinished($event);
+
+        $output->writeln(Argument::containingString('incomplete'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
+    }
+
+    function it_writes_successful_output_when_a_build_has_finished(
+        BuildRunEvent $event,
+        Result $result,
+        OutputInterface $output
+    ) {
+        $event->getResult()->willReturn($result);
+
+        $result->getOverallBuildResult()->willReturn(Result::SUCCESSFUL);
+        $result->getElapsedBuildTime()->willReturn(123456789);
 
         $this->onBuildFinished($event);
+
+        $output->writeln(Argument::containingString('successful'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
+    }
+
+    function it_writes_failed_output_when_a_build_has_finished(
+        BuildRunEvent $event,
+        Result $result,
+        OutputInterface $output
+    ) {
+        $event->getResult()->willReturn($result);
+
+        $result->getOverallBuildResult()->willReturn(Result::FAILED);
+        $result->getElapsedBuildTime()->willReturn(123456789);
+
+        $this->onBuildFinished($event);
+
+        $output->writeln(Argument::containingString('failed'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
+    }
+
+    function it_writes_incomplete_output_when_a_build_has_finished(
+        BuildRunEvent $event,
+        Result $result,
+        OutputInterface $output
+    ) {
+        $event->getResult()->willReturn($result);
+
+        $result->getOverallBuildResult()->willReturn(Result::INCOMPLETE);
+        $result->getElapsedBuildTime()->willReturn(123456789);
+
+        $this->onBuildFinished($event);
+
+        $output->writeln(Argument::containingString('incomplete'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 }

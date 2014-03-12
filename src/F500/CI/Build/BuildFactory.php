@@ -23,22 +23,25 @@ class BuildFactory
     /**
      * @param string $class
      * @param Suite  $suite
+     * @param string $buildsDir
      * @return Build
      * @throws \InvalidArgumentException
      */
-    public function create($class, Suite $suite)
+    public function createBuild($class, Suite $suite, $buildsDir)
     {
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
+            throw new \InvalidArgumentException(sprintf('Cannot create build, class "%s" does not exist.', $class));
         }
 
-        $build = new $class($suite);
+        $build = new $class($suite, $buildsDir);
 
         if (!$build instanceof Build) {
-            throw new \InvalidArgumentException(sprintf(
-                'Class "%s" should implement F500\CI\Build\Build.',
-                $class
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot create build, class "%s" does not implement F500\CI\Build\Build.',
+                    $class
+                )
+            );
         }
 
         return $build;

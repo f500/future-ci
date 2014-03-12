@@ -24,7 +24,10 @@ class CommandFactorySpec extends ObjectBehavior
     function let()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('F500\CI\Command\Command', 'F500\CI\Command\StoreResultCommand');
+        $this->beConstructedWith(
+            'F500\CI\Command\Command',
+            'F500\CI\Command\StoreResultCommand'
+        );
     }
 
     function it_is_initializable()
@@ -40,7 +43,11 @@ class CommandFactorySpec extends ObjectBehavior
     function it_fails_to_create_a_command_when_class_does_not_exist()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('NonExistent\Command', 'F500\CI\Command\StoreResultCommand');
+        $this->beConstructedWith(
+            'NonExistent\Command',
+            'F500\CI\Command\StoreResultCommand',
+            'Symfony\Component\Process\Process'
+        );
 
         $this->shouldThrow('RuntimeException')->during(
             'createCommand'
@@ -55,7 +62,11 @@ class CommandFactorySpec extends ObjectBehavior
     function it_fails_to_create_a_store_result_command_when_class_does_not_exist()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('F500\CI\Command\Command', 'NonExistent\StoreResultCommand');
+        $this->beConstructedWith(
+            'F500\CI\Command\Command',
+            'NonExistent\StoreResultCommand',
+            'Symfony\Component\Process\Process'
+        );
 
         $this->shouldThrow('RuntimeException')->during(
             'createStoreResultCommand'

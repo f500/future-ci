@@ -8,7 +8,7 @@
 namespace spec\F500\CI\Command;
 
 use F500\CI\Command\Command;
-use F500\CI\Process\ProcessFactory;
+use F500\CI\Command\Process\ProcessFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Psr\Log\LoggerInterface;
@@ -79,16 +79,16 @@ class CommandExecutorSpec extends ObjectBehavior
         $command->getCwd()->willReturn('/tmp');
         $command->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
         $command->stringify(true)->willReturn('ls -l');
-        $command->clearResult()->shouldBeCalled();
-        $command->setResult(Argument::type('int'), Argument::type('string'))->shouldBeCalled();
+        $command->clearResult()->willReturn();
+        $command->setResult(Argument::type('int'), Argument::type('string'))->willReturn();
 
         $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
         $logger->log(Argument::type('string'), Argument::type('string'), Argument::type('array'))->willReturn(true);
 
-        $processFactory->create(Argument::type('array'), Argument::type('string'), Argument::type('array'))
+        $processFactory->createProcess(Argument::type('array'), Argument::type('string'), Argument::type('array'))
             ->willReturn($process);
 
-        $process->run()->shouldBeCalled();
-        $process->getCommandLine()->willReturn("'ls' '-l'");
+        $process->run()->willReturn();
+        $process->getCommandLine()->willReturn('ls -l');
     }
 }

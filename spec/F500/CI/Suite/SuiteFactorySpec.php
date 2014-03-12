@@ -28,7 +28,7 @@ class SuiteFactorySpec extends ObjectBehavior
 
     function it_creates_a_suite()
     {
-        $suite = $this->create('F500\CI\Suite\StandardSuite', 'some_suite');
+        $suite = $this->createSuite('F500\CI\Suite\StandardSuite', 'some_suite');
         $suite->shouldHaveType('F500\CI\Suite\StandardSuite');
         $suite->shouldImplement('F500\CI\Suite\Suite');
     }
@@ -36,7 +36,7 @@ class SuiteFactorySpec extends ObjectBehavior
     function it_fails_to_create_a_suite_when_class_does_not_exist()
     {
         $this->shouldThrow('InvalidArgumentException')->during(
-            'create',
+            'createSuite',
             array('NonExistent\Suite', 'some_suite')
         );
     }
@@ -44,7 +44,7 @@ class SuiteFactorySpec extends ObjectBehavior
     function it_fails_to_create_a_suite_when_interface_not_implemented()
     {
         $this->shouldThrow('InvalidArgumentException')->during(
-            'create',
+            'createSuite',
             array('StdClass', 'some_suite')
         );
     }

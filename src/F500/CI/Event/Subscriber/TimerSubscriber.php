@@ -7,10 +7,9 @@
 
 namespace F500\CI\Event\Subscriber;
 
-use F500\CI\Event\BuildEvent;
+use F500\CI\Event\BuildRunEvent;
 use F500\CI\Event\Events;
-use F500\CI\Event\SuiteEvent;
-use F500\CI\Event\TaskEvent;
+use F500\CI\Event\TaskRunEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -32,11 +31,6 @@ class TimerSubscriber implements EventSubscriberInterface
     /**
      * @var float
      */
-    protected $suiteStarted;
-
-    /**
-     * @var float
-     */
     protected $taskStarted;
 
     /**
@@ -48,75 +42,51 @@ class TimerSubscriber implements EventSubscriberInterface
             Events::BuildStarted  => array(
                 array('onBuildStarted', 50)
             ),
-            Events::BuildFinished => array(
-                array('onBuildFinished', 50)
-            ),
-            Events::SuiteStarted  => array(
-                array('onSuiteStarted', 50)
-            ),
-            Events::SuiteFinished => array(
-                array('onSuiteFinished', 50)
-            ),
             Events::TaskStarted   => array(
                 array('onTaskStarted', 50)
             ),
             Events::TaskFinished  => array(
                 array('onTaskFinished', 50)
+            ),
+            Events::BuildFinished => array(
+                array('onBuildFinished', 50)
             )
         );
     }
 
     /**
-     * @param BuildEvent $event
+     * @param BuildRunEvent $event
      */
-    public function onBuildStarted(BuildEvent $event)
+    public function onBuildStarted(BuildRunEvent $event)
     {
         $this->buildStarted = microtime(true);
     }
 
     /**
-     * @param BuildEvent $event
+     * @param TaskRunEvent $event
      */
-    public function onBuildFinished(BuildEvent $event)
-    {
-        $time = round((microtime(true) - $this->buildStarted) * 1000);
-        $event->getBuild()->getMetadata()->setElapsedTime($time);
-        $this->buildStarted = null;
-    }
-
-    /**
-     * @param SuiteEvent $event
-     */
-    public function onSuiteStarted(SuiteEvent $event)
-    {
-        $this->suiteStarted = microtime(true);
-    }
-
-    /**
-     * @param SuiteEvent $event
-     */
-    public function onSuiteFinished(SuiteEvent $event)
-    {
-        $time = round((microtime(true) - $this->suiteStarted) * 1000);
-        $event->getSuite()->getMetadata()->setElapsedTime($time);
-        $this->suiteStarted = null;
-    }
-
-    /**
-     * @param TaskEvent $event
-     */
-    public function onTaskStarted(TaskEvent $event)
+    public function onTaskStarted(TaskRunEvent $event)
     {
         $this->taskStarted = microtime(true);
     }
 
     /**
-     * @param TaskEvent $event
+     * @param TaskRunEvent $event
      */
-    public function onTaskFinished(TaskEvent $event)
+    public function onTaskFinished(TaskRunEvent $event)
     {
         $time = round((microtime(true) - $this->taskStarted) * 1000);
-        $event->getTask()->getMetadata()->setElapsedTime($time);
+        $event->getResult()->setElapsedTaskTime($event->getTask(), $time);
         $this->taskStarted = null;
+    }
+
+    /**
+     * @param BuildRunEvent $event
+     */
+    public function onBuildFinished(BuildRunEvent $event)
+    {
+        $time = round((microtime(true) - $this->buildStarted) * 1000);
+        $event->getResult()->setElapsedBuildTime($time);
+        $this->buildStarted = null;
     }
 }

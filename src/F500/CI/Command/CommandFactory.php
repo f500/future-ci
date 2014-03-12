@@ -47,16 +47,18 @@ class CommandFactory
         $class = $this->commandClass;
 
         if (!class_exists($class)) {
-            throw new \RuntimeException(sprintf('Class "%s" does not exist.', $class));
+            throw new \RuntimeException(sprintf('Cannot create command, class "%s" does not exist.', $class));
         }
 
         $command = new $class();
 
         if (!$command instanceof Command) {
-            throw new \RuntimeException(sprintf(
-                'Class "%s" should be an instance of F500\CI\Command\Command.',
-                $class
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot create command, class "%s" is not an instance of F500\CI\Command\Command.',
+                    $class
+                )
+            );
         }
 
         return $command;
@@ -71,18 +73,25 @@ class CommandFactory
         $class = $this->storeResultCommandClass;
 
         if (!class_exists($class)) {
-            throw new \RuntimeException(sprintf('Class "%s" does not exist.', $class));
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot create store-result-command, class "%s" does not exist.',
+                    $class
+                )
+            );
         }
 
-        $command = new $class();
+        $storeResultCommand = new $class();
 
-        if (!$command instanceof StoreResultCommand) {
-            throw new \RuntimeException(sprintf(
-                'Class "%s" should be an instance of F500\CI\Command\StoreResultCommand.',
-                $class
-            ));
+        if (!$storeResultCommand instanceof StoreResultCommand) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot create store-result-command, class "%s" is not an instance of F500\CI\Command\StoreResultCommand.',
+                    $class
+                )
+            );
         }
 
-        return $command;
+        return $storeResultCommand;
     }
 }

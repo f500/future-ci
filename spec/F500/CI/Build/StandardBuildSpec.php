@@ -7,14 +7,10 @@
 
 namespace spec\F500\CI\Build;
 
-use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
-use Monolog\Logger;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Class StandardBuildSpec
@@ -27,12 +23,15 @@ use Symfony\Component\Filesystem\Filesystem;
 class StandardBuildSpec extends ObjectBehavior
 {
 
-    function let(Suite $suite)
+    function let(Suite $suite, Task $task)
     {
-        /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith($suite);
+        $suite->getCn()->willReturn('some_suite');
+        $suite->getName()->willReturn('Some Suite');
+        $suite->getProjectDir()->willReturn('/path/to/project');
+        $suite->getTasks()->willReturn(array('some_task' => $task));
 
-        $suite->setActiveBuild($this->getWrappedObject())->shouldBeCalled();
+        /** @noinspection PhpParamsInspection */
+        $this->beConstructedWith($suite, '/path/to/builds');
     }
 
     function it_is_initializable()
@@ -41,10 +40,8 @@ class StandardBuildSpec extends ObjectBehavior
         $this->shouldImplement('F500\CI\Build\Build');
     }
 
-    function it_has_a_cn(Suite $suite)
+    function it_has_a_cn()
     {
-        $suite->getCn()->willReturn('some_suite');
-
         $this->getCn()->shouldMatch('/^some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}$/');
     }
 
@@ -53,113 +50,32 @@ class StandardBuildSpec extends ObjectBehavior
         $this->getDate()->shouldHaveType('DateTimeImmutable');
     }
 
-    function it_has_a_suite(Suite $suite)
+    function it_has_a_name()
     {
-        $this->getSuite()->shouldReturn($suite);
+        $this->getName()->shouldReturn('Some Suite');
     }
 
-    function it_initializes_itself(
-        Suite $suite,
-        Task $task,
-        Toolkit $toolkit,
-        EventDispatcherInterface $dispatcher,
-        Filesystem $filesystem,
-        Logger $logger
-    ) {
-        $this->mock_dispatcher($toolkit, $dispatcher);
-        $this->mock_logger($toolkit, $logger);
-        $this->mock_for_initialization($suite, $task, $toolkit, $filesystem, $logger);
-
-        $this->initialize($toolkit)->shouldReturn(true);
-    }
-
-    function it_does_not_have_a_build_dir_initially()
+    function it_has_a_project_dir()
     {
-        $this->shouldThrow('\RuntimeException')->during(
-            'getBuildDir'
-        );
+        $this->getProjectDir()->shouldReturn('/path/to/project');
     }
 
-    function it_has_a_build_dir_after_initialization(
-        Suite $suite,
-        Task $task,
-        Toolkit $toolkit,
-        EventDispatcherInterface $dispatcher,
-        Filesystem $filesystem,
-        Logger $logger
-    ) {
-        $this->mock_dispatcher($toolkit, $dispatcher);
-        $this->mock_logger($toolkit, $logger);
-        $this->mock_for_initialization($suite, $task, $toolkit, $filesystem, $logger);
-
-        $this->initialize($toolkit);
-        $this->getBuildDir()->shouldReturn(
-            realpath(__DIR__ . '/../../../data/builds') . '/' . $this->getCn()->getWrappedObject()
-        );
-    }
-
-    function it_runs_itself(
-        Suite $suite,
-        Toolkit $toolkit,
-        EventDispatcherInterface $dispatcher,
-        Logger $logger
-    ) {
-        $this->mock_dispatcher($toolkit, $dispatcher);
-        $this->mock_logger($toolkit, $logger);
-
-        $suite->getCn()->willReturn('some_suite');
-        $suite->run($toolkit)->willReturn(true);
-
-        $this->run($toolkit)->shouldReturn(true);
-    }
-
-    function it_cleans_itself_up(Suite $suite, Toolkit $toolkit, EventDispatcherInterface $dispatcher, Logger $logger)
+    function it_has_a_build_dir()
     {
-        $this->mock_dispatcher($toolkit, $dispatcher);
-        $this->mock_logger($toolkit, $logger);
-
-        $suite->getCn()->willReturn('some_suite');
-
-        $toolkit->deactivateBuildLogHandler()->shouldBeCalled();
-
-        $this->cleanup($toolkit)->shouldReturn(true);
+        $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}$|');
     }
 
-    protected function mock_dispatcher(Toolkit $toolkit, EventDispatcherInterface $dispatcher)
+    function it_has_a_build_dir_for_a_task(Task $task)
     {
-        $toolkit->getDispatcher()->willReturn($dispatcher);
-
-        $dispatcher->dispatch(Argument::type('string'), Argument::type('Symfony\Component\EventDispatcher\Event'))
-            ->shouldBeCalled();
-    }
-
-    protected function mock_logger(Toolkit $toolkit, Logger $logger)
-    {
-        $toolkit->getLogger()->willReturn($logger);
-
-        $logger->log(Argument::type('string'), Argument::type('string'), Argument::type('array'))
-            ->willReturn(true);
-        $logger->log(Argument::type('string'), Argument::type('string'))
-            ->willReturn(true);
-    }
-
-    protected function mock_for_initialization(
-        Suite $suite,
-        Task $task,
-        Toolkit $toolkit,
-        Filesystem $filesystem
-    ) {
-        $suite->getCn()->willReturn('some_suite');
-        $suite->getTasks()->willReturn(array('some_task' => $task));
-
         $task->getCn()->willReturn('some_task');
 
-        $toolkit->getFilesystem()->willReturn($filesystem);
-        $toolkit->getBuildsDir()->willReturn(realpath(__DIR__ . '/../../../data/builds'));
+        $this->getBuildDir($task)->shouldMatch(
+            '|^/path/to/builds/some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/some_task$|'
+        );
+    }
 
-        $filesystem->mkdir(Argument::type('string'))->shouldBeCalled();
-        $filesystem->exists(Argument::type('string'))->willReturn(true);
-
-        $toolkit->activateBuildLogHandler(Argument::type('string'))->shouldBeCalled();
+    function it_has_tasks(Task $task)
+    {
+        $this->getTasks()->shouldReturn(array('some_task' => $task));
     }
 }

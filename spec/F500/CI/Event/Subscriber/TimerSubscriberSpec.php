@@ -7,14 +7,9 @@
 
 namespace spec\F500\CI\Event\Subscriber;
 
-use F500\CI\Build\Build;
-use F500\CI\Event\BuildEvent;
-use F500\CI\Event\SuiteEvent;
-use F500\CI\Event\TaskEvent;
-use F500\CI\Metadata\BuildMetadata;
-use F500\CI\Metadata\SuiteMetadata;
-use F500\CI\Metadata\TaskMetadata;
-use F500\CI\Suite\Suite;
+use F500\CI\Build\Result;
+use F500\CI\Event\BuildRunEvent;
+use F500\CI\Event\TaskRunEvent;
 use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -36,39 +31,25 @@ class TimerSubscriberSpec extends ObjectBehavior
         $this->shouldImplement('Symfony\Component\EventDispatcher\EventSubscriberInterface');
     }
 
-    function it_stores_elapsed_time_in_metadata_when_build_finished_event_is_dispatched(
-        Build $build,
-        BuildMetadata $metadata,
-        BuildEvent $event
-    ) {
-        $event->getBuild()->willReturn($build);
-        $build->getMetadata()->willReturn($metadata);
-        $metadata->setElapsedTime(Argument::type('float'))->shouldBeCalled();
+    function it_stores_elapsed_time_when_build_finished_event_is_dispatched(BuildRunEvent $event, Result $result)
+    {
+        $event->getResult()->willReturn($result);
 
         $this->onBuildFinished($event);
+
+        $result->setElapsedBuildTime(Argument::type('float'))->shouldHaveBeenCalled();
     }
 
-    function it_stores_elapsed_time_in_metadata_when_suite_finished_event_is_dispatched(
-        Suite $suite,
-        SuiteMetadata $metadata,
-        SuiteEvent $event
-    ) {
-        $event->getSuite()->willReturn($suite);
-        $suite->getMetadata()->willReturn($metadata);
-        $metadata->setElapsedTime(Argument::type('float'))->shouldBeCalled();
-
-        $this->onSuiteFinished($event);
-    }
-
-    function it_stores_elapsed_time_in_metadata_when_task_finished_event_is_dispatched(
+    function it_stores_elapsed_time_when_task_finished_event_is_dispatched(
         Task $task,
-        TaskMetadata $metadata,
-        TaskEvent $event
+        TaskRunEvent $event,
+        Result $result
     ) {
         $event->getTask()->willReturn($task);
-        $task->getMetadata()->willReturn($metadata);
-        $metadata->setElapsedTime(Argument::type('float'))->shouldBeCalled();
+        $event->getResult()->willReturn($result);
 
         $this->onTaskFinished($event);
+
+        $result->setElapsedTaskTime($task, Argument::type('float'))->shouldHaveBeenCalled();
     }
 }

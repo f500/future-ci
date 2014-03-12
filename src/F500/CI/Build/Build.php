@@ -7,8 +7,6 @@
 
 namespace F500\CI\Build;
 
-use F500\CI\Metadata\BuildMetadata;
-use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
 
 /**
@@ -21,10 +19,12 @@ use F500\CI\Suite\Suite;
  */
 interface Build
 {
+
     /**
-     * @param Suite $suite
+     * @param Suite  $suite
+     * @param string $buildsDir
      */
-    public function __construct(Suite $suite);
+    public function __construct(Suite $suite, $buildsDir);
 
     /**
      * @return string
@@ -37,19 +37,14 @@ interface Build
     public function getDate();
 
     /**
-     * @return Suite
+     * @return string
      */
-    public function getSuite();
+    public function getName();
 
     /**
-     * @return BuildMetadata
+     * @return string
      */
-    public function getMetadata();
-
-    /**
-     * @param BuildMetadata $metadata
-     */
-    public function setMetadata(BuildMetadata $metadata);
+    public function getProjectDir();
 
     /**
      * @return string
@@ -57,20 +52,7 @@ interface Build
     public function getBuildDir();
 
     /**
-     * @param Toolkit $toolkit
-     * @return bool
+     * @return \F500\CI\Task\Task[]
      */
-    public function initialize(Toolkit $toolkit);
-
-    /**
-     * @param Toolkit $toolkit
-     * @return bool
-     */
-    public function run(Toolkit $toolkit);
-
-    /**
-     * @param Toolkit $toolkit
-     * @return bool
-     */
-    public function cleanup(Toolkit $toolkit);
+    public function getTasks();
 }

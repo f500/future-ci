@@ -7,12 +7,8 @@
 
 namespace F500\CI\Build;
 
-use F500\CI\Event\BuildEvent;
-use F500\CI\Event\Events;
-use F500\CI\Metadata\BuildMetadata;
-use F500\CI\Run\Toolkit;
 use F500\CI\Suite\Suite;
-use Psr\Log\LogLevel;
+use F500\CI\Task\Task;
 
 /**
  * Class StandardBuild
@@ -31,29 +27,25 @@ class StandardBuild implements Build
     protected $date;
 
     /**
-     * @var Suite
-     */
-    protected $suite;
-
-    /**
-     * @var BuildMetadata
-     */
-    protected $metadata;
-
-    /**
      * @var string
      */
     protected $buildDir;
 
     /**
-     * @param Suite $suite
+     * @var Suite
      */
-    public function __construct(Suite $suite)
+    protected $suite;
+
+    /**
+     * @param Suite  $suite
+     * @param string $buildsDir
+     */
+    public function __construct(Suite $suite, $buildsDir)
     {
         $this->date  = new \DateTimeImmutable();
         $this->suite = $suite;
 
-        $suite->setActiveBuild($this);
+        $this->buildDir = $buildsDir . '/' . $this->getCn();
     }
 
     /**
@@ -61,7 +53,7 @@ class StandardBuild implements Build
      */
     public function getCn()
     {
-        return $this->getSuite()->getCn() . $this->getDate()->format('.Y.m.d.H.i.s');
+        return $this->suite->getCn() . $this->date->format('.Y.m.d.H.i.s');
     }
 
     /**
@@ -73,143 +65,41 @@ class StandardBuild implements Build
     }
 
     /**
-     * @return Suite
+     * @return string
      */
-    public function getSuite()
+    public function getName()
     {
-        return $this->suite;
-    }
-
-    /**
-     * @return BuildMetadata
-     */
-    public function getMetadata()
-    {
-        return $this->metadata;
-    }
-
-    /**
-     * @param BuildMetadata $metadata
-     */
-    public function setMetadata(BuildMetadata $metadata)
-    {
-        $this->metadata = $metadata;
+        return $this->suite->getName();
     }
 
     /**
      * @return string
-     * @throws \RuntimeException
      */
-    public function getBuildDir()
+    public function getProjectDir()
     {
-        if (!$this->buildDir) {
-            throw new \RuntimeException('Build has not been initialized yet.');
-        }
-
-        return $this->buildDir;
+        return $this->suite->getProjectDir();
     }
 
     /**
-     * @param Toolkit $toolkit
-     * @return bool
-     * @throws \RuntimeException
+     * @param Task $task
+     * @return string
      */
-    public function initialize(Toolkit $toolkit)
+    public function getBuildDir(Task $task = null)
     {
-        try {
-            $this->buildDir = $toolkit->getBuildsDir() . '/' . $this->getCn();
+        $buildDir = $this->buildDir;
 
-            $toolkit->getFilesystem()->mkdir($this->buildDir);
-            if (!$toolkit->getFilesystem()->exists($this->buildDir)) {
-                $toolkit->getLogger()->log(
-                    LogLevel::ERROR,
-                    sprintf('Cannot create dir "%s".', $this->buildDir),
-                    array('build' => $this->getCn())
-                );
-
-                return false;
-            }
-
-            foreach ($this->getSuite()->getTasks() as $task) {
-                $dir = $this->buildDir . '/' . $task->getCn();
-
-                $toolkit->getFilesystem()->mkdir($dir);
-                if (!$toolkit->getFilesystem()->exists($dir)) {
-                    $toolkit->getLogger()->log(
-                        LogLevel::ERROR,
-                        sprintf('Cannot create dir "%s".', $dir),
-                        array('build' => $this->getCn())
-                    );
-
-                    return false;
-                }
-            }
-
-            $toolkit->activateBuildLogHandler($this->buildDir . '/build.log');
-
-            $toolkit->getDispatcher()->dispatch(Events::BuildInitialized, new BuildEvent($this));
-            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" initialized.', $this->getCn()));
-
-            return true;
-        } catch (\Exception $e) {
-            $toolkit->getLogger()->log(
-                LogLevel::CRITICAL,
-                sprintf('An exception occurred during initialize: %s', $e->getMessage()),
-                array('build' => $this->getCn())
-            );
-
-            return false;
+        if ($task) {
+            $buildDir .= '/' . $task->getCn();
         }
+
+        return $buildDir;
     }
 
     /**
-     * @param Toolkit $toolkit
-     * @return bool
+     * @return \F500\CI\Task\Task[]
      */
-    public function run(Toolkit $toolkit)
+    public function getTasks()
     {
-        try {
-            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" started.', $this->getCn()));
-            $toolkit->getDispatcher()->dispatch(Events::BuildStarted, new BuildEvent($this));
-
-            $result = $this->suite->run($toolkit);
-
-            $toolkit->getDispatcher()->dispatch(Events::BuildFinished, new BuildEvent($this));
-            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" finished.', $this->getCn()));
-
-            return $result;
-        } catch (\Exception $e) {
-            $toolkit->getLogger()->log(
-                LogLevel::CRITICAL,
-                sprintf('An exception occurred during run: %s', $e->getMessage()),
-                array('build' => $this->getCn())
-            );
-
-            return false;
-        }
-    }
-
-    /**
-     * @param Toolkit $toolkit
-     * @return bool
-     */
-    public function cleanup(Toolkit $toolkit)
-    {
-        try {
-            $toolkit->deactivateBuildLogHandler();
-
-            $toolkit->getDispatcher()->dispatch(Events::BuildCleanedUp, new BuildEvent($this));
-            $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Build "%s" cleaned up.', $this->getCn()));
-
-            return true;
-        } catch (\Exception $e) {
-            $toolkit->getLogger()->log(
-                LogLevel::CRITICAL,
-                sprintf('An exception occurred during cleanup: %s', $e->getMessage()),
-                array('build' => $this->getCn())
-            );
-
-            return false;
-        }
+        return $this->suite->getTasks();
     }
 }

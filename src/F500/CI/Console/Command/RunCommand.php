@@ -7,6 +7,7 @@
 
 namespace F500\CI\Console\Command;
 
+use F500\CI\Build\Result;
 use F500\CI\Event\Subscriber\ConsoleOutputSubscriber;
 use F500\CI\Event\Subscriber\TimerSubscriber;
 use Symfony\Component\Console\Input\InputArgument;
@@ -53,16 +54,34 @@ class RunCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $filename = $input->getArgument('suite') . '.' . $input->getOption('format');
+        /**
+         * @var \F500\CI\Runner\Configurator $configurator
+         * @var \F500\CI\Runner\BuildRunner  $buildRunner
+         */
+        $configurator = $this->getService('f500ci.configurator');
+        $runner       = $this->getService('f500ci.build_runner');
 
-        $runner = $this->getService('f500ci.runner');
+        $config = $configurator->loadConfig($input->getArgument('suite'), $input->getOption('format'));
 
-        $build = $runner->setup($filename);
+        $suite = $configurator->createSuite($config['suite_class'], $config['suite_cn'], $config);
+        $build = $configurator->createBuild($config['build_class'], $suite);
 
-        $runner->initialize($build);
-        $runner->run($build);
-        $runner->cleanup($build);
+        $result = new Result($this->getService('filesystem'), $build->getBuildDir());
 
-        $output->writeln('');
+        if (!$runner->initialize($build)) {
+            $output->writeln("<bg=red>\xE2\x9C\x98 Initializing build failed!</bg=red>");
+
+            return;
+        }
+
+        if (!$runner->run($build, $result)) {
+            return;
+        }
+
+        if (!$runner->cleanup($build)) {
+            $output->writeln("<fg=magenta>\xE2\x9C\x98 Cleaning up build failed!</fg=magenta>");
+
+            return;
+        }
     }
 }

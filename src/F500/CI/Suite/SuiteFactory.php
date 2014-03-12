@@ -24,20 +24,21 @@ class SuiteFactory
      * @return Suite
      * @throws \InvalidArgumentException
      */
-    public function create($class, $cn)
+    public function createSuite($class, $cn)
     {
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" for suite "%s" does not exist.', $class, $cn));
+            throw new \InvalidArgumentException(sprintf('Cannot create suite, class "%s" does not exist.', $class));
         }
 
         $suite = new $class($cn);
 
         if (!$suite instanceof Suite) {
-            throw new \InvalidArgumentException(sprintf(
-                'Class "%s" for suite "%s" should implement F500\CI\Suite\Suite.',
-                $class,
-                $cn
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot create suite, class "%s" does not implement F500\CI\Suite\Suite.',
+                    $class
+                )
+            );
         }
 
         return $suite;

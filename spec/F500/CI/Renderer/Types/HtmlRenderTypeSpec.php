@@ -21,16 +21,6 @@ use Prophecy\Argument;
 class HtmlRenderTypeSpec extends ObjectBehavior
 {
 
-    protected $text = <<<'EOT'
-<!DOCTYPE html>
-<html>
-    <body>
-        <h1>Hello World!</h1>
-    </body>
-</html>
-
-EOT;
-
     function let()
     {
         $viewDir = __DIR__ . '/../../../../data/views';
@@ -46,6 +36,16 @@ EOT;
 
     function it_renders_html()
     {
-        $this->render('html_render_type')->shouldReturn($this->text);
+        $text = <<<'EOT'
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Hello World!</h1>
+    </body>
+</html>
+
+EOT;
+
+        $this->render('html_render_type')->shouldReturn($text);
     }
 }

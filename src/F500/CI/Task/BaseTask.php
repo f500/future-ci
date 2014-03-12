@@ -7,15 +7,7 @@
 
 namespace F500\CI\Task;
 
-use F500\CI\Command\Command;
-use F500\CI\Command\CommandFactory;
-use F500\CI\Event\Events;
-use F500\CI\Event\TaskEvent;
-use F500\CI\Metadata\Metadata;
-use F500\CI\Metadata\TaskMetadata;
-use F500\CI\Run\Toolkit;
-use F500\CI\Suite\Suite;
-use Psr\Log\LogLevel;
+use F500\CI\Command\Wrapper\Wrapper;
 
 /**
  * Class BaseTask
@@ -34,11 +26,6 @@ abstract class BaseTask implements Task
     protected $cn;
 
     /**
-     * @var Suite
-     */
-    protected $suite;
-
-    /**
      * @var string
      */
     protected $name;
@@ -49,27 +36,30 @@ abstract class BaseTask implements Task
     protected $options;
 
     /**
-     * @var string[]
+     * @var ResultParser[]
+     */
+    protected $resultParsers;
+
+    /**
+     * @var \F500\CI\Command\Wrapper\Wrapper[]
      */
     protected $wrappers;
 
     /**
-     * @var Metadata
+     * @var bool
      */
-    protected $metadata;
+    protected $stopOnFailure;
 
     /**
      * @param string $cn
-     * @param Suite  $suite
      */
-    public function __construct($cn, Suite $suite)
+    public function __construct($cn)
     {
-        $this->cn       = $cn;
-        $this->suite    = $suite;
-        $this->options  = array();
-        $this->wrappers = array();
-
-        $suite->addTask($cn, $this);
+        $this->cn            = $cn;
+        $this->options       = array();
+        $this->resultParsers = array();
+        $this->wrappers      = array();
+        $this->stopOnFailure = false;
     }
 
     /**
@@ -81,11 +71,11 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @return Suite
+     * @param string $name
      */
-    public function getSuite()
+    public function setName($name)
     {
-        return $this->suite;
+        $this->name = $name;
     }
 
     /**
@@ -97,11 +87,11 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param string $name
+     * @param array $options
      */
-    public function setName($name)
+    public function setOptions(array $options)
     {
-        $this->name = $name;
+        $this->options = $options;
     }
 
     /**
@@ -116,15 +106,33 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param array $options
+     * @param string       $cn
+     * @param ResultParser $resultParser
      */
-    public function setOptions(array $options)
+    public function addResultParser($cn, ResultParser $resultParser)
     {
-        $this->options = $options;
+        $this->resultParsers[$cn] = $resultParser;
     }
 
     /**
-     * @return string[]
+     * @return ResultParser[]
+     */
+    public function getResultParsers()
+    {
+        return $this->resultParsers;
+    }
+
+    /**
+     * @param string                           $cn
+     * @param \F500\CI\Command\Wrapper\Wrapper $wrapper
+     */
+    public function addWrapper($cn, Wrapper $wrapper)
+    {
+        $this->wrappers[$cn] = $wrapper;
+    }
+
+    /**
+     * @return Wrapper[]
      */
     public function getWrappers()
     {
@@ -132,32 +140,19 @@ abstract class BaseTask implements Task
     }
 
     /**
-     * @param string[] $cns
-     * @throws \InvalidArgumentException
+     * @return bool
      */
-    public function setWrappers($cns)
+    public function stopOnFailure()
     {
-        if (($unique = array_unique($cns)) != $cns) {
-            throw new \InvalidArgumentException('Duplicate wrappers passed.');
-        }
-
-        $this->wrappers = $unique;
+        return $this->stopOnFailure;
     }
 
     /**
-     * @return TaskMetadata
+     * @param bool $stop
      */
-    public function getMetadata()
+    public function setStopOnFailure($stop)
     {
-        return $this->metadata;
-    }
-
-    /**
-     * @param TaskMetadata $metadata
-     */
-    public function setMetadata(TaskMetadata $metadata)
-    {
-        $this->metadata = $metadata;
+        $this->stopOnFailure = (bool)$stop;
     }
 
     /**
@@ -165,38 +160,9 @@ abstract class BaseTask implements Task
      */
     protected function getDefaultOptions()
     {
-        return array();
-    }
-
-    /**
-     * @param Toolkit $toolkit
-     */
-    protected function startRun(Toolkit $toolkit)
-    {
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Task "%s" started.', $this->getCn()));
-        $toolkit->getDispatcher()->dispatch(Events::TaskStarted, new TaskEvent($this));
-    }
-
-    /**
-     * @param Toolkit $toolkit
-     */
-    protected function finishRun(Toolkit $toolkit)
-    {
-        $toolkit->getDispatcher()->dispatch(Events::TaskFinished, new TaskEvent($this));
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Task "%s" finished.', $this->getCn()));
-    }
-
-    /**
-     * @param Command        $command
-     * @param CommandFactory $commandFactory
-     * @return Command
-     */
-    protected function wrapCommand(Command $command, CommandFactory $commandFactory)
-    {
-        foreach ($this->getWrappers() as $wrapperCn) {
-            $command = $this->getSuite()->getWrapper($wrapperCn)->wrap($command, $commandFactory);
-        }
-
-        return $command;
+        return array(
+            'cwd' => '',
+            'env' => array()
+        );
     }
 }

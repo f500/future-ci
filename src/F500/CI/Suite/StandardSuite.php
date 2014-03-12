@@ -7,14 +7,9 @@
 
 namespace F500\CI\Suite;
 
-use F500\CI\Build\Build;
-use F500\CI\Event\Events;
+use F500\CI\Command\Wrapper\Wrapper;
 use F500\CI\Event\SuiteEvent;
-use F500\CI\Metadata\SuiteMetadata;
-use F500\CI\Run\Toolkit;
 use F500\CI\Task\Task;
-use F500\CI\Wrapper\Wrapper;
-use Psr\Log\LogLevel;
 
 /**
  * Class StandardSuite
@@ -43,11 +38,6 @@ class StandardSuite implements Suite
     protected $projectDir;
 
     /**
-     * @var Build
-     */
-    protected $activeBuild;
-
-    /**
      * @var Task[]
      */
     protected $tasks;
@@ -56,11 +46,6 @@ class StandardSuite implements Suite
      * @var Wrapper[]
      */
     protected $wrappers;
-
-    /**
-     * @var SuiteMetadata
-     */
-    protected $metadata;
 
     /**
      * @param string $cn
@@ -80,14 +65,6 @@ class StandardSuite implements Suite
     }
 
     /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
      * @param string $name
      */
     public function setName($name)
@@ -98,9 +75,9 @@ class StandardSuite implements Suite
     /**
      * @return string
      */
-    public function getProjectDir()
+    public function getName()
     {
-        return $this->projectDir;
+        return $this->name;
     }
 
     /**
@@ -112,27 +89,11 @@ class StandardSuite implements Suite
     }
 
     /**
-     * @return Build
+     * @return string
      */
-    public function getActiveBuild()
+    public function getProjectDir()
     {
-        return $this->activeBuild;
-    }
-
-    /**
-     * @param Build $build
-     */
-    public function setActiveBuild(Build $build)
-    {
-        $this->activeBuild = $build;
-    }
-
-    /**
-     * @return Task[]
-     */
-    public function getTasks()
-    {
-        return $this->tasks;
+        return $this->projectDir;
     }
 
     /**
@@ -147,6 +108,28 @@ class StandardSuite implements Suite
         }
 
         $this->tasks[$cn] = $task;
+    }
+
+    /**
+     * @return Task[]
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+    /**
+     * @param string  $cn
+     * @param Wrapper $wrapper
+     * @throws \InvalidArgumentException
+     */
+    public function addWrapper($cn, Wrapper $wrapper)
+    {
+        if (isset($this->wrappers[$cn])) {
+            throw new \InvalidArgumentException(sprintf('Wrapper "%s" already added.', $cn));
+        }
+
+        $this->wrappers[$cn] = $wrapper;
     }
 
     /**
@@ -169,58 +152,5 @@ class StandardSuite implements Suite
         }
 
         return $this->wrappers[$cn];
-    }
-
-    /**
-     * @param string  $cn
-     * @param Wrapper $wrapper
-     * @throws \InvalidArgumentException
-     */
-    public function addWrapper($cn, Wrapper $wrapper)
-    {
-        if (isset($this->wrappers[$cn])) {
-            throw new \InvalidArgumentException(sprintf('Wrapper "%s" already added.', $cn));
-        }
-
-        $this->wrappers[$cn] = $wrapper;
-    }
-
-    /**
-     * @return SuiteMetadata
-     */
-    public function getMetadata()
-    {
-        return $this->metadata;
-    }
-
-    /**
-     * @param SuiteMetadata $metadata
-     */
-    public function setMetadata(SuiteMetadata $metadata)
-    {
-        $this->metadata = $metadata;
-    }
-
-    /**
-     * @param Toolkit $toolkit
-     * @return bool
-     */
-    public function run(Toolkit $toolkit)
-    {
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Suite "%s" started.', $this->getCn()));
-        $toolkit->getDispatcher()->dispatch(Events::SuiteStarted, new SuiteEvent($this));
-
-        $result = true;
-        foreach ($this->getTasks() as $task) {
-            if (!$task->run($toolkit)) {
-                $result = false;
-                break;
-            }
-        }
-
-        $toolkit->getDispatcher()->dispatch(Events::SuiteFinished, new SuiteEvent($this));
-        $toolkit->getLogger()->log(LogLevel::DEBUG, sprintf('Suite "%s" finished.', $this->getCn()));
-
-        return $result;
     }
 }

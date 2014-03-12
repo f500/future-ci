@@ -11,6 +11,9 @@
     <files>
         <directory>src</directory>
     </files>
+    <transformations>
+        <template name="responsive-twig"/>
+    </transformations>
     <logging>
         <level>notice</level>
         <paths>

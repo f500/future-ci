@@ -7,9 +7,10 @@
 
 namespace F500\CI\Task;
 
-use F500\CI\Metadata\TaskMetadata;
-use F500\CI\Run\Toolkit;
-use F500\CI\Suite\Suite;
+use F500\CI\Build\Build;
+use F500\CI\Command\Command;
+use F500\CI\Command\CommandFactory;
+use F500\CI\Command\Wrapper\Wrapper;
 
 /**
  * Interface Task
@@ -24,9 +25,8 @@ interface Task
 
     /**
      * @param string $cn
-     * @param Suite  $suite
      */
-    public function __construct($cn, Suite $suite);
+    public function __construct($cn);
 
     /**
      * @return string
@@ -34,9 +34,9 @@ interface Task
     public function getCn();
 
     /**
-     * @return Suite
+     * @param string $name
      */
-    public function getSuite();
+    public function setName($name);
 
     /**
      * @return string
@@ -44,9 +44,9 @@ interface Task
     public function getName();
 
     /**
-     * @param string $name
+     * @param array $options
      */
-    public function setName($name);
+    public function setOptions(array $options);
 
     /**
      * @return array
@@ -54,33 +54,41 @@ interface Task
     public function getOptions();
 
     /**
-     * @param array $options
+     * @param string       $cn
+     * @param ResultParser $resultParser
      */
-    public function setOptions(array $options);
+    public function addResultParser($cn, ResultParser $resultParser);
 
     /**
-     * @return string[]
+     * @return ResultParser[]
+     */
+    public function getResultParsers();
+
+    /**
+     * @param string                           $cn
+     * @param \F500\CI\Command\Wrapper\Wrapper $wrapper
+     */
+    public function addWrapper($cn, Wrapper $wrapper);
+
+    /**
+     * @return Wrapper[]
      */
     public function getWrappers();
 
     /**
-     * @param string[] $cns
-     */
-    public function setWrappers($cns);
-
-    /**
-     * @return TaskMetadata
-     */
-    public function getMetadata();
-
-    /**
-     * @param TaskMetadata $metadata
-     */
-    public function setMetadata(TaskMetadata $metadata);
-
-    /**
-     * @param Toolkit $toolkit
      * @return bool
      */
-    public function run(Toolkit $toolkit);
+    public function stopOnFailure();
+
+    /**
+     * @param bool $stop
+     */
+    public function setStopOnFailure($stop);
+
+    /**
+     * @param Build          $build
+     * @param CommandFactory $commandFactory
+     * @return Command[]
+     */
+    public function buildCommands(Build $build, CommandFactory $commandFactory);
 }

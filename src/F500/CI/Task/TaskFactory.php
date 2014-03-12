@@ -7,8 +7,6 @@
 
 namespace F500\CI\Task;
 
-use F500\CI\Suite\Suite;
-
 /**
  * Class TaskFactory
  *
@@ -23,24 +21,24 @@ class TaskFactory
     /**
      * @param string $class
      * @param string $cn
-     * @param Suite  $suite
      * @return Task
      * @throws \InvalidArgumentException
      */
-    public function create($class, $cn, Suite $suite)
+    public function createTask($class, $cn)
     {
         if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" for task "%s" does not exist.', $class, $cn));
+            throw new \InvalidArgumentException(sprintf('Cannot create task, class "%s" does not exist.', $class));
         }
 
-        $task = new $class($cn, $suite);
+        $task = new $class($cn);
 
         if (!$task instanceof Task) {
-            throw new \InvalidArgumentException(sprintf(
-                'Class "%s" for task "%s" should implement F500\CI\Task\Task.',
-                $class,
-                $cn
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Cannot create suite, class "%s" does not implement F500\CI\Task\Task.',
+                    $class
+                )
+            );
         }
 
         return $task;

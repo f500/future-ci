@@ -7,8 +7,8 @@
 
 namespace spec\F500\CI\Task;
 
-use F500\CI\Suite\Suite;
-use F500\CI\Wrapper\Wrapper;
+use F500\CI\Command\Wrapper\Wrapper;
+use F500\CI\Task\ResultParser;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -25,22 +25,15 @@ abstract class TaskSpec extends ObjectBehavior
 
     protected $defaultOptions = array();
 
-    function let(Suite $suite)
+    function let()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('some_task', $suite);
-
-        $suite->addTask('some_task', $this->getWrappedObject())->shouldBeCalled();
+        $this->beConstructedWith('some_task');
     }
 
     function it_has_a_cn()
     {
         $this->getCn()->shouldReturn('some_task');
-    }
-
-    function it_has_a_suite(Suite $suite)
-    {
-        $this->getSuite()->shouldReturn($suite);
     }
 
     function it_has_a_name_after_setting_it()
@@ -51,36 +44,37 @@ abstract class TaskSpec extends ObjectBehavior
         $this->getName()->shouldReturn($name);
     }
 
-    function it_has_default_options()
+    function it_does_not_have_resultparsers_initially()
     {
-        $this->getOptions()->shouldReturn($this->defaultOptions);
+        $this->getResultParsers()->shouldReturn(array());
     }
 
-    function it_has_other_options_after_setting_them()
+    function its_resultparsers_can_be_added_to(ResultParser $resultParser)
     {
-        $options = array_replace_recursive(
-            $this->defaultOptions,
-            array(
-                'some_option'  => 'foo',
-                'other_option' => 'bar'
-            )
-        );
-
-        $this->setOptions($options);
-        $this->getOptions()->shouldReturn($options);
+        $this->addResultParser('some_parser', $resultParser);
+        $this->getResultParsers()->shouldReturn(array('some_parser' => $resultParser));
     }
 
-    function it_has_wrappers_after_setting_them()
+    function it_does_not_have_wrappers_initially()
     {
-        $this->setWrappers(array('some_wrapper'));
-        $this->getWrappers()->shouldReturn(array('some_wrapper'));
+        $this->getWrappers()->shouldReturn(array());
     }
 
-    function it_fails_setting_wrappers_if_duplicates_exist(Wrapper $wrapper)
+    function its_wrappers_can_be_added_to(Wrapper $wrapper)
     {
-        $this->shouldThrow('InvalidArgumentException')->during(
-            'setWrappers',
-            array(array('some_wrapper', 'some_wrapper'))
-        );
+        $this->addWrapper('some_wrapper', $wrapper);
+        $this->getWrappers()->shouldReturn(array('some_wrapper' => $wrapper));
+    }
+
+    function it_does_not_stop_on_failure_initially()
+    {
+        $this->stopOnFailure()->shouldReturn(false);
+    }
+
+    function it_stops_on_failure_after_setting_it()
+    {
+        $this->setStopOnFailure(true);
+
+        $this->stopOnFailure()->shouldReturn(true);
     }
 }

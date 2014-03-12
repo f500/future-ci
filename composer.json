@@ -12,7 +12,10 @@
         "bin-dir": "bin"
     },
     "autoload": {
-        "psr-0": { "F500": "./src/" }
+        "psr-0": {
+            "F500": "./src/",
+            "F500\\Provider": "./lib/filesystem"
+        }
     },
 
     "require": {
@@ -20,9 +23,9 @@
         "cilex/console-service-provider": "~1.0",
         "igorw/config-service-provider": "~1.2",
         "monolog/monolog": "~1.7",
-        "neutron/silex-filesystem-provider": "~1.0",
         "silex/silex": "~1.1",
         "symfony/console": "~2.4",
+        "symfony/filesystem": "~2.4",
         "symfony/process": "~2.4"
     },
     "require-dev": {

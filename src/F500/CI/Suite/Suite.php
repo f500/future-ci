@@ -7,11 +7,8 @@
 
 namespace F500\CI\Suite;
 
-use F500\CI\Build\Build;
-use F500\CI\Metadata\SuiteMetadata;
-use F500\CI\Run\Toolkit;
+use F500\CI\Command\Wrapper\Wrapper;
 use F500\CI\Task\Task;
-use F500\CI\Wrapper\Wrapper;
 
 /**
  * Interface Suite
@@ -35,11 +32,6 @@ interface Suite
     public function getCn();
 
     /**
-     * @return string
-     */
-    public function getName();
-
-    /**
      * @param string $name
      */
     public function setName($name);
@@ -47,7 +39,7 @@ interface Suite
     /**
      * @return string
      */
-    public function getProjectDir();
+    public function getName();
 
     /**
      * @param string $dir
@@ -55,19 +47,9 @@ interface Suite
     public function setProjectDir($dir);
 
     /**
-     * @return Build
+     * @return string
      */
-    public function getActiveBuild();
-
-    /**
-     * @param Build $build
-     */
-    public function setActiveBuild(Build $build);
-
-    /**
-     * @return Task[]
-     */
-    public function getTasks();
+    public function getProjectDir();
 
     /**
      * @param string $cn
@@ -77,35 +59,24 @@ interface Suite
     public function addTask($cn, Task $task);
 
     /**
-     * @return Wrapper[]
+     * @return Task[]
+     */
+    public function getTasks();
+
+    /**
+     * @param string                           $cn
+     * @param \F500\CI\Command\Wrapper\Wrapper $wrapper
+     */
+    public function addWrapper($cn, Wrapper $wrapper);
+
+    /**
+     * @return \F500\CI\Command\Wrapper\Wrapper[]
      */
     public function getWrappers();
 
     /**
      * @param string $cn
-     * @return Wrapper
+     * @return \F500\CI\Command\Wrapper\Wrapper
      */
     public function getWrapper($cn);
-
-    /**
-     * @param string  $cn
-     * @param Wrapper $wrapper
-     */
-    public function addWrapper($cn, Wrapper $wrapper);
-
-    /**
-     * @return SuiteMetadata
-     */
-    public function getMetadata();
-
-    /**
-     * @param SuiteMetadata $metadata
-     */
-    public function setMetadata(SuiteMetadata $metadata);
-
-    /**
-     * @param Toolkit $toolkit
-     * @return bool
-     */
-    public function run(Toolkit $toolkit);
 }

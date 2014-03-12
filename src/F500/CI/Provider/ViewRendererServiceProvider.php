@@ -52,17 +52,21 @@ class ViewRendererServiceProvider implements ServiceProviderInterface
                 $viewRenderer = new $class();
 
                 if (!$viewRenderer instanceof ViewRenderer) {
-                    throw new \RuntimeException('"f500ci.renderer.class" should be an instance of F500\CI\Renderer\ViewRenderer.');
+                    throw new \RuntimeException(
+                        '"f500ci.renderer.class" should be an instance of F500\CI\Renderer\ViewRenderer.'
+                    );
                 }
 
                 foreach ($app['f500ci.renderer.types'] as $name => $class) {
                     $renderType = new $class($app['f500ci.renderer.view_dir']);
 
                     if (!$renderType instanceof RenderType) {
-                        throw new \RuntimeException(sprintf(
-                            'Type "%s" should be an instance of F500\CI\Renderer\Types\RenderType.',
-                            $name
-                        ));
+                        throw new \RuntimeException(
+                            sprintf(
+                                'Type "%s" should be an instance of F500\CI\Renderer\Types\RenderType.',
+                                $name
+                            )
+                        );
                     }
 
                     $viewRenderer->registerType($name, $renderType);

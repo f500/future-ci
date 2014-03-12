@@ -7,14 +7,10 @@
 
 namespace spec\F500\CI\Suite;
 
-use F500\CI\Build\Build;
-use F500\CI\Run\Toolkit;
+use F500\CI\Command\Wrapper\Wrapper;
 use F500\CI\Task\Task;
-use F500\CI\Wrapper\Wrapper;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class StandardSuiteSpec
@@ -58,13 +54,6 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->getProjectDir()->shouldReturn('/path/to/project');
     }
 
-    function it_has_an_active_build_after_setting_it(Build $build)
-    {
-        $this->setActiveBuild($build);
-
-        $this->getActiveBuild()->shouldReturn($build);
-    }
-
     function it_can_add_a_task_to_itself(Task $task)
     {
         $this->addTask('some_task', $task);
@@ -106,16 +95,5 @@ class StandardSuiteSpec extends ObjectBehavior
             'getWrapper',
             array('some_wrapper')
         );
-    }
-
-    function it_runs_itself(Task $task, Toolkit $toolkit, EventDispatcherInterface $dispatcher, LoggerInterface $logger)
-    {
-        $toolkit->getDispatcher()->willReturn($dispatcher);
-        $toolkit->getLogger()->willReturn($logger);
-
-        $task->run($toolkit)->willReturn(true);
-
-        $this->addTask('some_task', $task);
-        $this->run($toolkit)->shouldReturn(true);
     }
 }

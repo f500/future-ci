@@ -64,14 +64,6 @@ class Command
     }
 
     /**
-     * @return array
-     */
-    public function getArgs()
-    {
-        return $this->args;
-    }
-
-    /**
      * @param string $arg
      */
     public function addArg($arg)
@@ -80,11 +72,11 @@ class Command
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getCwd()
+    public function getArgs()
     {
-        return $this->cwd;
+        return $this->args;
     }
 
     /**
@@ -96,11 +88,11 @@ class Command
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getEnv()
+    public function getCwd()
     {
-        return $this->env;
+        return $this->cwd;
     }
 
     /**
@@ -110,6 +102,14 @@ class Command
     public function addEnv($name, $value)
     {
         $this->env[$name] = $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEnv()
+    {
+        return $this->env;
     }
 
     /**
@@ -125,6 +125,22 @@ class Command
         }
 
         return $string;
+    }
+
+    /**
+     * @param int    $resultCode
+     * @param string $output
+     */
+    public function setResult($resultCode, $output)
+    {
+        $this->resultCode = $resultCode;
+        $this->output     = $output;
+    }
+
+    public function clearResult()
+    {
+        $this->resultCode = null;
+        $this->output     = null;
     }
 
     /**
@@ -151,21 +167,5 @@ class Command
         }
 
         return $this->output;
-    }
-
-    /**
-     * @param int    $resultCode
-     * @param string $output
-     */
-    public function setResult($resultCode, $output)
-    {
-        $this->resultCode = $resultCode;
-        $this->output     = $output;
-    }
-
-    public function clearResult()
-    {
-        $this->resultCode = null;
-        $this->output     = null;
     }
 }

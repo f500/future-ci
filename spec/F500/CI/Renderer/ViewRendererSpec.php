@@ -29,9 +29,9 @@ class ViewRendererSpec extends ObjectBehavior
 
     function it_renders_a_view_using_a_rendertype(RenderType $type)
     {
-        $type->render(Argument::type('string'), Argument::type('array'))->shouldBeCalled();
-
         $this->registerType('text', $type);
         $this->render('text', 'some_template');
+
+        $type->render(Argument::type('string'), Argument::type('array'))->shouldHaveBeenCalled();
     }
 }

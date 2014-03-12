@@ -10,6 +10,7 @@ namespace spec\F500\CI\Command\Wrapper;
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
 use F500\CI\Command\StoreResultCommand;
+use F500\PhpSpec\Doubler;
 use Prophecy\Argument;
 
 /**
@@ -87,7 +88,7 @@ class AnsibleWrapperSpec extends WrapperSpec
         $oldCommand->getCwd()->willReturn('/tmp');
         $oldCommand->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
 
-        $this->mock_new_command($commandFactory, $newCommand);
+        Doubler::get()->stubCommand($newCommand, $commandFactory);
 
         $this->setOptions(array('host' => 'localhost', 'inventory' => '/etc/ansible/hosts'));
 
@@ -118,7 +119,7 @@ class AnsibleWrapperSpec extends WrapperSpec
         $oldCommand->getSourceDir()->willReturn('/path/to/source/');
         $oldCommand->getDestinationDir()->willReturn('/path/to/destination/');
 
-        $this->mock_new_store_result_command($commandFactory, $newCommand);
+        Doubler::get()->stubStoreResultCommand($newCommand, $commandFactory);
 
         $this->setOptions(array('host' => 'localhost', 'inventory' => '/etc/ansible/hosts'));
 
@@ -133,7 +134,7 @@ class AnsibleWrapperSpec extends WrapperSpec
                 '-m',
                 'synchronize',
                 '-a',
-                'archive=yes delete=no dest=/path/to/destination/ mode=pull rsync_path=/usr/bin/rsync src=/path/to/source/'
+                "'archive=yes delete=no dest=/path/to/destination/ mode=pull rsync_path=/usr/bin/rsync src=/path/to/source/'"
             )
         );
         $wrappedCommand->getCwd()->shouldReturn(null);

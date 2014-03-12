@@ -5,7 +5,7 @@
  * Future CI is licensed under MIT (https://github.com/f500/future-ci/blob/master/LICENSE).
  */
 
-namespace spec\F500\CI\Task\VagrantUp;
+namespace spec\F500\CI\Task\VagrantProvision;
 
 use F500\CI\Build\Build;
 use F500\CI\Command\Command;
@@ -15,19 +15,19 @@ use Prophecy\Argument;
 use spec\F500\CI\Task\TaskSpec;
 
 /**
- * Class VagrantUpTaskSpec
+ * Class VagrantProvisionTaskSpec
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
- * @package   spec\F500\CI\Task
+ * @package   spec\F500\CI\Task\VagrantProvision
  */
-class VagrantUpTaskSpec extends TaskSpec
+class VagrantProvisionTaskSpec extends TaskSpec
 {
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('F500\CI\Task\VagrantUp\VagrantUpTask');
+        $this->shouldHaveType('F500\CI\Task\VagrantProvision\VagrantProvisionTask');
         $this->shouldImplement('F500\CI\Task\Task');
     }
 
@@ -75,8 +75,7 @@ class VagrantUpTaskSpec extends TaskSpec
         $commands[0]->getArgs()->shouldReturn(
             array(
                 '/usr/bin/env vagrant',
-                'up',
-                '--no-provision'
+                'provision'
             )
         );
     }

@@ -84,18 +84,19 @@ EOT;
                     'a1b2c3d4' => array(
                         'task'        => 'some_task',
                         'command_id'  => 'a1b2c3d4',
-                        'command'     => 'vagrant up',
+                        'command'     => '/usr/bin/env vagrant up --no-provision',
                         'result_code' => 0,
                         'output'      => $this->successfulOutput
                     )
                 )
             )
         );
-        $result->markTaskAsSuccessful($task)->willReturn();
+
+        $result->markTaskAsSuccessful($task)
+            ->willReturn()
+            ->shouldBeCalled();
 
         $this->parse($task, $result);
-
-        $result->markTaskAsSuccessful($task)->shouldHaveBeenCalled();
     }
 
     function it_determines_if_a_result_is_unsuccessful(Task $task, Result $result)
@@ -106,17 +107,18 @@ EOT;
                     'a1b2c3d4' => array(
                         'task'        => 'some_task',
                         'command_id'  => 'a1b2c3d4',
-                        'command'     => 'vagrant up',
+                        'command'     => '/usr/bin/env vagrant up --no-provision',
                         'result_code' => 0,
                         'output'      => $this->unsuccessfulOutput
                     )
                 )
             )
         );
-        $result->markTaskAsFailed($task)->willReturn();
+
+        $result->markTaskAsFailed($task)
+            ->willReturn()
+            ->shouldBeCalled();
 
         $this->parse($task, $result);
-
-        $result->markTaskAsFailed($task)->shouldHaveBeenCalled();
     }
 }

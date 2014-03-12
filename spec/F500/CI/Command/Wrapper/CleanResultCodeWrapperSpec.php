@@ -9,6 +9,7 @@ namespace spec\F500\CI\Command\Wrapper;
 
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
+use F500\PhpSpec\Doubler;
 use Prophecy\Argument;
 
 /**
@@ -65,7 +66,7 @@ class CleanResultCodeWrapperSpec extends WrapperSpec
         $oldCommand->getCwd()->willReturn('/tmp');
         $oldCommand->getEnv()->willReturn(array('PATH' => '/usr/local/bin:/usr/bin:/bin'));
 
-        $this->mock_new_command($commandFactory, $newCommand);
+        Doubler::get()->stubCommand($newCommand, $commandFactory);
 
         $wrappedCommand = $this->wrap($oldCommand, $commandFactory);
 

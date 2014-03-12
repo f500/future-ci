@@ -11,6 +11,7 @@ use F500\CI\Build\Build;
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
 use F500\CI\Command\StoreResultCommand;
+use F500\PhpSpec\Doubler;
 use Prophecy\Argument;
 use spec\F500\CI\Task\TaskSpec;
 
@@ -91,16 +92,51 @@ class CodeceptionTaskSpec extends TaskSpec
     function it_builds_commands(
         Build $build,
         CommandFactory $commandFactory,
-        Command $command,
+        Command $buildCommand,
+        Command $runCommand,
         StoreResultCommand $storeResultCommand
     ) {
-        $commandFactory->createCommand()->willReturn($command);
+        $commandFactory->createCommand()->will(
+            function () use ($buildCommand, $runCommand) {
+                $this->createCommand()->willReturn($runCommand);
+
+                return $buildCommand;
+            }
+        );
         $commandFactory->createStoreResultCommand()->willReturn($storeResultCommand);
 
-        $this->buildCommands($build, $commandFactory)->shouldReturn(
-            array($command, $command, $storeResultCommand)
+        Doubler::get()->stubCommand($buildCommand);
+        Doubler::get()->stubCommand($runCommand);
+        Doubler::get()->stubStoreResultCommand($storeResultCommand);
+
+        $build->getProjectDir()->willReturn('/path/to/project');
+        $build->getBuildDir($this->getWrappedObject())->willReturn('/path/to/builds/some_build/some_task');
+
+        $commands = $this->buildCommands($build, $commandFactory);
+        $commands->shouldBe(array($buildCommand, $runCommand, $storeResultCommand));
+
+        $commands[0]->getArgs()->shouldReturn(
+            array(
+                '/usr/bin/env codecept',
+                '--no-ansi',
+                '--no-interaction',
+                'build'
+            )
         );
 
-        $build->getBuildDir($this->getWrappedObject())->shouldHaveBeenCalled();
+        $commands[1]->getArgs()->shouldReturn(
+            array(
+                '/usr/bin/env codecept',
+                '--no-ansi',
+                '--no-interaction',
+                'run',
+                '--json',
+                '--silent',
+                '--no-exit'
+            )
+        );
+
+        $storeResultCommand->setResultDirs('/path/to/project/tests/_log', '/path/to/builds/some_build/some_task')
+            ->shouldHaveBeenCalled();
     }
 }

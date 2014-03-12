@@ -5,7 +5,7 @@
  * Future CI is licensed under MIT (https://github.com/f500/future-ci/blob/master/LICENSE).
  */
 
-namespace F500\CI\Task\VagrantUp;
+namespace F500\CI\Task\VagrantProvision;
 
 use F500\CI\Build\Build;
 use F500\CI\Command\Command;
@@ -13,14 +13,14 @@ use F500\CI\Command\CommandFactory;
 use F500\CI\Task\BaseTask;
 
 /**
- * Class VagrantUpTask
+ * Class VagrantProvisionTask
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
- * @package   F500\CI\Task
+ * @package   F500\CI\Task\VagrantProvision
  */
-class VagrantUpTask extends BaseTask
+class VagrantProvisionTask extends BaseTask
 {
 
     /**
@@ -31,7 +31,7 @@ class VagrantUpTask extends BaseTask
     public function buildCommands(Build $build, CommandFactory $commandFactory)
     {
         return array(
-            $this->createUpCommand($commandFactory)
+            $this->createProvisionCommand($commandFactory)
         );
     }
 
@@ -39,15 +39,14 @@ class VagrantUpTask extends BaseTask
      * @param CommandFactory $commandFactory
      * @return Command
      */
-    protected function createUpCommand(CommandFactory $commandFactory)
+    protected function createProvisionCommand(CommandFactory $commandFactory)
     {
         $options = $this->getOptions();
 
         $command = $commandFactory->createCommand();
 
         $command->addArg($options['bin']);
-        $command->addArg('up');
-        $command->addArg('--no-provision');
+        $command->addArg('provision');
 
         if (!empty($options['vm_name'])) {
             $command->addArg($options['vm_name']);

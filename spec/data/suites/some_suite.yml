@@ -1,9 +1,7 @@
-name: Test Suite
+parameters:
+  foo: ["bar", "baz"]
 
-tasks:
-  some_task:
-    name:  Some Task
-    class: F500\CI\Task\DummyTask
-  other_task:
-    name:  Other Task
-    class: F500\CI\Task\DummyTask
+suite:
+  name: Some Suite
+  path: %root_dir%/some/path
+  foo: %foo%

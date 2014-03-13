@@ -32,13 +32,6 @@ class CodeceptionTaskSpec extends TaskSpec
         $this->shouldImplement('F500\CI\Task\Task');
     }
 
-    function it_has_a_name()
-    {
-        $this->setName('Some Task');
-
-        $this->getName()->shouldReturn('Some Task');
-    }
-
     function it_has_default_options()
     {
         $options = array(
@@ -46,7 +39,7 @@ class CodeceptionTaskSpec extends TaskSpec
             'env'         => array(),
             'bin'         => '/usr/bin/env codecept',
             'config'      => '',
-            'log_dir'     => 'tests/_log',
+            'log_dir'     => '',
             'verbose'     => 0,
             'coverage'    => false,
             'suite'       => '',
@@ -67,7 +60,7 @@ class CodeceptionTaskSpec extends TaskSpec
             'env'         => array(),
             'bin'         => '/usr/bin/env codecept',
             'config'      => '',
-            'log_dir'     => 'tests/_log',
+            'log_dir'     => '',
             'verbose'     => 0,
             'coverage'    => false,
             'suite'       => 'foo',
@@ -109,8 +102,9 @@ class CodeceptionTaskSpec extends TaskSpec
         Doubler::get()->stubCommand($runCommand);
         Doubler::get()->stubStoreResultCommand($storeResultCommand);
 
-        $build->getProjectDir()->willReturn('/path/to/project');
         $build->getBuildDir($this->getWrappedObject())->willReturn('/path/to/builds/some_build/some_task');
+
+        $this->setOptions(array('log_dir' => '/path/to/project/tests/_log'));
 
         $commands = $this->buildCommands($build, $commandFactory);
         $commands->shouldBe(array($buildCommand, $runCommand, $storeResultCommand));

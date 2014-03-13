@@ -53,6 +53,7 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
 
                 $class    = $app['f500ci.configurator.class'];
                 $instance = new $class(
+                    $app['root_dir'],
                     $app['f500ci.builds_dir'],
                     $app['f500ci.suites_dir'],
                     $app['f500ci.build_factory'],

@@ -23,8 +23,6 @@ use Prophecy\Argument;
 abstract class TaskSpec extends ObjectBehavior
 {
 
-    protected $defaultOptions = array();
-
     function let()
     {
         /** @noinspection PhpParamsInspection */
@@ -38,10 +36,9 @@ abstract class TaskSpec extends ObjectBehavior
 
     function it_has_a_name_after_setting_it()
     {
-        $name = 'Some Task';
+        $this->setName('Some Task');
 
-        $this->setName($name);
-        $this->getName()->shouldReturn($name);
+        $this->getName()->shouldReturn('Some Task');
     }
 
     function it_does_not_have_resultparsers_initially()

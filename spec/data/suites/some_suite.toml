@@ -1,0 +1,7 @@
+[parameters]
+foo = ["bar", "baz"]
+
+[suite]
+name = "Some Suite"
+path = "%root_dir%/some/path"
+foo = "%foo%"

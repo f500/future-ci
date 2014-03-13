@@ -44,11 +44,6 @@ interface Build
     /**
      * @return string
      */
-    public function getProjectDir();
-
-    /**
-     * @return string
-     */
     public function getBuildDir();
 
     /**

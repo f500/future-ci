@@ -47,13 +47,6 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->getName()->shouldReturn('Some Suite');
     }
 
-    function it_has_a_project_dir_after_setting_it()
-    {
-        $this->setProjectDir('/path/to/project');
-
-        $this->getProjectDir()->shouldReturn('/path/to/project');
-    }
-
     function it_can_add_a_task_to_itself(Task $task)
     {
         $this->addTask('some_task', $task);

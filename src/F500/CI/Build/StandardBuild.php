@@ -73,14 +73,6 @@ class StandardBuild implements Build
     }
 
     /**
-     * @return string
-     */
-    public function getProjectDir()
-    {
-        return $this->suite->getProjectDir();
-    }
-
-    /**
      * @param Task $task
      * @return string
      */

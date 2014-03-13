@@ -27,7 +27,6 @@ class StandardBuildSpec extends ObjectBehavior
     {
         $suite->getCn()->willReturn('some_suite');
         $suite->getName()->willReturn('Some Suite');
-        $suite->getProjectDir()->willReturn('/path/to/project');
         $suite->getTasks()->willReturn(array('some_task' => $task));
 
         /** @noinspection PhpParamsInspection */
@@ -53,11 +52,6 @@ class StandardBuildSpec extends ObjectBehavior
     function it_has_a_name()
     {
         $this->getName()->shouldReturn('Some Suite');
-    }
-
-    function it_has_a_project_dir()
-    {
-        $this->getProjectDir()->shouldReturn('/path/to/project');
     }
 
     function it_has_a_build_dir()

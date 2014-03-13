@@ -29,8 +29,8 @@ class FilesystemSpec extends ObjectBehavior
 
     function it_reads_a_file()
     {
-        $file    = realpath(__DIR__ . '/../../../data/suites/blank_suite.yml');
-        $content = "name: Blank Suite\n";
+        $file    = realpath(__DIR__ . '/../../../data/suites/file.txt');
+        $content = "with some content\n";
 
         $this->readFile($file)->shouldReturn($content);
     }

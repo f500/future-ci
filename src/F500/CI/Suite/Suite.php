@@ -42,16 +42,6 @@ interface Suite
     public function getName();
 
     /**
-     * @param string $dir
-     */
-    public function setProjectDir($dir);
-
-    /**
-     * @return string
-     */
-    public function getProjectDir();
-
-    /**
      * @param string $cn
      * @param Task   $task
      * @throws \InvalidArgumentException

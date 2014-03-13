@@ -63,8 +63,8 @@ class RunCommand extends Command
 
         $config = $configurator->loadConfig($input->getArgument('suite'), $input->getOption('format'));
 
-        $suite = $configurator->createSuite($config['suite_class'], $config['suite_cn'], $config);
-        $build = $configurator->createBuild($config['build_class'], $suite);
+        $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config['suite']);
+        $build = $configurator->createBuild($config['build']['class'], $suite);
 
         $result = new Result($this->getService('filesystem'), $build->getBuildDir());
 

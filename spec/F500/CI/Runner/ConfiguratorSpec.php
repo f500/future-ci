@@ -52,7 +52,6 @@ class ConfiguratorSpec extends ObjectBehavior
         $wrapperFactory->createWrapper($stringArg, $stringArg)->willReturn($wrapper);
 
         $suite->setName($stringArg)->willReturn();
-        $suite->setProjectDir($stringArg)->willReturn();
         $suite->addWrapper($stringArg, Argument::type('F500\CI\Command\Wrapper\Wrapper'))->will(
             function ($args) {
                 $this->getWrappers()->willReturn(array($args[0] => $args[1]));
@@ -61,6 +60,7 @@ class ConfiguratorSpec extends ObjectBehavior
         $suite->addTask($stringArg, Argument::type('F500\CI\Task\Task'))->willReturn();
 
         $this->beConstructedWith(
+            '/path/to/root',
             __DIR__ . '/../../../data/builds',
             __DIR__ . '/../../../data/suites',
             $buildFactory,
@@ -78,12 +78,18 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_json_config_file()
     {
-        $filename = __DIR__ . '/../../../data/suites/blank_suite.json';
+        $filename = __DIR__ . '/../../../data/suites/some_suite.json';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename)->shouldReturn($config);
@@ -91,12 +97,18 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_php_config_file()
     {
-        $filename = __DIR__ . '/../../../data/suites/blank_suite.php';
+        $filename = __DIR__ . '/../../../data/suites/some_suite.php';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename)->shouldReturn($config);
@@ -104,12 +116,18 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_toml_config_file()
     {
-        $filename = __DIR__ . '/../../../data/suites/blank_suite.toml';
+        $filename = __DIR__ . '/../../../data/suites/some_suite.toml';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename)->shouldReturn($config);
@@ -117,12 +135,18 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_yaml_config_file()
     {
-        $filename = __DIR__ . '/../../../data/suites/blank_suite.yml';
+        $filename = __DIR__ . '/../../../data/suites/some_suite.yml';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename)->shouldReturn($config);
@@ -130,12 +154,18 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_config_file_with_relative_path()
     {
-        $filename = 'blank_suite.yml';
+        $filename = 'some_suite.yml';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename)->shouldReturn($config);
@@ -143,13 +173,19 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_loads_a_config_file_with_specified_format()
     {
-        $filename = __DIR__ . '/../../../data/suites/blank_suite';
+        $filename = __DIR__ . '/../../../data/suites/some_suite';
         $format   = 'yml';
         $config   = array(
-            'name'        => 'Blank Suite',
-            'suite_cn'    => 'blank_suite',
-            'suite_class' => 'F500\CI\Suite\StandardSuite',
-            'build_class' => 'F500\CI\Build\StandardBuild'
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => array('bar', 'baz'),
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
         );
 
         $this->loadConfig($filename, $format)->shouldReturn($config);
@@ -158,26 +194,27 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_creates_a_suite(Suite $suite, Task $task, ResultParser $resultParser, Wrapper $wrapper)
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array(
-                    'class' => 'F500\CI\Command\Wrapper\Wrapper',
-                    'foo'   => 'bar'
-                )
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array(
-                            'class' => 'F500\CI\Task\ResultParser',
-                            'foo'   => 'bar'
-                        )
-                    ),
-                    'wrappers' => array('some_wrapper'),
-                    'foo'      => 'bar'
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -185,11 +222,10 @@ class ConfiguratorSpec extends ObjectBehavior
         $this->createSuite(
             'F500\CI\Suite\StandardSuite',
             'some_suite',
-            $config
+            $config['suite']
         )->shouldReturnAnInstanceOf('F500\CI\Suite\Suite');
 
         $suite->setName('Some Suite')->shouldHaveBeenCalled();
-        $suite->setProjectDir('/path/to/project')->shouldHaveBeenCalled();
         $suite->addWrapper('some_wrapper', $wrapper)->shouldHaveBeenCalled();
         $suite->addTask('some_task', $task)->shouldHaveBeenCalled();
 
@@ -206,47 +242,26 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_name_is_missing()
     {
         $config = array(
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
-                )
-            )
-        );
-
-        $this->shouldThrow('\RuntimeException')->during(
-            'createSuite',
-            array(
-                'F500\CI\Suite\StandardSuite',
-                'some_suite',
-                $config
-            )
-        );
-    }
-
-    function it_fails_creating_a_suite_when_project_dir_is_missing()
-    {
-        $config = array(
-            'name'     => 'Some Suite',
-            'wrappers' => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'    => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -264,17 +279,22 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_wrappers_is_not_an_array()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => 'not an array',
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => 'not an array',
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -292,19 +312,26 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_wrapper_class_is_missing()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array()
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -322,10 +349,14 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_tasks_is_missing()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                )
             )
         );
 
@@ -342,12 +373,16 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_tasks_is_not_an_array()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => 'not an array'
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => 'not an array'
+            )
         );
 
         $this->shouldThrow('\RuntimeException')->during(
@@ -363,18 +398,26 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_class_is_missing()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -392,18 +435,26 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_name_is_missing()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -421,16 +472,21 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_parsers_is_missing()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -448,17 +504,22 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_parsers_not_an_array()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => 'not an array',
-                    'wrappers' => array('some_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => 'not an array',
+                        'wrappers' => array('some_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );
@@ -476,29 +537,28 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_wrappers_is_not_an_array()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => 'not an array'
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => 'not an array',
+                        'foo'      => 'bar'
+                    )
                 )
-            )
-        );
-
-        $this->shouldThrow('\RuntimeException')->during(
-            'createSuite',
-            array(
-                'F500\CI\Suite\StandardSuite',
-                'some_suite',
-                $config
             )
         );
     }
@@ -506,19 +566,27 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_fails_creating_a_suite_when_task_refers_to_an_undefined_wrapper()
     {
         $config = array(
-            'name'        => 'Some Suite',
-            'project_dir' => '/path/to/project',
-            'wrappers'    => array(
-                'some_wrapper' => array('class' => 'F500\CI\Command\Wrapper\Wrapper')
-            ),
-            'tasks'       => array(
-                'some_task' => array(
-                    'class'    => 'F500\CI\Task\Task',
-                    'name'     => 'Some Task',
-                    'parsers'  => array(
-                        'some_parser' => array('class' => 'F500\CI\Task\ResultParser')
-                    ),
-                    'wrappers' => array('other_wrapper')
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'wrappers' => array('other_wrapper'),
+                        'foo'      => 'bar'
+                    )
                 )
             )
         );

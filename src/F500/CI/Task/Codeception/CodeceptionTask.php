@@ -33,7 +33,7 @@ class CodeceptionTask extends BaseTask
         return array(
             $this->createBuildCommand($commandFactory),
             $this->createRunCommand($commandFactory),
-            $this->createStoreResultCommand($commandFactory, $build->getBuildDir($this), $build->getProjectDir())
+            $this->createStoreResultCommand($commandFactory, $build->getBuildDir($this))
         );
     }
 
@@ -111,14 +111,13 @@ class CodeceptionTask extends BaseTask
     /**
      * @param CommandFactory $commandFactory
      * @param string         $buildDir
-     * @param string         $projectDir
      * @return bool
      */
-    protected function createStoreResultCommand(CommandFactory $commandFactory, $buildDir, $projectDir)
+    protected function createStoreResultCommand(CommandFactory $commandFactory, $buildDir)
     {
         $options = $this->getOptions();
 
-        $sourceDir      = $projectDir . '/' . $options['log_dir'];
+        $sourceDir      = $options['log_dir'];
         $destinationDir = $buildDir;
 
         $command = $commandFactory->createStoreResultCommand();
@@ -171,7 +170,7 @@ class CodeceptionTask extends BaseTask
             'env'         => array(),
             'bin'         => '/usr/bin/env codecept',
             'config'      => '',
-            'log_dir'     => 'tests/_log',
+            'log_dir'     => '',
             'verbose'     => 0,
             'coverage'    => false,
             'suite'       => '',

@@ -40,6 +40,11 @@ class Configurator
     /**
      * @var string
      */
+    protected $rootDir;
+
+    /**
+     * @var string
+     */
     protected $suitesDir;
 
     /**
@@ -73,6 +78,7 @@ class Configurator
     protected $wrapperFactory;
 
     /**
+     * @param string              $rootDir
      * @param string              $buildsDir
      * @param string              $suitesDir
      * @param BuildFactory        $buildFactory
@@ -82,6 +88,7 @@ class Configurator
      * @param WrapperFactory      $wrapperFactory
      */
     public function __construct(
+        $rootDir,
         $buildsDir,
         $suitesDir,
         BuildFactory $buildFactory,
@@ -90,6 +97,7 @@ class Configurator
         ResultParserFactory $resultParserFactory,
         WrapperFactory $wrapperFactory
     ) {
+        $this->rootDir   = $rootDir;
         $this->buildsDir = realpath($buildsDir);
         $this->suitesDir = realpath($suitesDir);
 
@@ -142,14 +150,16 @@ class Configurator
             throw new \InvalidArgumentException(sprintf('Format of config file "%s" is not supported.', $filename));
         }
 
-        $config             = $driver->load($filename);
-        $config['suite_cn'] = $suiteCn;
+        $config = $driver->load($filename);
+        $config = $this->parseConfig($config);
 
-        if (empty($config['suite_class'])) {
-            $config['suite_class'] = self::DEFAULT_SUITE_CLASS;
+        $config['suite']['cn'] = $suiteCn;
+
+        if (empty($config['suite']['class'])) {
+            $config['suite']['class'] = self::DEFAULT_SUITE_CLASS;
         }
-        if (empty($config['build_class'])) {
-            $config['build_class'] = self::DEFAULT_BUILD_CLASS;
+        if (empty($config['build']['class'])) {
+            $config['build']['class'] = self::DEFAULT_BUILD_CLASS;
         }
 
         return $config;
@@ -188,14 +198,10 @@ class Configurator
      */
     protected function configureSuite(Suite $suite, array $config)
     {
-        unset($config['suite_cn'], $config['suite_class'], $config['build_class']);
+        unset($config['suite']['cn'], $config['suite']['class'], $config['build']['class']);
 
         if (empty($config['name'])) {
             throw new \RuntimeException(sprintf('Suite "%s" has no name configured.', $suite->getCn()));
-        }
-
-        if (empty($config['project_dir'])) {
-            throw new \RuntimeException(sprintf('Suite "%s" has no project_dir configured.', $suite->getCn()));
         }
 
         if (empty($config['tasks'])) {
@@ -211,7 +217,6 @@ class Configurator
         }
 
         $suite->setName($config['name']);
-        $suite->setProjectDir($config['project_dir']);
 
         foreach ($config['wrappers'] as $wrapperCn => $wrapperConfig) {
             if (empty($wrapperConfig['class'])) {
@@ -319,5 +324,45 @@ class Configurator
     protected function configureResultParser(ResultParser $resultParser, array $config)
     {
         $resultParser->setOptions($config);
+    }
+
+    /**
+     * @param array $config
+     * @return array
+     */
+    protected function parseConfig(array $config)
+    {
+        $parameters = array();
+
+        if (isset($config['parameters']) && is_array($config['parameters'])) {
+            $parameters = $config['parameters'];
+        }
+
+        $parameters = array_merge(get_defined_constants(), $parameters);
+
+        if (empty($parameters['root_dir'])) {
+            $parameters['root_dir'] = $this->rootDir;
+        }
+
+        array_walk_recursive(
+            $config,
+            function (&$value) use ($parameters) {
+                if (is_string($value) && preg_match_all('/%(.+?)%/', $value, $m)) {
+                    foreach ($m[1] as $i => $var) {
+                        if (array_key_exists($var, $parameters)) {
+                            if ($value === $m[0][$i]) {
+                                $value = $parameters[$var];
+                            } else {
+                                $value = str_replace($m[0][$i], $parameters[$var], $value);
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        unset($config['parameters']);
+
+        return $config;
     }
 }

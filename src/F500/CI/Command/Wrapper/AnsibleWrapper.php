@@ -127,18 +127,18 @@ class AnsibleWrapper extends BaseWrapper
         $script = array();
 
         foreach ($command->getEnv() as $name => $value) {
-            $script[] = $name . '=' . escapeshellcmd($value);
+            $script[] = "{$name}='{$value}'";
         }
 
         foreach ($command->getArgs() as $arg) {
-            $script[] = escapeshellcmd($arg);
+            $script[] = $arg;
         }
 
         if ($command->getCwd()) {
-            $script[] = 'chdir=' . escapeshellcmd($command->getCwd());
+            $script[] = "chdir='{$command->getCwd()}'";
         }
 
-        return "'" . implode(' ', $script) . "'";
+        return escapeshellarg(implode(' ', $script));
     }
 
     /**
@@ -152,13 +152,13 @@ class AnsibleWrapper extends BaseWrapper
         $script = array(
             'archive=yes',
             'delete=no',
-            'dest=' . $command->getDestinationDir(),
+            "dest='{$command->getDestinationDir()}'",
             'mode=pull',
-            'rsync_path=' . $options['rsync_bin'],
-            'src=' . $command->getSourceDir()
+            "rsync_path='{$options['rsync_bin']}'",
+            "src='{$command->getSourceDir()}'"
         );
 
-        return "'" . implode(' ', $script) . "'";
+        return escapeshellarg(implode(' ', $script));
     }
 
     /**

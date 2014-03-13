@@ -168,8 +168,8 @@ class AnsibleWrapper extends BaseWrapper
     {
         return array(
             'env'         => array(),
-            'bin'         => '/usr/bin/ansible',
-            'rsync_bin'   => '/usr/bin/rsync',
+            'bin'         => '/usr/bin/env ansible',
+            'rsync_bin'   => '/usr/bin/env rsync',
             'host'        => '',
             'inventory'   => '',
             'limit'       => '',

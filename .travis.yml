@@ -2,7 +2,8 @@ language: php
 php:
   - 5.5
 notifications:
-  slack: future500:D25FmdODmv6meSORkbgp91eA
+  webhooks:
+    - webhook: https://future500.slack.com/services/hooks/incoming-webhook?token=CckepAuyRJ3lxrT371bFxnOX
 before_install:
   - npm install -g bower
   - npm install -g grunt-cli

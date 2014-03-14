@@ -34,8 +34,8 @@ class AnsibleWrapperSpec extends WrapperSpec
     {
         $options = array(
             'env'         => array(),
-            'bin'         => '/usr/bin/ansible',
-            'rsync_bin'   => '/usr/bin/rsync',
+            'bin'         => '/usr/bin/env ansible',
+            'rsync_bin'   => '/usr/bin/env rsync',
             'host'        => '',
             'inventory'   => '',
             'limit'       => '',
@@ -54,8 +54,8 @@ class AnsibleWrapperSpec extends WrapperSpec
     {
         $options = array(
             'env'         => array(),
-            'bin'         => '/usr/bin/ansible',
-            'rsync_bin'   => '/usr/bin/rsync',
+            'bin'         => '/usr/bin/env ansible',
+            'rsync_bin'   => '/usr/bin/env rsync',
             'host'        => 'testing',
             'inventory'   => '',
             'limit'       => '',
@@ -96,14 +96,14 @@ class AnsibleWrapperSpec extends WrapperSpec
         $wrappedCommand->shouldImplement('F500\CI\Command\Command');
         $wrappedCommand->getArgs()->shouldReturn(
             array(
-                '/usr/bin/ansible',
+                '/usr/bin/env ansible',
                 'localhost',
                 '--inventory-file=/etc/ansible/hosts',
                 '--timeout=10',
                 '-m',
                 'shell',
                 '-a',
-                "'PATH=/usr/local/bin:/usr/bin:/bin ls -l chdir=/tmp'"
+                "'PATH='\\''/usr/local/bin:/usr/bin:/bin'\\'' ls -l chdir='\\''/tmp'\\'''"
             )
         );
         $wrappedCommand->getCwd()->shouldReturn(null);
@@ -127,14 +127,14 @@ class AnsibleWrapperSpec extends WrapperSpec
         $wrappedCommand->shouldImplement('F500\CI\Command\StoreResultCommand');
         $wrappedCommand->getArgs()->shouldReturn(
             array(
-                '/usr/bin/ansible',
+                '/usr/bin/env ansible',
                 'localhost',
                 '--inventory-file=/etc/ansible/hosts',
                 '--timeout=10',
                 '-m',
                 'synchronize',
                 '-a',
-                "'archive=yes delete=no dest=/path/to/destination/ mode=pull rsync_path=/usr/bin/rsync src=/path/to/source/'"
+                "'archive=yes delete=no dest='\\''/path/to/destination/'\\'' mode=pull rsync_path='\\''/usr/bin/env rsync'\\'' src='\\''/path/to/source/'\\'''"
             )
         );
         $wrappedCommand->getCwd()->shouldReturn(null);

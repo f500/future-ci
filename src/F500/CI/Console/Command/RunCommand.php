@@ -29,10 +29,16 @@ class RunCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('ci:run')
-            ->setDescription('Perform a CI run')
+            ->setName('run')
+            ->setDescription('Runs a CI build.')
             ->addArgument('suite', InputArgument::REQUIRED, 'Common name of the suite to run.')
-            ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, 'Format of configuration file.', 'yml');
+            ->addOption('format', 'f', InputOption::VALUE_OPTIONAL, 'Format of configuration file.', 'yml')
+            ->addOption(
+                'param',
+                'p',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Extra parameters for the suite. (-p key:value -p "foo:bar\:baz")'
+            );
     }
 
     /**
@@ -51,6 +57,7 @@ class RunCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      * @return void
+     * @throws \RuntimeException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -61,7 +68,19 @@ class RunCommand extends Command
         $configurator = $this->getService('f500ci.configurator');
         $runner       = $this->getService('f500ci.build_runner');
 
-        $config = $configurator->loadConfig($input->getArgument('suite'), $input->getOption('format'));
+        $filename = $input->getArgument('suite');
+        $format   = $input->getOption('format');
+
+        $params = array();
+        foreach ($input->getOption('param') as $param) {
+            $split = preg_split('/(?<!\\\\):/', $param);
+            if (count($split) != 2) {
+                throw new \RuntimeException(sprintf('Param "%s" has incorrect format.', $param));
+            }
+            $params[$split[0]] = $split[1];
+        }
+
+        $config = $configurator->loadConfig($filename, $format, $params);
 
         $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config['suite']);
         $build = $configurator->createBuild($config['build']['class'], $suite);

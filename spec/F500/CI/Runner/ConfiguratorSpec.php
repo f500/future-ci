@@ -191,6 +191,26 @@ class ConfiguratorSpec extends ObjectBehavior
         $this->loadConfig($filename, $format)->shouldReturn($config);
     }
 
+    function it_loads_a_config_file_with_extra_parameters()
+    {
+        $filename   = __DIR__ . '/../../../data/suites/some_suite.yml';
+        $parameters = array('foo' => 'bar');
+        $config     = array(
+            'suite' => array(
+                'name'  => 'Some Suite',
+                'path'  => '/path/to/root/some/path',
+                'foo'   => 'bar',
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
+        );
+
+        $this->loadConfig($filename, null, $parameters)->shouldReturn($config);
+    }
+
     function it_creates_a_suite(Suite $suite, Task $task, ResultParser $resultParser, Wrapper $wrapper)
     {
         $config = array(
@@ -316,7 +336,7 @@ class ConfiguratorSpec extends ObjectBehavior
                 'name'     => 'Some Suite',
                 'wrappers' => array(
                     'some_wrapper' => array(
-                        'foo'   => 'bar'
+                        'foo' => 'bar'
                     )
                 ),
                 'tasks'    => array(

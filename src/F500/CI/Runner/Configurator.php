@@ -111,10 +111,11 @@ class Configurator
     /**
      * @param string $filename
      * @param string $format
+     * @param array  $parameters
      * @return array
      * @throws \InvalidArgumentException
      */
-    public function loadConfig($filename, $format = null)
+    public function loadConfig($filename, $format = null, array $parameters = array())
     {
         if (substr($filename, 0, 1) != '/') {
             $filename = $this->suitesDir . '/' . $filename;
@@ -151,7 +152,7 @@ class Configurator
         }
 
         $config = $driver->load($filename);
-        $config = $this->parseConfig($config);
+        $config = $this->parseConfig($config, $parameters);
 
         $config['suite']['cn'] = $suiteCn;
 
@@ -328,17 +329,16 @@ class Configurator
 
     /**
      * @param array $config
+     * @param array $parameters
      * @return array
      */
-    protected function parseConfig(array $config)
+    protected function parseConfig(array $config, array $parameters = array())
     {
-        $parameters = array();
-
         if (isset($config['parameters']) && is_array($config['parameters'])) {
-            $parameters = $config['parameters'];
+            $parameters = array_replace_recursive($config['parameters'], $parameters);
         }
 
-        $parameters = array_merge(get_defined_constants(), $parameters);
+        $parameters = array_replace_recursive(get_defined_constants(), $parameters);
 
         if (empty($parameters['root_dir'])) {
             $parameters['root_dir'] = $this->rootDir;

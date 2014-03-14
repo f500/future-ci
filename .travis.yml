@@ -13,4 +13,4 @@ install:
   - npm install
   - grunt
 script:
-  - php vendor/bin/phpci run
+  - bin/phpspec run

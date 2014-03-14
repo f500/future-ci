@@ -4,7 +4,7 @@ php:
 notifications:
   slack:
     rooms:
-      -  future500:D25FmdODmv6meSORkbgp91eA
+      -  future500:D25FmdODmv6meSORkbgp91eA#poolz
     on_success: always
     on_failure: always
 before_install:

@@ -1,0 +1,16 @@
+language: php
+php:
+  - 5.4
+notifications:
+  slack: future500:D25FmdODmv6meSORkbgp91eA
+before_install:
+  - npm install -g bower
+  - npm install -g grunt-cli
+install:
+  - composer self-update
+  - composer install --dev --no-scripts --prefer-source --no-interaction
+  - bower install
+  - npm install
+  - grunt
+script:
+  - php vendor/bin/phpci run

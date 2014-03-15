@@ -1,20 +1,20 @@
 language: php
 php:
-  - 5.5
+- 5.5
 notifications:
   slack:
     rooms:
-      - "future500:D25FmdODmv6meSORkbgp91eA#poolz"
+      - secure: "FCf22Xx/GZSVwhpyqdYn8ppVdegFbqeUD03HOBWBKqAJcmulDVw7ggKc067c+RlQVub7L39r6VvycV7c4eSr0jJmDNTqdbCcuS3VMYnFOdrrmxXnLy0Fp3gkdE+t7uFheuqKn8c1TNbO/wVLM6hQ3j6gdaWGlL8kj45h+fcdkhk="
     on_success: always
     on_failure: always
 before_install:
-  - npm install -g bower
-  - npm install -g grunt-cli
+- npm install -g bower
+- npm install -g grunt-cli
 install:
-  - composer self-update
-  - composer install --dev --no-scripts --prefer-source --no-interaction
-  - bower install
-  - npm install
-  - grunt
+- composer self-update
+- composer install --dev --no-scripts --prefer-source --no-interaction
+- bower install
+- npm install
+- grunt
 script:
-  - bin/phpspec run
+- bin/phpspec run

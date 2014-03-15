@@ -1,7 +1,6 @@
 language: php
 php:
   - 5.5
-  - hhvm
 notifications:
   slack:
     rooms:

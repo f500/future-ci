@@ -7,6 +7,9 @@ monolog.logfile: %root_dir%/var/logs/app.dev.log
 monolog.level:   debug
 monolog.name:    F500ci
 
+slack.username: %slack.username%
+slack.token:    %slack.token%
+
 filesystem.class: F500\CI\Filesystem\Filesystem
 
 f500ci.suites_dir: %root_dir%/var/suites

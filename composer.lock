@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "b964a20cd64201d9fd2d686a59fd35dc",
+    "hash": "24765fc17823b37ea73cba28515771b9",
     "packages": [
         {
             "name": "cilex/console-service-provider",
@@ -65,6 +65,166 @@
             "time": "2012-12-19 10:50:58"
         },
         {
+            "name": "doctrine/collections",
+            "version": "v1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/collections.git",
+                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/b99c5c46c87126201899afe88ec490a25eedd6a2",
+                "reference": "b99c5c46c87126201899afe88ec490a25eedd6a2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.2.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Doctrine\\Common\\Collections\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com",
+                    "homepage": "http://www.jwage.com/",
+                    "role": "Creator"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com",
+                    "homepage": "http://www.instaclick.com"
+                },
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com",
+                    "homepage": "http://jmsyst.com",
+                    "role": "Developer of wrapped JMSSerializerBundle"
+                }
+            ],
+            "description": "Collections Abstraction library",
+            "homepage": "http://www.doctrine-project.org",
+            "keywords": [
+                "array",
+                "collections",
+                "iterator"
+            ],
+            "time": "2014-02-03 23:07:43"
+        },
+        {
+            "name": "guzzle/guzzle",
+            "version": "v3.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
+                "reference": "4de0618a01b34aa1c8c33a3f13f396dcd3882eba",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.3.3",
+                "symfony/event-dispatcher": ">=2.1"
+            },
+            "replace": {
+                "guzzle/batch": "self.version",
+                "guzzle/cache": "self.version",
+                "guzzle/common": "self.version",
+                "guzzle/http": "self.version",
+                "guzzle/inflection": "self.version",
+                "guzzle/iterator": "self.version",
+                "guzzle/log": "self.version",
+                "guzzle/parser": "self.version",
+                "guzzle/plugin": "self.version",
+                "guzzle/plugin-async": "self.version",
+                "guzzle/plugin-backoff": "self.version",
+                "guzzle/plugin-cache": "self.version",
+                "guzzle/plugin-cookie": "self.version",
+                "guzzle/plugin-curlauth": "self.version",
+                "guzzle/plugin-error-response": "self.version",
+                "guzzle/plugin-history": "self.version",
+                "guzzle/plugin-log": "self.version",
+                "guzzle/plugin-md5": "self.version",
+                "guzzle/plugin-mock": "self.version",
+                "guzzle/plugin-oauth": "self.version",
+                "guzzle/service": "self.version",
+                "guzzle/stream": "self.version"
+            },
+            "require-dev": {
+                "doctrine/cache": "*",
+                "monolog/monolog": "1.*",
+                "phpunit/phpunit": "3.7.*",
+                "psr/log": "1.0.*",
+                "symfony/class-loader": "*",
+                "zendframework/zend-cache": "<2.3",
+                "zendframework/zend-log": "<2.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.8-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Guzzle": "src/",
+                    "Guzzle\\Tests": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Guzzle Community",
+                    "homepage": "https://github.com/guzzle/guzzle/contributors"
+                }
+            ],
+            "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "client",
+                "curl",
+                "framework",
+                "http",
+                "http client",
+                "rest",
+                "web service"
+            ],
+            "time": "2014-01-28 22:29:15"
+        },
+        {
             "name": "igorw/config-service-provider",
             "version": "v1.2.1",
             "source": {
@@ -120,6 +280,72 @@
                 "silex"
             ],
             "time": "2013-05-31 14:23:34"
+        },
+        {
+            "name": "mcrumm/phlack",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mcrumm/phlack.git",
+                "reference": "d67c92b9c0d080c9b88193027460521c4e7ef0e8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mcrumm/phlack/zipball/d67c92b9c0d080c9b88193027460521c4e7ef0e8",
+                "reference": "d67c92b9c0d080c9b88193027460521c4e7ef0e8",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/collections": ">=1.0",
+                "guzzle/guzzle": "~3.8",
+                "php": ">=5.4",
+                "symfony/options-resolver": "~2.4"
+            },
+            "require-dev": {
+                "behat/behat": "~2.5.0@stable",
+                "henrikbjorn/phpspec-code-coverage": "1.0.*-dev@dev",
+                "phpspec/nyan-formatters": "1.*",
+                "phpspec/phpspec": "2.0.*@dev",
+                "silex/silex": "~1.1",
+                "symfony/console": "~2.4@stable",
+                "symfony/expression-language": "~2.4@stable",
+                "symfony/http-foundation": "~2.4@stable"
+            },
+            "suggest": {
+                "symfony/console": "Required to use the ConsoleAdapter",
+                "symfony/expression-language": "Required to use ExpressionBots",
+                "symfony/http-foundation": "Required to use the RequestAdapter"
+            },
+            "bin": [
+                "bin/phlackbot"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.5.x-dev",
+                    "dev-develop": "0.6.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "": "src",
+                    "Context": "features"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Crumm",
+                    "email": "mike@crumm.net",
+                    "homepage": "http://crumm.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Slack API and WebHook integration in PHP",
+            "time": "2014-03-05 17:50:36"
         },
         {
             "name": "monolog/monolog",
@@ -703,6 +929,60 @@
             "time": "2014-02-12 19:27:03"
         },
         {
+            "name": "symfony/options-resolver",
+            "version": "v2.4.2",
+            "target-dir": "Symfony/Component/OptionsResolver",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/OptionsResolver.git",
+                "reference": "723ec89b49960211ccf2ab46b77185f2616169c3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/OptionsResolver/zipball/723ec89b49960211ccf2ab46b77185f2616169c3",
+                "reference": "723ec89b49960211ccf2ab46b77185f2616169c3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Component\\OptionsResolver\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony OptionsResolver Component",
+            "homepage": "http://symfony.com",
+            "keywords": [
+                "config",
+                "configuration",
+                "options"
+            ],
+            "time": "2014-01-07 13:28:54"
+        },
+        {
             "name": "symfony/process",
             "version": "v2.4.2",
             "target-dir": "Symfony/Component/Process",
@@ -903,12 +1183,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/phpspec.git",
-                "reference": "9f72dd2ea9f860572b7ce7f229e043e667f34564"
+                "reference": "2c8b000e697281e33e95eeac1134e9e03a9b9f9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/9f72dd2ea9f860572b7ce7f229e043e667f34564",
-                "reference": "9f72dd2ea9f860572b7ce7f229e043e667f34564",
+                "url": "https://api.github.com/repos/phpspec/phpspec/zipball/2c8b000e697281e33e95eeac1134e9e03a9b9f9b",
+                "reference": "2c8b000e697281e33e95eeac1134e9e03a9b9f9b",
                 "shasum": ""
             },
             "require": {
@@ -968,7 +1248,7 @@
                 "testing",
                 "tests"
             ],
-            "time": "2014-03-04 20:57:45"
+            "time": "2014-03-19 14:04:42"
         },
         {
             "name": "phpspec/prophecy",
@@ -1129,6 +1409,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "mcrumm/phlack": 20,
         "phpspec/phpspec": 20
     },
     "platform": {

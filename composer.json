@@ -14,7 +14,8 @@
     "autoload": {
         "psr-0": {
             "F500": "./src/",
-            "F500\\Provider": "./lib/filesystem"
+            "F500\\Provider": "./lib/filesystem",
+            "F500\\Provider": "./lib/phlack"
         }
     },
 

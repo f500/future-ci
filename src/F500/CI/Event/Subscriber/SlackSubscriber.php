@@ -7,6 +7,8 @@
 
 namespace F500\CI\Event\Subscriber;
 
+use Crummy\Phlack\Phlack;
+use F500\CI\Build\Result;
 use F500\CI\Event\BuildRunEvent;
 use F500\CI\Event\Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,6 +25,12 @@ class SlackSubscriber implements EventSubscriberInterface
 {
 
     /**
+     * @var Phlack
+     */
+    protected $phlack;
+
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
@@ -37,9 +45,12 @@ class SlackSubscriber implements EventSubscriberInterface
         );
     }
 
-    public function __construct()
+    /**
+     * @param Phlack $phlack
+     */
+    public function __construct(Phlack $phlack)
     {
-
+        $this->phlack = $phlack;
     }
 
     /**
@@ -48,13 +59,15 @@ class SlackSubscriber implements EventSubscriberInterface
     public function onBuildStarted(BuildRunEvent $event)
     {
         $build = $event->getBuild();
-        $this->slackApi->(
-            sprintf(
-                'Running build <fg=yellow>%s</fg=yellow> (<fg=yellow>%s</fg=yellow>)',
-                $build->getName(),
-                $build->getDate()->format('Y-m-d H:i:s')
-            )
-        );
+
+        $messageBuilder    = $this->phlack->getMessageBuilder();
+        $attachmentBuilder = $messageBuilder->createAttachment();
+
+        $attachmentBuilder
+            ->setText('Build started: ' . $build->getCn())
+            ->end();
+
+        $response = $this->phlack->send($messageBuilder->create());
     }
 
     /**
@@ -62,11 +75,31 @@ class SlackSubscriber implements EventSubscriberInterface
      */
     public function onBuildFinished(BuildRunEvent $event)
     {
+        $build = $event->getBuild();
         $result = $event->getResult();
 
-//        $this->output->writeln(sprintf("\n<fg=%s>%s Build was %s</fg=%s>", $color, $icon, $text, $color));
-//        $this->output->writeln(sprintf('(took %s)', $this->stringifyElapsedTime($result->getElapsedBuildTime())));
+        $messageBuilder = $this->phlack->getMessageBuilder();
+
+        $attachmentBuilder = $messageBuilder->createAttachment();
+        $attachmentBuilder->setText('Build finished: ' . $build->getCn());
+
+        switch ($result->getOverallBuildResult()) {
+            case Result::SUCCESSFUL:
+                $attachmentBuilder->setPreText('success');
+                $attachmentBuilder->setColor('good');
+                break;
+            case Result::FAILED:
+                $attachmentBuilder->setPreText('failure');
+                $attachmentBuilder->setColor('warning');
+                break;
+            case Result::INCOMPLETE:
+                $attachmentBuilder->setPreText('incomplete');
+                $attachmentBuilder->setColor('danger');
+                break;
+        }
+
+        $attachmentBuilder->end();
+
+        $response = $this->phlack->send($messageBuilder->create());
     }
-
-
 }

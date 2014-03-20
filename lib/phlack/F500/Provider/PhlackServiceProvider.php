@@ -18,7 +18,8 @@ use Silex\ServiceProviderInterface;
  */
 class PhlackServiceProvider implements ServiceProviderInterface
 {
-    public function register(Application $app) {
+    public function register(Application $app)
+    {
         $app['phlack.class'] = 'Crummy\Phlack\Phlack';
 
         $app['phlack'] = $app->share(
@@ -32,13 +33,13 @@ class PhlackServiceProvider implements ServiceProviderInterface
                     throw new \RuntimeException('"phlack.token" should contain your Slack.com token.');
                 }
 
-
                 $client = PhlackClient::factory([$app['phlack.username'], $app['phlack.token']]);
                 return new $class($client);
             }
         );
     }
 
-    public function boot(Application $app) {
+    public function boot(Application $app)
+    {
     }
 } 

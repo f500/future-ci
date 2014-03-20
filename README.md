@@ -3,6 +3,8 @@ Future _CI_
 
 A Continuous Integration tool by Future500 B.V.
 
+[![Build Status](https://travis-ci.org/f500/future-ci.png)](https://travis-ci.org/f500/future-ci)
+
 Development
 -----------
 

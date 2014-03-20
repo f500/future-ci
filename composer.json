@@ -13,9 +13,10 @@
     },
     "autoload": {
         "psr-0": {
-            "F500": "./src/",
-            "F500\\Provider": "./lib/filesystem",
-            "F500\\Provider": "./lib/phlack"
+            "F500": "src",
+            "F500\\Provider\\FilesystemServiceProvider": "lib/filesystem",
+            "F500\\Provider\\PheanstalkServiceProvider": "lib/pheanstalk",
+            "F500\\Provider\\PhlackServiceProvider": "lib/phlack"
         }
     },
 
@@ -23,8 +24,9 @@
         "php": ">=5.3.3",
         "cilex/console-service-provider": "~1.0",
         "igorw/config-service-provider": "~1.2",
-        "monolog/monolog": "~1.7",
         "mcrumm/phlack": "~0.5@dev",
+        "monolog/monolog": "~1.7",
+        "pda/pheanstalk": "~2.1",
         "silex/silex": "~1.1",
         "symfony/console": "~2.4",
         "symfony/filesystem": "~2.4",
@@ -36,8 +38,13 @@
         "symfony/yaml": "~2.4"
     },
     "suggest": {
-        "jamesmoss/toml": "~0.1",
-        "symfony/yaml": "~2.4"
+        "jakub-onderka/php-parallel-lint": "Linting Tool",
+        "jamesmoss/toml": "Parser for TOML",
+        "phploc/phploc": "Lines of code",
+        "phpmd/phpmd": "Mess detector",
+        "sebastian/phpcpd": "Copy/Paste detector",
+        "squizlabs/php_codesniffer": "Code sniffer",
+        "symfony/yaml": "Parser for YAML"
     },
 
     "extra": {

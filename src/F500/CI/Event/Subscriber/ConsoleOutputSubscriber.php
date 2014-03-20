@@ -106,9 +106,9 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
 
         $this->output->writeln(
             sprintf(
-                'Running build <fg=yellow>%s</fg=yellow> (<fg=yellow>%s</fg=yellow>)',
-                $build->getName(),
-                $build->getDate()->format('Y-m-d H:i:s')
+                'Running build [<fg=yellow>%s</fg=yellow>] (<fg=yellow>%s</fg=yellow>)',
+                $build->getCn(),
+                $build->getSuiteName()
             )
         );
     }
@@ -139,10 +139,11 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
         $task   = $event->getTask();
         $result = $event->getResult();
 
-        $color  = $this->resultColorMap[$result->getOverallTaskResult($task)];
-        $icon   = $this->resultIconMap[$result->getOverallTaskResult($task)];
-        $text   = $this->resultTextMap[$result->getOverallTaskResult($task)];
-        $repeat = max(78 - $this->lineLength - strlen($text), 0);
+        $taskResult = $result->getOverallTaskResult($task);
+        $color      = $this->resultColorMap[$taskResult];
+        $icon       = $this->resultIconMap[$taskResult];
+        $text       = $this->resultTextMap[$taskResult];
+        $repeat     = max(78 - $this->lineLength - strlen($text), 0);
 
         $this->output->writeln(
             sprintf('%s <fg=%s>%s %s</fg=%s>', str_repeat('.', $repeat), $color, $icon, $text, $color)
@@ -157,9 +158,10 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $result = $event->getResult();
 
-        $color = $this->resultColorMap[$result->getOverallBuildResult()];
-        $icon  = $this->resultIconMap[$result->getOverallBuildResult()];
-        $text  = $this->resultTextMap[$result->getOverallBuildResult()];
+        $buildResult = $result->getOverallBuildResult();
+        $color = $this->resultColorMap[$buildResult];
+        $icon  = $this->resultIconMap[$buildResult];
+        $text  = $this->resultTextMap[$buildResult];
 
         $this->output->writeln(sprintf("\n<fg=%s>%s Build was %s</fg=%s>", $color, $icon, $text, $color));
         $this->output->writeln(sprintf('(took %s)', $this->stringifyElapsedTime($result->getElapsedBuildTime())));

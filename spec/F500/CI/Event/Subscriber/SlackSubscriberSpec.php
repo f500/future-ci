@@ -15,6 +15,7 @@ use Crummy\Phlack\Phlack;
 use F500\CI\Build\Build;
 use F500\CI\Build\Result;
 use F500\CI\Event\BuildRunEvent;
+use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -29,24 +30,39 @@ use Prophecy\Argument;
 class SlackSubscriberSpec extends ObjectBehavior
 {
 
-    function let(Phlack $phlack, BuildRunEvent $event, Build $build, MessageBuilder $mb, AttachmentBuilder $ab, Message $message, MessageResponse $response)
-    {
+    function let(
+        BuildRunEvent $event,
+        Build $build,
+        Task $task,
+        Phlack $phlack,
+        MessageBuilder $mb,
+        AttachmentBuilder $ab,
+        Message $message,
+        MessageResponse $response
+    ) {
         /** @noinspection PhpParamsInspection */
         $this->beConstructedWith($phlack);
 
         $event->getBuild()->willReturn($build);
 
-        $phlack->getMessageBuilder()->willReturn($mb);
-        $mb->createAttachment()->willReturn($ab);
+        $build->getCn()->willReturn('a1b2c3d4');
+        $build->getSuiteName()->willReturn('Some Suite');
+        $build->getTasks()->willReturn(array('some_task' => $task));
 
+        $task->getCn()->willReturn('some_task');
+        $task->getName()->willReturn('Some Task');
+
+        $phlack->getMessageBuilder()->willReturn($mb);
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->willReturn($response);
 
         $mb->setText(Argument::type('string'))->willReturn($mb);
+        $mb->createAttachment()->willReturn($ab);
         $mb->create()->willReturn($message);
 
         $ab->setText(Argument::type('string'))->willReturn($ab);
-        $ab->setPretext(Argument::type('string'))->willReturn($ab);
+        $ab->setFallback(Argument::type('string'))->willReturn($ab);
         $ab->setColor(Argument::type('string'))->willReturn($ab);
+        $ab->addField(Argument::type('string'), Argument::type('string'), Argument::type('bool'))->willReturn($ab);
         $ab->end()->willReturn($mb);
     }
 
@@ -69,50 +85,71 @@ class SlackSubscriberSpec extends ObjectBehavior
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
+        MessageBuilder $mb,
         AttachmentBuilder $ab
     ) {
         $event->getResult()->willReturn($result);
 
         $result->getOverallBuildResult()->willReturn(Result::SUCCESSFUL);
+        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::SUCCESSFUL);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->shouldHaveBeenCalled();
-        $ab->setPretext(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $mb->setText(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $ab->setFallback(Argument::containingString('Passed'))->shouldHaveBeenCalled();
         $ab->setColor('good')->shouldHaveBeenCalled();
+        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 
     function it_sends_a_slack_success_message_on_build_failed(
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
+        MessageBuilder $mb,
         AttachmentBuilder $ab
     ) {
         $event->getResult()->willReturn($result);
 
         $result->getOverallBuildResult()->willReturn(Result::FAILED);
+        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::FAILED);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->shouldHaveBeenCalled();
-        $ab->setPretext(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $mb->setText(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $ab->setFallback(Argument::containingString('Failed'))->shouldHaveBeenCalled();
         $ab->setColor('warning')->shouldHaveBeenCalled();
+        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 
-    function it_sends_a_slack_success_message_on_build_incomplete(
+    function it_sends_a_slack_success_message_on_build_borked(
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
+        MessageBuilder $mb,
         AttachmentBuilder $ab
     ) {
         $event->getResult()->willReturn($result);
 
         $result->getOverallBuildResult()->willReturn(Result::INCOMPLETE);
+        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::INCOMPLETE);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->shouldHaveBeenCalled();
-        $ab->setPretext(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $mb->setText(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $ab->setFallback(Argument::containingString('Borked'))->shouldHaveBeenCalled();
         $ab->setColor('danger')->shouldHaveBeenCalled();
+        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 }

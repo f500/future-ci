@@ -38,7 +38,7 @@ class BuildRunnerSpec extends ObjectBehavior
         Filesystem $filesystem,
         Logger $logger
     ) {
-        $build->getCn()->willReturn('some_suite.1970.01.01.00.00.00');
+        $build->getCn()->willReturn('a1b2c3d4');
         $build->getBuildDir()->willReturn('/path/to/build');
         $build->getTasks()->willReturn(array('some_task' => $taskOne, 'other_task' => $taskTwo));
 

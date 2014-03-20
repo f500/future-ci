@@ -11,14 +11,14 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 
 /**
- * Class FilesystemServiceProvider
+ * Class PheanstalkServiceProvider
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
  * @package   F500\Provider
  */
-class FilesystemServiceProvider implements ServiceProviderInterface
+class PheanstalkServiceProvider implements ServiceProviderInterface
 {
 
     /**
@@ -26,12 +26,20 @@ class FilesystemServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $app['filesystem.class'] = 'Symfony\Component\Filesystem\Filesystem';
-        $app['filesystem']       = $app->share(
-            function (Application $app) {
-                $class = $app['filesystem.class'];
+        $app['pheanstalk.class']           = 'Pheanstalk_Pheanstalk';
+        $app['pheanstalk.server']          = '127.0.0.1';
+        $app['pheanstalk.port']            = \Pheanstalk_PheanstalkInterface::DEFAULT_PORT;
+        $app['pheanstalk.connect_timeout'] = null;
 
-                return new $class();
+        $app['pheanstalk'] = $app->share(
+            function (Application $app) {
+                $class = $app['pheanstalk.class'];
+
+                return new $class(
+                    $app['pheanstalk.server'],
+                    $app['pheanstalk.port'],
+                    $app['pheanstalk.connect_timeout']
+                );
             }
         );
     }

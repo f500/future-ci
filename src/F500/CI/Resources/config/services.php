@@ -14,6 +14,7 @@ $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 $app->register(new Cilex\Provider\Console\Adapter\Silex\ConsoleServiceProvider());
 
 $app->register(new F500\Provider\FilesystemServiceProvider());
+$app->register(new F500\Provider\PheanstalkServiceProvider());
 $app->register(new F500\Provider\PhlackServiceProvider());
 
 $app->register(new F500\CI\Provider\ViewRendererServiceProvider());

@@ -3,14 +3,14 @@ debug: %debug%
 console.name:    Future CI
 console.version: 0.0.1
 
+filesystem.class: F500\CI\Filesystem\Filesystem
+
 monolog.logfile: %root_dir%/var/logs/app.dev.log
 monolog.level:   debug
 monolog.name:    F500ci
 
-slack.username: %slack.username%
-slack.token:    %slack.token%
-
-filesystem.class: F500\CI\Filesystem\Filesystem
+phlack.username: %slack_username%
+phlack.token:    %slack_token%
 
 f500ci.suites_dir: %root_dir%/var/suites
 f500ci.builds_dir: %root_dir%/var/builds

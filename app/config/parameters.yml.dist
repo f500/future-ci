@@ -1,6 +1,5 @@
 parameters:
   debug: false
 
-  slack:
-    username: slack_user_name
-    token: slack_integration_token
+  slack_username: slack_user_name
+  slack_token:    slack_integration_token

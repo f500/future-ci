@@ -41,7 +41,7 @@ class StandardBuildSpec extends ObjectBehavior
 
     function it_has_a_cn()
     {
-        $this->getCn()->shouldMatch('/^some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}$/');
+        $this->getCn()->shouldMatch('/^[a-z0-9]+$/');
     }
 
     function it_has_a_date()
@@ -49,23 +49,26 @@ class StandardBuildSpec extends ObjectBehavior
         $this->getDate()->shouldHaveType('DateTimeImmutable');
     }
 
-    function it_has_a_name()
+    function it_has_a_suite_cn()
     {
-        $this->getName()->shouldReturn('Some Suite');
+        $this->getSuiteCn()->shouldReturn('some_suite');
+    }
+
+    function it_has_a_suite_name()
+    {
+        $this->getSuiteName()->shouldReturn('Some Suite');
     }
 
     function it_has_a_build_dir()
     {
-        $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}$|');
+        $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite\.[a-z0-9]+$|');
     }
 
     function it_has_a_build_dir_for_a_task(Task $task)
     {
         $task->getCn()->willReturn('some_task');
 
-        $this->getBuildDir($task)->shouldMatch(
-            '|^/path/to/builds/some_suite.\d{4}.\d{2}.\d{2}.\d{2}.\d{2}.\d{2}/some_task$|'
-        );
+        $this->getBuildDir($task)->shouldMatch('|^/path/to/builds/some_suite\.[a-z0-9]+/some_task$|');
     }
 
     function it_has_tasks(Task $task)

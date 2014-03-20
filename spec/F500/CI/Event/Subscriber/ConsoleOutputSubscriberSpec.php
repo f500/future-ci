@@ -47,8 +47,8 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
     ) {
         $event->getBuild()->willReturn($build);
 
-        $build->getName()->willReturn('Some Suite');
-        $build->getDate()->willReturn($date);
+        $build->getCn()->willReturn('a1b2c3d4');
+        $build->getSuiteName()->willReturn('Some Suite');
 
         $this->onBuildStarted($event);
 

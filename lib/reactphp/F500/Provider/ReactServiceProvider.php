@@ -11,14 +11,14 @@ use Silex\Application;
 use Silex\ServiceProviderInterface;
 
 /**
- * Class FilesystemServiceProvider
+ * Class ReactServiceProvider
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
  * @package   F500\Provider
  */
-class FilesystemServiceProvider implements ServiceProviderInterface
+class ReactServiceProvider implements ServiceProviderInterface
 {
 
     /**
@@ -26,14 +26,12 @@ class FilesystemServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $app['filesystem.class'] = 'Symfony\Component\Filesystem\Filesystem';
-        $app['filesystem']       = $app->share(
-            function (Application $app) {
-                $class = $app['filesystem.class'];
+        $app['reactphp.event_loop.class'] = 'React\EventLoop\StreamSelectLoop';
+        $app['reactphp.event_loop']       = function (Application $app) {
+            $class = $app['reactphp.event_loop.class'];
 
-                return new $class();
-            }
-        );
+            return new $class();
+        };
     }
 
     /**

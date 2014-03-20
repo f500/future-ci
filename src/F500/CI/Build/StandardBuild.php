@@ -42,10 +42,9 @@ class StandardBuild implements Build
      */
     public function __construct(Suite $suite, $buildsDir)
     {
-        $this->date  = new \DateTimeImmutable();
-        $this->suite = $suite;
-
-        $this->buildDir = $buildsDir . '/' . $this->getCn();
+        $this->date     = new \DateTimeImmutable();
+        $this->suite    = $suite;
+        $this->buildDir = sprintf('%s/%s.%s', $buildsDir, $this->getSuiteCn(), $this->getCn());
     }
 
     /**
@@ -53,7 +52,7 @@ class StandardBuild implements Build
      */
     public function getCn()
     {
-        return $this->suite->getCn() . $this->date->format('.Y.m.d.H.i.s');
+        return base_convert($this->getDate()->getTimestamp(), 10, 36);
     }
 
     /**
@@ -67,7 +66,15 @@ class StandardBuild implements Build
     /**
      * @return string
      */
-    public function getName()
+    public function getSuiteCn()
+    {
+        return $this->suite->getCn();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuiteName()
     {
         return $this->suite->getName();
     }

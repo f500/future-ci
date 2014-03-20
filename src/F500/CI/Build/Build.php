@@ -39,7 +39,12 @@ interface Build
     /**
      * @return string
      */
-    public function getName();
+    public function getSuiteCn();
+
+    /**
+     * @return string
+     */
+    public function getSuiteName();
 
     /**
      * @return string

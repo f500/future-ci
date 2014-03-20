@@ -4,10 +4,12 @@
  * This file is part of the Future CI package.
  * Future CI is licensed under MIT (https://github.com/f500/future-ci/blob/master/LICENSE).
  */
+
+namespace F500\Provider;
+
 use Crummy\Phlack\Bridge\Guzzle\PhlackClient;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
-
 
 /**
  * Class PhlackServiceProvider
@@ -33,8 +35,11 @@ class PhlackServiceProvider implements ServiceProviderInterface
                     throw new \RuntimeException('"phlack.token" should contain your Slack.com token.');
                 }
 
-                $client = PhlackClient::factory([$app['phlack.username'], $app['phlack.token']]);
-                return new $class($client);
+                return new $class(
+                    PhlackClient::factory(
+                        array('username' => $app['phlack.username'], 'token' => $app['phlack.token'])
+                    )
+                );
             }
         );
     }
@@ -42,4 +47,4 @@ class PhlackServiceProvider implements ServiceProviderInterface
     public function boot(Application $app)
     {
     }
-} 
+}

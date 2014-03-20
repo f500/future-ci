@@ -29,6 +29,23 @@ class SlackSubscriber implements EventSubscriberInterface
      */
     protected $phlack;
 
+    /**
+     * @var array
+     */
+    protected $resultColorMap = array(
+        Result::INCOMPLETE => 'danger',
+        Result::FAILED     => 'warning',
+        Result::SUCCESSFUL => 'good'
+    );
+
+    /**
+     * @var array
+     */
+    protected $resultTextMap = array(
+        Result::INCOMPLETE => 'Borked',
+        Result::FAILED     => 'Failed',
+        Result::SUCCESSFUL => 'Passed'
+    );
 
     /**
      * @return array
@@ -60,12 +77,11 @@ class SlackSubscriber implements EventSubscriberInterface
     {
         $build = $event->getBuild();
 
-        $messageBuilder    = $this->phlack->getMessageBuilder();
-        $attachmentBuilder = $messageBuilder->createAttachment();
+        $messageBuilder = $this->phlack->getMessageBuilder();
 
-        $attachmentBuilder
-            ->setText('Build started: ' . $build->getCn())
-            ->end();
+        $messageBuilder->setText(
+            sprintf('Build [%s] (%s) started.', $build->getCn(), $build->getSuiteName())
+        );
 
         $response = $this->phlack->send($messageBuilder->create());
     }
@@ -75,31 +91,74 @@ class SlackSubscriber implements EventSubscriberInterface
      */
     public function onBuildFinished(BuildRunEvent $event)
     {
-        $build = $event->getBuild();
+        $build  = $event->getBuild();
         $result = $event->getResult();
 
-        $messageBuilder = $this->phlack->getMessageBuilder();
-
+        $messageBuilder    = $this->phlack->getMessageBuilder();
         $attachmentBuilder = $messageBuilder->createAttachment();
-        $attachmentBuilder->setText('Build finished: ' . $build->getCn());
 
-        switch ($result->getOverallBuildResult()) {
-            case Result::SUCCESSFUL:
-                $attachmentBuilder->setPreText('success');
-                $attachmentBuilder->setColor('good');
-                break;
-            case Result::FAILED:
-                $attachmentBuilder->setPreText('failure');
-                $attachmentBuilder->setColor('warning');
-                break;
-            case Result::INCOMPLETE:
-                $attachmentBuilder->setPreText('incomplete');
-                $attachmentBuilder->setColor('danger');
-                break;
+        $messageBuilder->setText(
+            sprintf('Build [%s] (%s) finished.', $build->getCn(), $build->getSuiteName())
+        );
+
+        $buildResult = $result->getOverallBuildResult();
+        $color       = $this->resultColorMap[$buildResult];
+        $text        = sprintf(
+            '%s in %s.',
+            $this->resultTextMap[$buildResult],
+            $this->stringifyElapsedTime($result->getElapsedBuildTime())
+        );
+
+        $attachmentBuilder
+            ->setFallback($text)
+            ->setText($text)
+            ->setColor($color);
+
+        foreach ($build->getTasks() as $task) {
+            $attachmentBuilder->addField(
+                $task->getName(),
+                $this->resultTextMap[$result->getOverallTaskResult($task)],
+                false
+            );
         }
 
         $attachmentBuilder->end();
 
         $response = $this->phlack->send($messageBuilder->create());
+    }
+
+    /**
+     * @param float $milliseconds
+     * @return string
+     */
+    protected function stringifyElapsedTime($milliseconds)
+    {
+        $formatted = array();
+
+        if ($milliseconds >= 86400000) {
+            $days        = floor($milliseconds / 86400000);
+            $formatted[] = $days . ' day' . ($days == 1 ? '' : 's');
+            $milliseconds %= 86400000;
+        }
+        if ($milliseconds >= 3600000) {
+            $hours       = floor($milliseconds / 3600000);
+            $formatted[] = $hours . ' hour' . ($hours == 1 ? '' : 's');
+            $milliseconds %= 3600000;
+        }
+        if ($milliseconds >= 60000) {
+            $minutes     = floor($milliseconds / 60000);
+            $formatted[] = $minutes . ' minute' . ($minutes == 1 ? '' : 's');
+            $milliseconds %= 60000;
+        }
+        if ($milliseconds >= 1000) {
+            $seconds     = floor($milliseconds / 1000);
+            $formatted[] = $seconds . ' second' . ($seconds == 1 ? '' : 's');
+            $milliseconds %= 1000;
+        }
+        if ($milliseconds) {
+            $formatted[] = $milliseconds . ' millisecond' . ($milliseconds == 1 ? '' : 's');
+        }
+
+        return implode(', ', $formatted);
     }
 }

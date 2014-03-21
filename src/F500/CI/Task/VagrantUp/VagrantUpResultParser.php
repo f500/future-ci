@@ -28,7 +28,7 @@ class VagrantUpResultParser extends BaseResultParser
     public function parse(Task $task, Result $result)
     {
         $passed      = true;
-        $taskResults = $result->getTaskResults($task);
+        $taskResults = $result->getResults($task);
 
         if (!empty($taskResults['commands'])) {
             foreach ($taskResults['commands'] as $commandResults) {

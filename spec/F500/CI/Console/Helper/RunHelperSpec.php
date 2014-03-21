@@ -12,6 +12,7 @@ use F500\CI\Filesystem\Filesystem;
 use F500\CI\Runner\BuildRunner;
 use F500\CI\Runner\Configurator;
 use F500\CI\Suite\Suite;
+use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -48,7 +49,8 @@ class RunHelperSpec extends ObjectBehavior
         Configurator $configurator,
         BuildRunner $buildRunner,
         Suite $suite,
-        Build $build
+        Build $build,
+        Task $task
     ) {
         $input->getArgument('suite')->willReturn('some_suite.yml');
         $input->getArgument('params')->willReturn(array());
@@ -74,6 +76,16 @@ class RunHelperSpec extends ObjectBehavior
         $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
             ->willReturn(true)
             ->shouldBeCalled();
+
+        $build->getCn()->willReturn('a1b2c3d4');
+        $build->getDate()->willReturn(new \DateTimeImmutable());
+        $build->getBuildDir()->willReturn('/path/to/builds/some_suite/a1b2c3d4');
+        $build->getSuiteCn()->willReturn('some_suite');
+        $build->getSuiteName()->willReturn('Some Suite');
+        $build->getTasks()->willReturn(array('some_task' => $task));
+
+        $task->getCn()->willReturn('some_task');
+        $task->getName()->willReturn('Some Task');
 
         $this->execute($input, $output);
     }

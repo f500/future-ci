@@ -7,6 +7,7 @@
 
 namespace spec\F500\CI\Build;
 
+use F500\CI\Build\Build;
 use F500\CI\Build\Result;
 use F500\CI\Command\Command;
 use F500\CI\Filesystem\Filesystem;
@@ -24,12 +25,22 @@ use Prophecy\Argument;
 class ResultSpec extends ObjectBehavior
 {
 
-    function let(Task $task, Command $command, Filesystem $filesystem)
+    function let(Build $build, Task $task, Command $command, Filesystem $filesystem, \DateTimeImmutable $date)
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith($filesystem, '/path/to/build');
+        $this->beConstructedWith($build, $filesystem);
+
+        $date->format('r')->willReturn('Fri, 21 Mar 2014 17:04:10 +0100');
+
+        $build->getCn()->willReturn('a1b2c3d4');
+        $build->getDate()->willReturn($date);
+        $build->getBuildDir()->willReturn('/path/to/builds/some_suite/a1b2c3d4');
+        $build->getSuiteCn()->willReturn('some_suite');
+        $build->getSuiteName()->willReturn('Some Suite');
+        $build->getTasks()->willReturn(array('some_task' => $task));
 
         $task->getCn()->willReturn('some_task');
+        $task->getName()->willReturn('Some Task');
 
         $command->getId()->willReturn('a1b2c3d4');
         $command->stringify()->willReturn('ls -l');
@@ -42,26 +53,29 @@ class ResultSpec extends ObjectBehavior
         $this->shouldHaveType('F500\CI\Build\Result');
     }
 
-    function it_has_a_filesystem()
-    {
-        $this->getFilesystem()->shouldReturnAnInstanceOf('F500\CI\Filesystem\Filesystem');
-    }
-
     function it_has_a_build_dir()
     {
-        $this->getBuildDir()->shouldReturn('/path/to/build');
+        $this->getBuildDir()->shouldReturn('/path/to/builds/some_suite/a1b2c3d4');
     }
 
     function it_has_a_build_dir_for_a_task(Task $task)
     {
-        $this->getBuildDir($task)->shouldReturn('/path/to/build/some_task');
+        $this->getBuildDir($task)->shouldReturn('/path/to/builds/some_suite/a1b2c3d4/some_task');
     }
 
-    function it_has_task_results_after_adding_command_results(Task $task, Command $command)
+    function it_has_no_task_results_when_not_added(Task $task)
+    {
+        $this->shouldThrow('InvalidArgumentException')->during(
+            'getResults',
+            array($task)
+        );
+    }
+
+    function it_has_task_results_after_adding_a_command_result(Task $task, Command $command)
     {
         $this->addCommandResult($task, $command);
 
-        $this->getTaskResults($task)->shouldReturn(
+        $this->getResults($task)->shouldReturn(
             array(
                 'commands' => array(
                     'a1b2c3d4' => array(
@@ -76,63 +90,17 @@ class ResultSpec extends ObjectBehavior
         );
     }
 
-    function it_has_build_results_after_adding_command_results(Task $task, Command $command)
+    function it_has_task_results_after_adding_an_additional_result(Task $task)
     {
-        $this->addCommandResult($task, $command);
+        $this->addAdditionalResult($task, 'foo', 'bar');
+    }
 
-        $this->getBuildResults()->shouldReturn(
-            array(
-                'some_task' => array(
-                    'commands' => array(
-                        'a1b2c3d4' => array(
-                            'task'        => 'some_task',
-                            'command_id'  => 'a1b2c3d4',
-                            'command'     => 'ls -l',
-                            'result_code' => 0,
-                            'output'      => 'Some output...'
-                        )
-                    )
-                )
-            )
+    function it_has_no_task_status_when_task_is_not_marked(Task $task)
+    {
+        $this->shouldThrow('InvalidArgumentException')->during(
+            'getTaskStatus',
+            array($task)
         );
-    }
-
-    function it_has_task_results_after_task_is_marked(Task $task)
-    {
-        $this->markTaskAsPassed($task);
-
-        $this->getTaskResults($task)->shouldReturn(
-            array(
-                'result' => Result::PASSED
-            )
-        );
-    }
-
-    function it_has_build_results_after_task_is_marked(Task $task)
-    {
-        $this->markTaskAsPassed($task);
-
-        $this->getBuildResults()->shouldReturn(
-            array(
-                'some_task' => array(
-                    'result' => Result::PASSED
-                )
-            )
-        );
-    }
-
-    function it_has_a_borked_task_status_after_task_is_marked_as_borked(Task $task)
-    {
-        $this->markTaskAsBorked($task);
-
-        $this->getTaskStatus($task)->shouldReturn(Result::BORKED);
-    }
-
-    function it_has_a_failed_task_status_after_task_is_marked_as_failed(Task $task)
-    {
-        $this->markTaskAsFailed($task);
-
-        $this->getTaskStatus($task)->shouldReturn(Result::FAILED);
     }
 
     function it_has_a_passed_task_status_after_task_is_marked_as_passed(Task $task)
@@ -142,12 +110,18 @@ class ResultSpec extends ObjectBehavior
         $this->getTaskStatus($task)->shouldReturn(Result::PASSED);
     }
 
-    function it_has_no_task_status_when_task_is_not_marked(Task $task)
+    function it_has_a_failed_task_status_after_task_is_marked_as_failed(Task $task)
     {
-        $this->shouldThrow('InvalidArgumentException')->during(
-            'getTaskStatus',
-            array($task)
-        );
+        $this->markTaskAsFailed($task);
+
+        $this->getTaskStatus($task)->shouldReturn(Result::FAILED);
+    }
+
+    function it_has_a_borked_task_status_after_task_is_marked_as_borked(Task $task)
+    {
+        $this->markTaskAsBorked($task);
+
+        $this->getTaskStatus($task)->shouldReturn(Result::BORKED);
     }
 
     function it_has_a_borked_build_status_when_a_build_has_a_borked_task(
@@ -228,7 +202,31 @@ class ResultSpec extends ObjectBehavior
     {
         $json = <<< EOT
 {
-    "build_dir": "\/path\/to\/build",
+    "metadata": {
+        "suite": {
+            "cn": "some_suite",
+            "name": "Some Suite"
+        },
+        "build": {
+            "cn": "a1b2c3d4",
+            "date": "Fri, 21 Mar 2014 17:04:10 +0100",
+            "dir": "\/path\/to\/builds\/some_suite\/a1b2c3d4",
+            "time": 12345678
+        },
+        "tasks": {
+            "some_task": {
+                "cn": "some_task",
+                "name": "Some Task",
+                "time": 12345678
+            }
+        }
+    },
+    "statuses": {
+        "build": "passed",
+        "tasks": {
+            "some_task": "passed"
+        }
+    },
     "results": {
         "some_task": {
             "commands": {
@@ -239,25 +237,11 @@ class ResultSpec extends ObjectBehavior
                     "result_code": 0,
                     "output": "Some output..."
                 }
-            },
-            "result": "passed"
+            }
         }
-    },
-    "elapsed_times": {
-        "tasks": {
-            "some_task": 12345678
-        },
-        "build": 12345678
     }
 }
 EOT;
-
-        $task->getCn()->willReturn('some_task');
-
-        $command->getId()->willReturn('a1b2c3d4');
-        $command->stringify()->willReturn('ls -l');
-        $command->getResultCode()->willReturn(0);
-        $command->getOutput()->willReturn('Some output...');
 
         $this->addCommandResult($task, $command);
         $this->markTaskAsPassed($task);
@@ -265,5 +249,10 @@ EOT;
         $this->setElapsedBuildTime(12345678);
 
         $this->toJson()->shouldReturn($json);
+    }
+
+    function it_has_a_filesystem()
+    {
+        $this->getFilesystem()->shouldReturnAnInstanceOf('F500\CI\Filesystem\Filesystem');
     }
 }

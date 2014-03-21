@@ -54,7 +54,7 @@ EOT;
 
     function it_determines_if_the_task_has_passed(Task $task, Result $result)
     {
-        $result->getTaskResults($task)->willReturn(
+        $result->getResults($task)->willReturn(
             array(
                 'commands' => array(
                     'a1b2c3d4' => array(
@@ -77,7 +77,7 @@ EOT;
 
     function it_determines_if_the_task_has_failed(Task $task, Result $result)
     {
-        $result->getTaskResults($task)->willReturn(
+        $result->getResults($task)->willReturn(
             array(
                 'commands' => array(
                     'a1b2c3d4' => array(

@@ -8,3 +8,6 @@
  */
 
 $app->get('/', 'f500ci.controller.default:indexAction');
+
+$app->get('/builds', 'f500ci.controller.build:listAction');
+$app->get('/build/{suiteCn}/{buildCn}', 'f500ci.controller.build:showAction');

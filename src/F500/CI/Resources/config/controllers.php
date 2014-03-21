@@ -12,3 +12,9 @@ $app['f500ci.controller.default'] = $app->share(
         return new F500\CI\Controller\DefaultController($app);
     }
 );
+
+$app['f500ci.controller.build'] = $app->share(
+    function () use ($app) {
+        return new F500\CI\Controller\BuildController($app);
+    }
+);

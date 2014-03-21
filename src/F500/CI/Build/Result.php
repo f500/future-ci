@@ -37,14 +37,14 @@ class Result
     const BORKED = 'borked';
 
     /**
-     * @var Filesystem
+     * @var array
      */
-    protected $filesystem;
+    protected $metadata;
 
     /**
-     * @var string
+     * @var array
      */
-    protected $buildDir;
+    protected $statuses;
 
     /**
      * @var array
@@ -52,20 +52,61 @@ class Result
     protected $results;
 
     /**
-     * @var array
+     * @var Filesystem
      */
-    protected $elapsedTimes;
+    protected $filesystem;
 
     /**
+     * @param Build      $build
      * @param Filesystem $filesystem
-     * @param string     $buildDir
      */
-    public function __construct(Filesystem $filesystem, $buildDir)
+    public function __construct(Build $build, Filesystem $filesystem)
     {
-        $this->filesystem   = $filesystem;
-        $this->buildDir     = $buildDir;
-        $this->results      = array();
-        $this->elapsedTimes = array();
+        $this->metadata = array(
+            'suite' => array(
+                'cn'   => $build->getSuiteCn(),
+                'name' => $build->getSuiteName()
+            ),
+            'build' => array(
+                'cn'   => $build->getCn(),
+                'date' => $build->getDate()->format('r'),
+                'dir'  => $build->getBuildDir(),
+                'time' => null
+            ),
+            'tasks' => array()
+        );
+
+        foreach ($build->getTasks() as $task) {
+            $this->metadata['tasks'][$task->getCn()] = array(
+                'cn'   => $task->getCn(),
+                'name' => $task->getName(),
+                'time' => null
+            );
+        }
+
+        $this->statuses = array(
+            'build' => null,
+            'tasks' => array()
+        );
+
+        $this->results = array();
+
+        $this->filesystem = $filesystem;
+    }
+
+    /**
+     * @param Task $task
+     * @return string
+     */
+    public function getBuildDir(Task $task = null)
+    {
+        $buildDir = $this->metadata['build']['dir'];
+
+        if ($task) {
+            $buildDir .= '/' . $task->getCn();
+        }
+
+        return $buildDir;
     }
 
     /**
@@ -84,11 +125,35 @@ class Result
     }
 
     /**
+     * @param Task   $task
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function addAdditionalResult(Task $task, $name, $value)
+    {
+        $this->results[$task->getCn()][$name] = $value;
+    }
+
+    /**
+     * @param Task $task
+     * @return array
+     * @throws \InvalidArgumentException
+     */
+    public function getResults(Task $task)
+    {
+        if (!isset($this->results[$task->getCn()])) {
+            throw new \InvalidArgumentException(sprintf('Task %s has no results yet.', $task->getCn()));
+        }
+
+        return $this->results[$task->getCn()];
+    }
+
+    /**
      * @param Task $task
      */
     public function markTaskAsPassed(Task $task)
     {
-        $this->results[$task->getCn()]['result'] = self::PASSED;
+        $this->statuses['tasks'][$task->getCn()] = self::PASSED;
     }
 
     /**
@@ -96,7 +161,7 @@ class Result
      */
     public function markTaskAsFailed(Task $task)
     {
-        $this->results[$task->getCn()]['result'] = self::FAILED;
+        $this->statuses['tasks'][$task->getCn()] = self::FAILED;
     }
 
     /**
@@ -104,7 +169,92 @@ class Result
      */
     public function markTaskAsBorked(Task $task)
     {
-        $this->results[$task->getCn()]['result'] = self::BORKED;
+        $this->statuses['tasks'][$task->getCn()] = self::BORKED;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBuildStatus()
+    {
+        $this->determineBuildStatus();
+
+        return $this->statuses['build'];
+    }
+
+    /**
+     * @param Task $task
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function getTaskStatus(Task $task)
+    {
+        if (!isset($this->statuses['tasks'][$task->getCn()])) {
+            throw new \InvalidArgumentException(sprintf('Task %s has no status yet.', $task->getCn()));
+        }
+
+        return $this->statuses['tasks'][$task->getCn()];
+    }
+
+    /**
+     * @param float $time
+     */
+    public function setElapsedBuildTime($time)
+    {
+        $this->metadata['build']['time'] = $time;
+    }
+
+    /**
+     * @return float
+     * @throws \InvalidArgumentException
+     */
+    public function getElapsedBuildTime()
+    {
+        if (!isset($this->metadata['build']['time'])) {
+            throw new \InvalidArgumentException(sprintf('Build has no elapsed time yet.'));
+        }
+
+        return $this->metadata['build']['time'];
+    }
+
+    /**
+     * @param Task  $task
+     * @param float $time
+     */
+    public function setElapsedTaskTime(Task $task, $time)
+    {
+        $this->metadata['tasks'][$task->getCn()]['time'] = $time;
+    }
+
+    /**
+     * @param Task $task
+     * @return float
+     * @throws \InvalidArgumentException
+     */
+    public function getElapsedTaskTime(Task $task)
+    {
+        if (!isset($this->metadata['tasks'][$task->getCn()]['time'])) {
+            throw new \InvalidArgumentException(sprintf('Task %s has no elapsed time yet.', $task->getCn()));
+        }
+
+        return $this->metadata['tasks'][$task->getCn()]['time'];
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        $this->determineBuildStatus();
+
+        return json_encode(
+            array(
+                'metadata' => $this->metadata,
+                'statuses' => $this->statuses,
+                'results'  => $this->results
+            ),
+            JSON_PRETTY_PRINT
+        );
     }
 
     /**
@@ -115,126 +265,19 @@ class Result
         return $this->filesystem;
     }
 
-    /**
-     * @param Task $task
-     * @return string
-     */
-    public function getBuildDir(Task $task = null)
+    protected function determineBuildStatus()
     {
-        $buildDir = $this->buildDir;
+        if (!$this->statuses['build']) {
+            $this->statuses['build'] = self::PASSED;
 
-        if ($task) {
-            $buildDir .= '/' . $task->getCn();
-        }
-
-        return $buildDir;
-    }
-
-    /**
-     * @return array
-     */
-    public function getBuildResults()
-    {
-        return $this->results;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBuildStatus()
-    {
-        $result = self::PASSED;
-
-        foreach ($this->results as $taskResults) {
-            if ($taskResults['result'] == self::BORKED) {
-                return self::BORKED;
-            } elseif ($taskResults['result'] == self::FAILED) {
-                $result = self::FAILED;
+            foreach ($this->statuses['tasks'] as $taskStatus) {
+                if ($taskStatus == self::BORKED) {
+                    $this->statuses['build'] = self::BORKED;
+                    break;
+                } elseif ($taskStatus == self::FAILED) {
+                    $this->statuses['build'] = self::FAILED;
+                }
             }
         }
-
-        return $result;
-    }
-
-    /**
-     * @param Task $task
-     * @return array
-     */
-    public function getTaskResults(Task $task)
-    {
-        return $this->results[$task->getCn()];
-    }
-
-    /**
-     * @param Task $task
-     * @return string
-     * @throws \InvalidArgumentException
-     */
-    public function getTaskStatus(Task $task)
-    {
-        if (!isset($this->results[$task->getCn()]['result'])) {
-            throw new \InvalidArgumentException(sprintf('Task %s has no result yet.', $task->getCn()));
-        }
-
-        return $this->results[$task->getCn()]['result'];
-    }
-
-    /**
-     * @param float $time
-     */
-    public function setElapsedBuildTime($time)
-    {
-        $this->elapsedTimes['build'] = $time;
-    }
-
-    /**
-     * @return float
-     * @throws \InvalidArgumentException
-     */
-    public function getElapsedBuildTime()
-    {
-        if (!isset($this->elapsedTimes['build'])) {
-            throw new \InvalidArgumentException(sprintf('Build has no elapsed time yet.'));
-        }
-
-        return $this->elapsedTimes['build'];
-    }
-
-    /**
-     * @param Task  $task
-     * @param float $time
-     */
-    public function setElapsedTaskTime(Task $task, $time)
-    {
-        $this->elapsedTimes['tasks'][$task->getCn()] = $time;
-    }
-
-    /**
-     * @param Task $task
-     * @return float
-     * @throws \InvalidArgumentException
-     */
-    public function getElapsedTaskTime(Task $task)
-    {
-        if (!isset($this->elapsedTimes['tasks'][$task->getCn()])) {
-            throw new \InvalidArgumentException(sprintf('Task %s has no elapsed time yet.', $task->getCn()));
-        }
-
-        return $this->elapsedTimes['tasks'][$task->getCn()];
-    }
-
-    /**
-     * @return string
-     */
-    public function toJson()
-    {
-        return json_encode(
-            array(
-                'build_dir'     => $this->buildDir,
-                'results'       => $this->results,
-                'elapsed_times' => $this->elapsedTimes
-            ),
-            JSON_PRETTY_PRINT
-        );
     }
 }

@@ -72,7 +72,7 @@ class RunHelper
         $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config);
         $build = $configurator->createBuild($config['build']['class'], $suite);
 
-        $result = new Result($filesystem, $build->getBuildDir());
+        $result = new Result($build, $filesystem);
 
         if (!$buildRunner->initialize($build)) {
             $output->writeln("<bg=red>\xE2\x9C\x98 Initializing build failed!</bg=red>");

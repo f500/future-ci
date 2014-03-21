@@ -12,25 +12,25 @@ use F500\CI\Task\Task;
 use Prophecy\Argument;
 
 /**
- * Class AlwaysSuccessResultParserSpec
+ * Class AlwaysPassResultParserSpec
  *
  * @author    Jasper N. Brouwer <jasper@future500.nl>
  * @copyright 2014 Future500 B.V.
  * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
  * @package   spec\F500\CI\Task
  */
-class AlwaysSuccessResultParserSpec extends ResultParserSpec
+class AlwaysPassResultParserSpec extends ResultParserSpec
 {
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('F500\CI\Task\AlwaysSuccessResultParser');
+        $this->shouldHaveType('F500\CI\Task\AlwaysPassResultParser');
         $this->shouldImplement('F500\CI\Task\ResultParser');
     }
 
-    function it_always_determines_that_a_result_is_successful(Task $task, Result $result)
+    function it_always_determines_that_a_task_has_passed(Task $task, Result $result)
     {
-        $result->markTaskAsSuccessful($task)
+        $result->markTaskAsPassed($task)
             ->willReturn()
             ->shouldBeCalled();
 

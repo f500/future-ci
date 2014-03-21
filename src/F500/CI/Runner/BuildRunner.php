@@ -152,7 +152,7 @@ class BuildRunner
                     break;
                 }
 
-                if ($task->stopOnFailure() && $result->getOverallTaskResult($task) == Result::FAILED) {
+                if ($task->stopOnFailure() && $result->getTaskStatus($task) == Result::FAILED) {
                     break;
                 }
             }

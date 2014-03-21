@@ -81,7 +81,7 @@ class TaskRunner
             $result->addCommandResult($task, $command);
 
             if (!$success) {
-                $result->markTaskAsIncomplete($task);
+                $result->markTaskAsBorked($task);
 
                 return false;
             }

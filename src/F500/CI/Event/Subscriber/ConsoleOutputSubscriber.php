@@ -40,27 +40,27 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
      * @var array
      */
     protected $resultColorMap = array(
-        Result::INCOMPLETE => 'magenta',
-        Result::FAILED     => 'red',
-        Result::SUCCESSFUL => 'green'
+        Result::PASSED => 'green',
+        Result::FAILED => 'red',
+        Result::BORKED => 'magenta'
     );
 
     /**
      * @var array
      */
     protected $resultIconMap = array(
-        Result::INCOMPLETE => self::UNICODE_BALLOT,
-        Result::FAILED     => self::UNICODE_BALLOT,
-        Result::SUCCESSFUL => self::UNICODE_CHECKMARK
+        Result::PASSED => self::UNICODE_CHECKMARK,
+        Result::FAILED => self::UNICODE_BALLOT,
+        Result::BORKED => self::UNICODE_BALLOT
     );
 
     /**
      * @var array
      */
     protected $resultTextMap = array(
-        Result::INCOMPLETE => 'incomplete',
-        Result::FAILED     => 'failed',
-        Result::SUCCESSFUL => 'successful'
+        Result::PASSED => 'passed',
+        Result::FAILED => 'failed',
+        Result::BORKED => 'borked'
     );
 
     /**
@@ -139,7 +139,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
         $task   = $event->getTask();
         $result = $event->getResult();
 
-        $taskResult = $result->getOverallTaskResult($task);
+        $taskResult = $result->getTaskStatus($task);
         $color      = $this->resultColorMap[$taskResult];
         $icon       = $this->resultIconMap[$taskResult];
         $text       = $this->resultTextMap[$taskResult];
@@ -158,12 +158,12 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
     {
         $result = $event->getResult();
 
-        $buildResult = $result->getOverallBuildResult();
-        $color = $this->resultColorMap[$buildResult];
-        $icon  = $this->resultIconMap[$buildResult];
-        $text  = $this->resultTextMap[$buildResult];
+        $buildResult = $result->getBuildStatus();
+        $color       = $this->resultColorMap[$buildResult];
+        $icon        = $this->resultIconMap[$buildResult];
+        $text        = $this->resultTextMap[$buildResult];
 
-        $this->output->writeln(sprintf("\n<fg=%s>%s Build was %s</fg=%s>", $color, $icon, $text, $color));
+        $this->output->writeln(sprintf("\n<fg=%s>%s Build has %s</fg=%s>", $color, $icon, $text, $color));
         $this->output->writeln(sprintf('(took %s)', $this->stringifyElapsedTime($result->getElapsedBuildTime())));
     }
 

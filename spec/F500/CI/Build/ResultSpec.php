@@ -100,58 +100,58 @@ class ResultSpec extends ObjectBehavior
 
     function it_has_task_results_after_task_is_marked(Task $task)
     {
-        $this->markTaskAsSuccessful($task);
+        $this->markTaskAsPassed($task);
 
         $this->getTaskResults($task)->shouldReturn(
             array(
-                'result' => Result::SUCCESSFUL
+                'result' => Result::PASSED
             )
         );
     }
 
     function it_has_build_results_after_task_is_marked(Task $task)
     {
-        $this->markTaskAsSuccessful($task);
+        $this->markTaskAsPassed($task);
 
         $this->getBuildResults()->shouldReturn(
             array(
                 'some_task' => array(
-                    'result' => Result::SUCCESSFUL
+                    'result' => Result::PASSED
                 )
             )
         );
     }
 
-    function it_has_a_incomplete_overall_task_result_after_task_is_marked_as_incomplete(Task $task)
+    function it_has_a_borked_task_status_after_task_is_marked_as_borked(Task $task)
     {
-        $this->markTaskAsIncomplete($task);
+        $this->markTaskAsBorked($task);
 
-        $this->getOverallTaskResult($task)->shouldReturn(Result::INCOMPLETE);
+        $this->getTaskStatus($task)->shouldReturn(Result::BORKED);
     }
 
-    function it_has_a_failed_overall_task_result_after_task_is_marked_as_failed(Task $task)
+    function it_has_a_failed_task_status_after_task_is_marked_as_failed(Task $task)
     {
         $this->markTaskAsFailed($task);
 
-        $this->getOverallTaskResult($task)->shouldReturn(Result::FAILED);
+        $this->getTaskStatus($task)->shouldReturn(Result::FAILED);
     }
 
-    function it_has_a_successful_overall_task_result_after_task_is_marked_as_successful(Task $task)
+    function it_has_a_passed_task_status_after_task_is_marked_as_passed(Task $task)
     {
-        $this->markTaskAsSuccessful($task);
+        $this->markTaskAsPassed($task);
 
-        $this->getOverallTaskResult($task)->shouldReturn(Result::SUCCESSFUL);
+        $this->getTaskStatus($task)->shouldReturn(Result::PASSED);
     }
 
-    function it_has_no_overall_task_result_when_not_set(Task $task)
+    function it_has_no_task_status_when_task_is_not_marked(Task $task)
     {
         $this->shouldThrow('InvalidArgumentException')->during(
-            'getOverallTaskResult',
+            'getTaskStatus',
             array($task)
         );
     }
 
-    function it_has_a_incomplete_overall_build_result_when_it_has_an_incomplete_task(
+    function it_has_a_borked_build_status_when_a_build_has_a_borked_task(
         Task $task1,
         Task $task2,
         Task $task3
@@ -160,27 +160,27 @@ class ResultSpec extends ObjectBehavior
         $task2->getCn()->willReturn('task_two');
         $task3->getCn()->willReturn('task_three');
 
-        $this->markTaskAsSuccessful($task1);
-        $this->markTaskAsIncomplete($task2);
-        $this->markTaskAsSuccessful($task3);
+        $this->markTaskAsPassed($task1);
+        $this->markTaskAsBorked($task2);
+        $this->markTaskAsPassed($task3);
 
-        $this->getOverallBuildResult()->shouldReturn(Result::INCOMPLETE);
+        $this->getBuildStatus()->shouldReturn(Result::BORKED);
     }
 
-    function it_has_a_failed_overall_build_result_when_it_has_a_failed_task(Task $task1, Task $task2, Task $task3)
+    function it_has_a_failed_build_status_when_a_build_has_a_failed_task(Task $task1, Task $task2, Task $task3)
     {
         $task1->getCn()->willReturn('task_one');
         $task2->getCn()->willReturn('task_two');
         $task3->getCn()->willReturn('task_three');
 
-        $this->markTaskAsSuccessful($task1);
-        $this->markTaskAsSuccessful($task2);
+        $this->markTaskAsPassed($task1);
+        $this->markTaskAsPassed($task2);
         $this->markTaskAsFailed($task3);
 
-        $this->getOverallBuildResult()->shouldReturn(Result::FAILED);
+        $this->getBuildStatus()->shouldReturn(Result::FAILED);
     }
 
-    function it_has_a_successful_overall_build_result_when_it_only_has_successful_tasks(
+    function it_has_a_passed_build_status_when_a_build_only_has_passed_tasks(
         Task $task1,
         Task $task2,
         Task $task3
@@ -189,11 +189,11 @@ class ResultSpec extends ObjectBehavior
         $task2->getCn()->willReturn('task_two');
         $task3->getCn()->willReturn('task_three');
 
-        $this->markTaskAsSuccessful($task1);
-        $this->markTaskAsSuccessful($task2);
-        $this->markTaskAsSuccessful($task3);
+        $this->markTaskAsPassed($task1);
+        $this->markTaskAsPassed($task2);
+        $this->markTaskAsPassed($task3);
 
-        $this->getOverallBuildResult()->shouldReturn(Result::SUCCESSFUL);
+        $this->getBuildStatus()->shouldReturn(Result::PASSED);
     }
 
     function it_has_an_elapsed_time_for_a_build()

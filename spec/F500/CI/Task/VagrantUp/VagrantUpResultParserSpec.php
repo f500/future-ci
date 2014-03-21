@@ -23,7 +23,7 @@ use spec\F500\CI\Task\ResultParserSpec;
 class VagrantUpResultParserSpec extends ResultParserSpec
 {
 
-    protected $successfulOutput = <<<'EOT'
+    protected $passedOutput = <<<'EOT'
 Bringing machine 'testing' up with 'virtualbox' provider...
 [testing] Clearing any previously set forwarded ports...
 [testing] Creating shared folders metadata...
@@ -40,7 +40,7 @@ Bringing machine 'testing' up with 'virtualbox' provider...
 [testing] Mounting shared folders...
 EOT;
 
-    protected $unsuccessfulOutput = <<<'EOT'
+    protected $failedOutput = <<<'EOT'
 /path/to/project/Vagrantfile:82:in `block (2 levels) in <top (required)>': undefined local variable or method `onfig' for main:Object (NameError)
 	from /Applications/Vagrant/embedded/gems/gems/vagrant-1.3.5/lib/vagrant/config/v2/loader.rb:37:in `call'
 	from /Applications/Vagrant/embedded/gems/gems/vagrant-1.3.5/lib/vagrant/config/v2/loader.rb:37:in `load'
@@ -76,7 +76,7 @@ EOT;
         $this->shouldImplement('F500\CI\Task\ResultParser');
     }
 
-    function it_determines_if_a_result_is_successful(Task $task, Result $result)
+    function it_determines_if_the_task_has_passed(Task $task, Result $result)
     {
         $result->getTaskResults($task)->willReturn(
             array(
@@ -86,20 +86,20 @@ EOT;
                         'command_id'  => 'a1b2c3d4',
                         'command'     => '/usr/bin/env vagrant up --no-provision',
                         'result_code' => 0,
-                        'output'      => $this->successfulOutput
+                        'output'      => $this->passedOutput
                     )
                 )
             )
         );
 
-        $result->markTaskAsSuccessful($task)
+        $result->markTaskAsPassed($task)
             ->willReturn()
             ->shouldBeCalled();
 
         $this->parse($task, $result);
     }
 
-    function it_determines_if_a_result_is_unsuccessful(Task $task, Result $result)
+    function it_determines_if_the_task_has_failed(Task $task, Result $result)
     {
         $result->getTaskResults($task)->willReturn(
             array(
@@ -109,7 +109,7 @@ EOT;
                         'command_id'  => 'a1b2c3d4',
                         'command'     => '/usr/bin/env vagrant up --no-provision',
                         'result_code' => 0,
-                        'output'      => $this->unsuccessfulOutput
+                        'output'      => $this->failedOutput
                     )
                 )
             )

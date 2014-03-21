@@ -49,8 +49,8 @@ class SlackSubscriberSpec extends ObjectBehavior
         $build->getSuiteName()->willReturn('Some Suite');
         $build->getTasks()->willReturn(array('some_task' => $task));
 
-        $task->getCn()->willReturn('some_task');
-        $task->getName()->willReturn('Some Task');
+//        $task->getCn()->willReturn('some_task');
+//        $task->getName()->willReturn('Some Task');
 
         $phlack->getMessageBuilder()->willReturn($mb);
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->willReturn($response);
@@ -62,7 +62,7 @@ class SlackSubscriberSpec extends ObjectBehavior
         $ab->setText(Argument::type('string'))->willReturn($ab);
         $ab->setFallback(Argument::type('string'))->willReturn($ab);
         $ab->setColor(Argument::type('string'))->willReturn($ab);
-        $ab->addField(Argument::type('string'), Argument::type('string'), Argument::type('bool'))->willReturn($ab);
+//        $ab->addField(Argument::type('string'), Argument::type('string'), Argument::type('bool'))->willReturn($ab);
         $ab->end()->willReturn($mb);
     }
 
@@ -81,7 +81,7 @@ class SlackSubscriberSpec extends ObjectBehavior
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->shouldHaveBeenCalled();
     }
 
-    function it_sends_a_slack_success_message_on_build_succeeded(
+    function it_sends_a_slack_passed_message_on_build_passed(
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
@@ -90,8 +90,8 @@ class SlackSubscriberSpec extends ObjectBehavior
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::SUCCESSFUL);
-        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::SUCCESSFUL);
+        $result->getBuildStatus()->willReturn(Result::PASSED);
+        $result->getTaskStatus(Argument::type('F500\CI\Task\Task'))->willReturn(Result::PASSED);
         $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
@@ -102,10 +102,10 @@ class SlackSubscriberSpec extends ObjectBehavior
 
         $ab->setFallback(Argument::containingString('Passed'))->shouldHaveBeenCalled();
         $ab->setColor('good')->shouldHaveBeenCalled();
-        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
+//        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 
-    function it_sends_a_slack_success_message_on_build_failed(
+    function it_sends_a_slack_failed_message_on_build_failed(
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
@@ -114,8 +114,8 @@ class SlackSubscriberSpec extends ObjectBehavior
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::FAILED);
-        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::FAILED);
+        $result->getBuildStatus()->willReturn(Result::FAILED);
+        $result->getTaskStatus(Argument::type('F500\CI\Task\Task'))->willReturn(Result::FAILED);
         $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
@@ -126,10 +126,10 @@ class SlackSubscriberSpec extends ObjectBehavior
 
         $ab->setFallback(Argument::containingString('Failed'))->shouldHaveBeenCalled();
         $ab->setColor('warning')->shouldHaveBeenCalled();
-        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
+//        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 
-    function it_sends_a_slack_success_message_on_build_borked(
+    function it_sends_a_slack_borked_message_on_build_borked(
         BuildRunEvent $event,
         Result $result,
         Phlack $phlack,
@@ -138,8 +138,8 @@ class SlackSubscriberSpec extends ObjectBehavior
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::INCOMPLETE);
-        $result->getOverallTaskResult(Argument::type('F500\CI\Task\Task'))->willReturn(Result::INCOMPLETE);
+        $result->getBuildStatus()->willReturn(Result::BORKED);
+        $result->getTaskStatus(Argument::type('F500\CI\Task\Task'))->willReturn(Result::BORKED);
         $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
@@ -150,6 +150,6 @@ class SlackSubscriberSpec extends ObjectBehavior
 
         $ab->setFallback(Argument::containingString('Borked'))->shouldHaveBeenCalled();
         $ab->setColor('danger')->shouldHaveBeenCalled();
-        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
+//        $ab->addField(Argument::type('string'), Argument::type('string'), false)->shouldHaveBeenCalled();
     }
 }

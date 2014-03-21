@@ -28,22 +28,21 @@ class VagrantUpResultParser extends BaseResultParser
      */
     public function parse(Task $task, Result $result)
     {
-        $success = true;
-
+        $passed      = true;
         $taskResults = $result->getTaskResults($task);
 
         if (!empty($taskResults['commands'])) {
             foreach ($taskResults['commands'] as $commandResults) {
                 if (!empty($commandResults['output'])) {
                     if (preg_match('/Unclean result code: \d+/', $commandResults['output'])) {
-                        $success = false;
+                        $passed = false;
                     }
                 }
             }
         }
 
-        if ($success) {
-            $result->markTaskAsSuccessful($task);
+        if ($passed) {
+            $result->markTaskAsPassed($task);
         } else {
             $result->markTaskAsFailed($task);
         }

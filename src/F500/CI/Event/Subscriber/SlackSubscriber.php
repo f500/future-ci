@@ -33,18 +33,18 @@ class SlackSubscriber implements EventSubscriberInterface
      * @var array
      */
     protected $resultColorMap = array(
-        Result::INCOMPLETE => 'danger',
-        Result::FAILED     => 'warning',
-        Result::SUCCESSFUL => 'good'
+        Result::PASSED => 'good',
+        Result::FAILED => 'warning',
+        Result::BORKED => 'danger'
     );
 
     /**
      * @var array
      */
     protected $resultTextMap = array(
-        Result::INCOMPLETE => 'Borked',
-        Result::FAILED     => 'Failed',
-        Result::SUCCESSFUL => 'Passed'
+        Result::PASSED => 'Passed',
+        Result::FAILED => 'Failed',
+        Result::BORKED => 'Borked'
     );
 
     /**
@@ -101,7 +101,7 @@ class SlackSubscriber implements EventSubscriberInterface
             sprintf('Build [%s] (%s) finished.', $build->getCn(), $build->getSuiteName())
         );
 
-        $buildResult = $result->getOverallBuildResult();
+        $buildResult = $result->getBuildStatus();
         $color       = $this->resultColorMap[$buildResult];
         $text        = sprintf(
             '%s in %s.',
@@ -114,13 +114,13 @@ class SlackSubscriber implements EventSubscriberInterface
             ->setText($text)
             ->setColor($color);
 
-        foreach ($build->getTasks() as $task) {
-            $attachmentBuilder->addField(
-                $task->getName(),
-                $this->resultTextMap[$result->getOverallTaskResult($task)],
-                false
-            );
-        }
+//        foreach ($build->getTasks() as $task) {
+//            $attachmentBuilder->addField(
+//                $task->getName(),
+//                $this->resultTextMap[$result->getTaskStatus($task)],
+//                false
+//            );
+//        }
 
         $attachmentBuilder->end();
 

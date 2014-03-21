@@ -24,7 +24,7 @@ use spec\F500\CI\Task\ResultParserSpec;
 class CodeceptionResultParserSpec extends ResultParserSpec
 {
 
-    protected $successfulReport = <<<'EOT'
+    protected $passedReport = <<<'EOT'
 {
     "event": "suiteStart",
     "suite": "acceptance",
@@ -47,7 +47,7 @@ class CodeceptionResultParserSpec extends ResultParserSpec
 }
 EOT;
 
-    protected $unsuccessfulReport = <<<'EOT'
+    protected $failedReport = <<<'EOT'
 {
     "event": "suiteStart",
     "suite": "acceptance",
@@ -76,25 +76,25 @@ EOT;
         $this->shouldImplement('F500\CI\Task\ResultParser');
     }
 
-    function it_determines_if_a_result_is_successful(Task $task, Result $result, Filesystem $filesystem)
+    function it_determines_if_the_task_has_passed(Task $task, Result $result, Filesystem $filesystem)
     {
         $filesystem->exists(Argument::type('string'))->willReturn(true);
-        $filesystem->readFile(Argument::type('string'))->willReturn($this->successfulReport);
+        $filesystem->readFile(Argument::type('string'))->willReturn($this->passedReport);
         $filesystem->dumpFile(Argument::type('string'), Argument::type('string'))->willReturn();
 
         $result->getBuildDir($task)->willReturn('/path/to/build');
         $result->getFilesystem()->willReturn($filesystem);
-        $result->markTaskAsSuccessful($task)->willReturn();
+        $result->markTaskAsPassed($task)->willReturn();
 
         $this->parse($task, $result);
 
-        $result->markTaskAsSuccessful($task)->shouldHaveBeenCalled();
+        $result->markTaskAsPassed($task)->shouldHaveBeenCalled();
     }
 
-    function it_determines_if_a_result_is_unsuccessful(Task $task, Result $result, Filesystem $filesystem)
+    function it_determines_if_the_task_has_failed(Task $task, Result $result, Filesystem $filesystem)
     {
         $filesystem->exists(Argument::type('string'))->willReturn(true);
-        $filesystem->readFile(Argument::type('string'))->willReturn($this->unsuccessfulReport);
+        $filesystem->readFile(Argument::type('string'))->willReturn($this->failedReport);
         $filesystem->dumpFile(Argument::type('string'), Argument::type('string'))->willReturn();
 
         $result->getBuildDir($task)->willReturn('/path/to/build');

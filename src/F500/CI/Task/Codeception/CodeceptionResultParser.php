@@ -33,16 +33,16 @@ class CodeceptionResultParser extends BaseResultParser
         $report = $this->fixReport($result->getBuildDir($task), $result->getFilesystem());
         $report = json_decode($report, true);
 
-        $success = true;
+        $passed = true;
         foreach ($report as $item) {
             if ($item['event'] == 'test' && $item['status'] !== 'pass') {
-                $success = false;
+                $passed = false;
                 break;
             }
         }
 
-        if ($success) {
-            $result->markTaskAsSuccessful($task);
+        if ($passed) {
+            $result->markTaskAsPassed($task);
         } else {
             $result->markTaskAsFailed($task);
         }

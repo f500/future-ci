@@ -84,8 +84,8 @@ class BuildRunnerSpec extends ObjectBehavior
         $taskRunner->run($taskOne, $build, $result)->willReturn(true);
         $taskRunner->run($taskTwo, $build, $result)->willReturn(true);
 
-        $result->getOverallTaskResult($taskOne)->willReturn(Result::SUCCESSFUL);
-        $result->getOverallTaskResult($taskTwo)->willReturn(Result::SUCCESSFUL);
+        $result->getTaskStatus($taskOne)->willReturn(Result::PASSED);
+        $result->getTaskStatus($taskTwo)->willReturn(Result::PASSED);
 
         $this->run($build, $result)->shouldReturn(true);
 
@@ -102,7 +102,7 @@ class BuildRunnerSpec extends ObjectBehavior
             ->shouldHaveBeenCalled();
     }
 
-    function it_stops_running_a_build_when_a_task_is_incomplete(
+    function it_stops_running_a_build_when_a_task_has_borked(
         Build $build,
         Result $result,
         Task $taskOne,
@@ -115,7 +115,7 @@ class BuildRunnerSpec extends ObjectBehavior
 
         $taskRunner->run($taskOne, $build, $result)->willReturn(false);
 
-        $result->getOverallTaskResult($taskOne)->willReturn(Result::INCOMPLETE);
+        $result->getTaskStatus($taskOne)->willReturn(Result::BORKED);
 
         $this->run($build, $result)->shouldReturn(false);
 
@@ -149,8 +149,8 @@ class BuildRunnerSpec extends ObjectBehavior
         $taskRunner->run($taskOne, $build, $result)->willReturn(true);
         $taskRunner->run($taskTwo, $build, $result)->willReturn(true);
 
-        $result->getOverallTaskResult($taskOne)->willReturn(Result::FAILED);
-        $result->getOverallTaskResult($taskTwo)->willReturn(Result::FAILED);
+        $result->getTaskStatus($taskOne)->willReturn(Result::FAILED);
+        $result->getTaskStatus($taskTwo)->willReturn(Result::FAILED);
 
         $this->run($build, $result)->shouldReturn(true);
 
@@ -180,7 +180,7 @@ class BuildRunnerSpec extends ObjectBehavior
 
         $taskRunner->run($taskOne, $build, $result)->willReturn(true);
 
-        $result->getOverallTaskResult($taskOne)->willReturn(Result::FAILED);
+        $result->getTaskStatus($taskOne)->willReturn(Result::FAILED);
 
         $this->run($build, $result)->shouldReturn(true);
 

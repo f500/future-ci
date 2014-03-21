@@ -22,11 +22,20 @@ use F500\CI\Task\Task;
 class Result
 {
 
-    const INCOMPLETE = 'incomplete';
+    /**
+     * Run correctly and passed.
+     */
+    const PASSED = 'passed';
 
+    /**
+     * Run correctly and failed.
+     */
     const FAILED = 'failed';
 
-    const SUCCESSFUL = 'successful';
+    /**
+     * Run could not be completed.
+     */
+    const BORKED = 'borked';
 
     /**
      * @var Filesystem
@@ -78,9 +87,9 @@ class Result
     /**
      * @param Task $task
      */
-    public function markTaskAsIncomplete(Task $task)
+    public function markTaskAsPassed(Task $task)
     {
-        $this->results[$task->getCn()]['result'] = self::INCOMPLETE;
+        $this->results[$task->getCn()]['result'] = self::PASSED;
     }
 
     /**
@@ -94,9 +103,9 @@ class Result
     /**
      * @param Task $task
      */
-    public function markTaskAsSuccessful(Task $task)
+    public function markTaskAsBorked(Task $task)
     {
-        $this->results[$task->getCn()]['result'] = self::SUCCESSFUL;
+        $this->results[$task->getCn()]['result'] = self::BORKED;
     }
 
     /**
@@ -133,13 +142,13 @@ class Result
     /**
      * @return string
      */
-    public function getOverallBuildResult()
+    public function getBuildStatus()
     {
-        $result = self::SUCCESSFUL;
+        $result = self::PASSED;
 
         foreach ($this->results as $taskResults) {
-            if ($taskResults['result'] == self::INCOMPLETE) {
-                return self::INCOMPLETE;
+            if ($taskResults['result'] == self::BORKED) {
+                return self::BORKED;
             } elseif ($taskResults['result'] == self::FAILED) {
                 $result = self::FAILED;
             }
@@ -162,7 +171,7 @@ class Result
      * @return string
      * @throws \InvalidArgumentException
      */
-    public function getOverallTaskResult(Task $task)
+    public function getTaskStatus(Task $task)
     {
         if (!isset($this->results[$task->getCn()]['result'])) {
             throw new \InvalidArgumentException(sprintf('Task %s has no result yet.', $task->getCn()));

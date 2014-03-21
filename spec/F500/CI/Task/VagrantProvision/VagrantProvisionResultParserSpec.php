@@ -23,10 +23,28 @@ use spec\F500\CI\Task\ResultParserSpec;
 class VagrantProvisionResultParserSpec extends ResultParserSpec
 {
 
-    protected $successfulOutput = <<<'EOT'
+    protected $passedOutput = <<<'EOT'
+==> testing: Running provisioner: ansible...
+
+PLAY [testing] ****************************************************************
+
+GATHERING FACTS ***************************************************************
+ok: [testing.local]
+
+PLAY RECAP ********************************************************************
+testing.local              : ok=1    changed=0    unreachable=0    failed=0
 EOT;
 
-    protected $unsuccessfulOutput = <<<'EOT'
+    protected $failedOutput = <<<'EOT'
+==> testing: Running provisioner: ansible...
+
+PLAY [testing] ****************************************************************
+
+GATHERING FACTS ***************************************************************
+ok: [testing.local]
+
+PLAY RECAP ********************************************************************
+testing.local              : ok=0    changed=0    unreachable=0    failed=1
 EOT;
 
     function it_is_initializable()
@@ -35,7 +53,7 @@ EOT;
         $this->shouldImplement('F500\CI\Task\ResultParser');
     }
 
-    function it_determines_if_a_result_is_successful(Task $task, Result $result)
+    function it_determines_if_the_task_has_passed(Task $task, Result $result)
     {
         $result->getTaskResults($task)->willReturn(
             array(
@@ -45,13 +63,36 @@ EOT;
                         'command_id'  => 'a1b2c3d4',
                         'command'     => '/usr/bin/env vagrant provision',
                         'result_code' => 0,
-                        'output'      => $this->successfulOutput
+                        'output'      => $this->passedOutput
                     )
                 )
             )
         );
 
-        $result->markTaskAsSuccessful($task)
+        $result->markTaskAsPassed($task)
+            ->willReturn()
+            ->shouldBeCalled();
+
+        $this->parse($task, $result);
+    }
+
+    function it_determines_if_the_task_has_failed(Task $task, Result $result)
+    {
+        $result->getTaskResults($task)->willReturn(
+            array(
+                'commands' => array(
+                    'a1b2c3d4' => array(
+                        'task'        => 'some_task',
+                        'command_id'  => 'a1b2c3d4',
+                        'command'     => '/usr/bin/env vagrant provision',
+                        'result_code' => 0,
+                        'output'      => $this->failedOutput
+                    )
+                )
+            )
+        );
+
+        $result->markTaskAsFailed($task)
             ->willReturn()
             ->shouldBeCalled();
 

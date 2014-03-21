@@ -66,7 +66,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $output->write(Argument::type('string'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_successful_output_when_a_task_has_finished(
+    function it_writes_passed_output_when_a_task_has_passed(
         Task $task,
         TaskRunEvent $event,
         Result $result,
@@ -75,16 +75,16 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getTask()->willReturn($task);
         $event->getResult()->willReturn($result);
 
-        $result->getOverallTaskResult($task)->willReturn(Result::SUCCESSFUL);
+        $result->getTaskStatus($task)->willReturn(Result::PASSED);
         $result->getElapsedTaskTime($task)->willReturn(123456789);
 
         $this->onTaskFinished($event);
 
-        $output->writeln(Argument::containingString('successful'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('passed'))->shouldHaveBeenCalled();
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_failed_output_when_a_task_has_finished(
+    function it_writes_failed_output_when_a_task_has_failed(
         Task $task,
         TaskRunEvent $event,
         Result $result,
@@ -93,7 +93,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getTask()->willReturn($task);
         $event->getResult()->willReturn($result);
 
-        $result->getOverallTaskResult($task)->willReturn(Result::FAILED);
+        $result->getTaskStatus($task)->willReturn(Result::FAILED);
         $result->getElapsedTaskTime($task)->willReturn(123456789);
 
         $this->onTaskFinished($event);
@@ -102,7 +102,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_incomplete_output_when_a_task_has_finished(
+    function it_writes_borked_output_when_a_task_has_borked(
         Task $task,
         TaskRunEvent $event,
         Result $result,
@@ -111,39 +111,39 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getTask()->willReturn($task);
         $event->getResult()->willReturn($result);
 
-        $result->getOverallTaskResult($task)->willReturn(Result::INCOMPLETE);
+        $result->getTaskStatus($task)->willReturn(Result::BORKED);
         $result->getElapsedTaskTime($task)->willReturn(123456789);
 
         $this->onTaskFinished($event);
 
-        $output->writeln(Argument::containingString('incomplete'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('borked'))->shouldHaveBeenCalled();
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_successful_output_when_a_build_has_finished(
+    function it_writes_passed_output_when_a_build_has_passed(
         BuildRunEvent $event,
         Result $result,
         OutputInterface $output
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::SUCCESSFUL);
+        $result->getBuildStatus()->willReturn(Result::PASSED);
         $result->getElapsedBuildTime()->willReturn(123456789);
 
         $this->onBuildFinished($event);
 
-        $output->writeln(Argument::containingString('successful'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('passed'))->shouldHaveBeenCalled();
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_failed_output_when_a_build_has_finished(
+    function it_writes_failed_output_when_a_build_has_failed(
         BuildRunEvent $event,
         Result $result,
         OutputInterface $output
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::FAILED);
+        $result->getBuildStatus()->willReturn(Result::FAILED);
         $result->getElapsedBuildTime()->willReturn(123456789);
 
         $this->onBuildFinished($event);
@@ -152,19 +152,19 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 
-    function it_writes_incomplete_output_when_a_build_has_finished(
+    function it_writes_borked_output_when_a_build_has_borked(
         BuildRunEvent $event,
         Result $result,
         OutputInterface $output
     ) {
         $event->getResult()->willReturn($result);
 
-        $result->getOverallBuildResult()->willReturn(Result::INCOMPLETE);
+        $result->getBuildStatus()->willReturn(Result::BORKED);
         $result->getElapsedBuildTime()->willReturn(123456789);
 
         $this->onBuildFinished($event);
 
-        $output->writeln(Argument::containingString('incomplete'))->shouldHaveBeenCalled();
+        $output->writeln(Argument::containingString('borked'))->shouldHaveBeenCalled();
         $output->writeln(Argument::containingString('took'))->shouldHaveBeenCalled();
     }
 }

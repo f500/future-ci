@@ -69,7 +69,7 @@ class RunHelper
             return;
         }
 
-        $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config['suite']);
+        $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config);
         $build = $configurator->createBuild($config['build']['class'], $suite);
 
         $result = new Result($filesystem, $build->getBuildDir());
@@ -84,7 +84,7 @@ class RunHelper
             return;
         }
 
-        if (!$buildRunner->cleanup($build)) {
+        if (!$buildRunner->cleanup($build, $result)) {
             $output->writeln("<fg=magenta>\xE2\x9C\x98 Cleaning up build failed!</fg=magenta>");
 
             return;

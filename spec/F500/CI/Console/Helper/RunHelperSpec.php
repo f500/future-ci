@@ -71,7 +71,7 @@ class RunHelperSpec extends ObjectBehavior
         $buildRunner->run(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
             ->willReturn(true)
             ->shouldBeCalled();
-        $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'))
+        $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
             ->willReturn(true)
             ->shouldBeCalled();
 

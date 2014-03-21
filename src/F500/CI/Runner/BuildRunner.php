@@ -78,6 +78,8 @@ class BuildRunner
     /**
      * @param Build $build
      * @return bool
+     * @throws PhpSpecException
+     * @throws ProphecyException
      */
     public function initialize(Build $build)
     {
@@ -101,6 +103,11 @@ class BuildRunner
         }
 
         $this->activateBuildLogHandler($buildDir . '/build.log');
+
+        $this->filesystem->dumpFile(
+            $buildDir . '/suite_config.json',
+            $build->toJson()
+        );
 
         try {
             $this->dispatcher->dispatch(Events::BuildInitialized, new BuildEvent($build));
@@ -128,6 +135,8 @@ class BuildRunner
      * @param Build  $build
      * @param Result $result
      * @return bool
+     * @throws PhpSpecException
+     * @throws ProphecyException
      */
     public function run(Build $build, Result $result)
     {
@@ -177,12 +186,20 @@ class BuildRunner
     }
 
     /**
-     * @param Build $build
+     * @param Build  $build
+     * @param Result $result
      * @return bool
+     * @throws PhpSpecException
+     * @throws ProphecyException
      */
-    public function cleanup(Build $build)
+    public function cleanup(Build $build, Result $result)
     {
         try {
+            $this->filesystem->dumpFile(
+                $build->getBuildDir() . '/build_result.json',
+                $result->toJson()
+            );
+
             $this->deactivateBuildLogHandler();
 
             $this->dispatcher->dispatch(Events::BuildCleanedUp, new BuildEvent($build));

@@ -197,9 +197,9 @@ class ResultSpec extends ObjectBehavior
 
     function it_has_an_elapsed_time_for_a_build()
     {
-        $this->setElapsedBuildTime(123456789);
+        $this->setElapsedBuildTime(12345678);
 
-        $this->getElapsedBuildTime()->shouldReturn(123456789);
+        $this->getElapsedBuildTime()->shouldReturn(12345678);
     }
 
     function it_has_no_elapsed_time_for_a_build_if_not_set()
@@ -211,9 +211,9 @@ class ResultSpec extends ObjectBehavior
 
     function it_has_an_elapsed_time_for_a_task(Task $task)
     {
-        $this->setElapsedTaskTime($task, 123456789);
+        $this->setElapsedTaskTime($task, 12345678);
 
-        $this->getElapsedTaskTime($task)->shouldReturn(123456789);
+        $this->getElapsedTaskTime($task)->shouldReturn(12345678);
     }
 
     function it_has_no_elapsed_time_for_a_task_if_not_set(Task $task)
@@ -222,5 +222,48 @@ class ResultSpec extends ObjectBehavior
             'getElapsedTaskTime',
             array($task)
         );
+    }
+
+    function it_turns_itself_into_json(Task $task, Command $command)
+    {
+        $json = <<< EOT
+{
+    "build_dir": "\/path\/to\/build",
+    "results": {
+        "some_task": {
+            "commands": {
+                "a1b2c3d4": {
+                    "task": "some_task",
+                    "command_id": "a1b2c3d4",
+                    "command": "ls -l",
+                    "result_code": 0,
+                    "output": "Some output..."
+                }
+            },
+            "result": "passed"
+        }
+    },
+    "elapsed_times": {
+        "tasks": {
+            "some_task": 12345678
+        },
+        "build": 12345678
+    }
+}
+EOT;
+
+        $task->getCn()->willReturn('some_task');
+
+        $command->getId()->willReturn('a1b2c3d4');
+        $command->stringify()->willReturn('ls -l');
+        $command->getResultCode()->willReturn(0);
+        $command->getOutput()->willReturn('Some output...');
+
+        $this->addCommandResult($task, $command);
+        $this->markTaskAsPassed($task);
+        $this->setElapsedTaskTime($task, 12345678);
+        $this->setElapsedBuildTime(12345678);
+
+        $this->toJson()->shouldReturn($json);
     }
 }

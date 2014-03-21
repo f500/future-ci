@@ -20,16 +20,17 @@ class SuiteFactory
     /**
      * @param string $class
      * @param string $cn
+     * @param array  $config
      * @return Suite
      * @throws \InvalidArgumentException
      */
-    public function createSuite($class, $cn)
+    public function createSuite($class, $cn, array $config)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Cannot create suite, class "%s" does not exist.', $class));
         }
 
-        $suite = new $class($cn);
+        $suite = new $class($cn, $config);
 
         if (!$suite instanceof Suite) {
             throw new \InvalidArgumentException(

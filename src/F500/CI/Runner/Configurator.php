@@ -173,8 +173,8 @@ class Configurator
      */
     public function createSuite($class, $cn, array $config)
     {
-        $suite = $this->suiteFactory->createSuite($class, $cn);
-        $this->configureSuite($suite, $config);
+        $suite = $this->suiteFactory->createSuite($class, $cn, $config);
+        $this->configureSuite($suite, $config['suite']);
 
         return $suite;
     }

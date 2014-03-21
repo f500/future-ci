@@ -45,7 +45,7 @@ class ConfiguratorSpec extends ObjectBehavior
         $stringArg = Argument::type('string');
 
         $buildFactory->createBuild($stringArg, Argument::type('F500\CI\Suite\Suite'), $stringArg)->willReturn($build);
-        $suiteFactory->createSuite($stringArg, $stringArg)->willReturn($suite);
+        $suiteFactory->createSuite($stringArg, $stringArg, Argument::type('array'))->willReturn($suite);
         $taskFactory->createTask($stringArg, $stringArg)->willReturn($task);
         $resultParserFactory->createResultParser($stringArg, $stringArg)->willReturn($resultParser);
         $wrapperFactory->createWrapper($stringArg, $stringArg)->willReturn($wrapper);
@@ -234,14 +234,19 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
         $this->createSuite(
             'F500\CI\Suite\StandardSuite',
             'some_suite',
-            $config['suite']
+            $config
         )->shouldReturnAnInstanceOf('F500\CI\Suite\Suite');
 
         $suite->setName('Some Suite')->shouldHaveBeenCalled();
@@ -281,7 +286,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -314,7 +324,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -351,7 +366,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -375,7 +395,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'class' => 'F500\CI\Command\Wrapper\Wrapper',
                         'foo'   => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -400,7 +425,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'foo'   => 'bar'
                     )
                 ),
-                'tasks'    => 'not an array'
+                'tasks'    => 'not an array',
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -437,7 +467,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -474,7 +509,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -506,7 +546,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -539,7 +584,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('some_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 
@@ -577,7 +627,21 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => 'not an array',
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
+        );
+
+        $this->shouldThrow('\RuntimeException')->during(
+            'createSuite',
+            array(
+                'F500\CI\Suite\StandardSuite',
+                'some_suite',
+                $config
             )
         );
     }
@@ -606,7 +670,12 @@ class ConfiguratorSpec extends ObjectBehavior
                         'wrappers' => array('other_wrapper'),
                         'foo'      => 'bar'
                     )
-                )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
             )
         );
 

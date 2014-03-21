@@ -20,6 +20,17 @@ use Prophecy\Argument;
 class SuiteFactorySpec extends ObjectBehavior
 {
 
+    protected $config = array(
+        'suite' => array(
+            'name'  => 'Some Suite',
+            'cn'    => 'some_suite',
+            'class' => 'F500\CI\Suite\StandardSuite'
+        ),
+        'build' => array(
+            'class' => 'F500\CI\Build\StandardBuild'
+        )
+    );
+
     function it_is_initializable()
     {
         $this->shouldHaveType('F500\CI\Suite\SuiteFactory');
@@ -27,7 +38,8 @@ class SuiteFactorySpec extends ObjectBehavior
 
     function it_creates_a_suite()
     {
-        $suite = $this->createSuite('F500\CI\Suite\StandardSuite', 'some_suite');
+        $suite = $this->createSuite('F500\CI\Suite\StandardSuite', 'some_suite', $this->config);
+
         $suite->shouldHaveType('F500\CI\Suite\StandardSuite');
         $suite->shouldImplement('F500\CI\Suite\Suite');
     }
@@ -36,7 +48,7 @@ class SuiteFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'createSuite',
-            array('NonExistent\Suite', 'some_suite')
+            array('NonExistent\Suite', 'some_suite', $this->config)
         );
     }
 
@@ -44,7 +56,7 @@ class SuiteFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'createSuite',
-            array('StdClass', 'some_suite')
+            array('StdClass', 'some_suite', $this->config)
         );
     }
 }

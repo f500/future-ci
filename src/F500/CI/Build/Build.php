@@ -54,4 +54,9 @@ interface Build
      * @return \F500\CI\Task\Task[]
      */
     public function getTasks();
+
+    /**
+     * @return string
+     */
+    public function toJson();
 }

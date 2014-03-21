@@ -25,7 +25,19 @@ class StandardSuiteSpec extends ObjectBehavior
     function let()
     {
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith('some_suite');
+        $this->beConstructedWith(
+            'some_suite',
+            array(
+                'suite' => array(
+                    'name'  => 'Some Suite',
+                    'cn'    => 'some_suite',
+                    'class' => 'F500\CI\Suite\StandardSuite'
+                ),
+                'build' => array(
+                    'class' => 'F500\CI\Build\StandardBuild'
+                )
+            )
+        );
     }
 
     function it_is_initializable()
@@ -87,5 +99,23 @@ class StandardSuiteSpec extends ObjectBehavior
             'getWrapper',
             array('some_wrapper')
         );
+    }
+
+    function it_turns_itself_into_json()
+    {
+        $json = <<< EOT
+{
+    "suite": {
+        "name": "Some Suite",
+        "cn": "some_suite",
+        "class": "F500\\\\CI\\\\Suite\\\\StandardSuite"
+    },
+    "build": {
+        "class": "F500\\\\CI\\\\Build\\\\StandardBuild"
+    }
+}
+EOT;
+
+        $this->toJson()->shouldReturn($json);
     }
 }

@@ -22,11 +22,25 @@ use Prophecy\Argument;
 class StandardBuildSpec extends ObjectBehavior
 {
 
+    protected $suiteJson = <<< EOT
+{
+    "suite": {
+        "name": "Some Suite",
+        "cn": "some_suite",
+        "class": "F500\\\\CI\\\\Suite\\\\StandardSuite"
+    },
+    "build": {
+        "class": "F500\\\\CI\\\\Build\\\\StandardBuild"
+    }
+}
+EOT;
+
     function let(Suite $suite, Task $task)
     {
         $suite->getCn()->willReturn('some_suite');
         $suite->getName()->willReturn('Some Suite');
         $suite->getTasks()->willReturn(array('some_task' => $task));
+        $suite->toJson()->willReturn($this->suiteJson);
 
         /** @noinspection PhpParamsInspection */
         $this->beConstructedWith($suite, '/path/to/builds');
@@ -60,18 +74,23 @@ class StandardBuildSpec extends ObjectBehavior
 
     function it_has_a_build_dir()
     {
-        $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite\.[a-z0-9]+$|');
+        $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite/[a-z0-9]+$|');
     }
 
     function it_has_a_build_dir_for_a_task(Task $task)
     {
         $task->getCn()->willReturn('some_task');
 
-        $this->getBuildDir($task)->shouldMatch('|^/path/to/builds/some_suite\.[a-z0-9]+/some_task$|');
+        $this->getBuildDir($task)->shouldMatch('|^/path/to/builds/some_suite/[a-z0-9]+/some_task$|');
     }
 
     function it_has_tasks(Task $task)
     {
         $this->getTasks()->shouldReturn(array('some_task' => $task));
+    }
+
+    function it_turns_itself_into_json()
+    {
+        $this->toJson()->shouldReturn($this->suiteJson);
     }
 }

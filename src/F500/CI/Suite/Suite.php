@@ -22,8 +22,9 @@ interface Suite
 
     /**
      * @param string $cn
+     * @param array  $config
      */
-    public function __construct($cn);
+    public function __construct($cn, array $config);
 
     /**
      * @return string
@@ -68,4 +69,9 @@ interface Suite
      * @return \F500\CI\Command\Wrapper\Wrapper
      */
     public function getWrapper($cn);
+
+    /**
+     * @return string
+     */
+    public function toJson();
 }

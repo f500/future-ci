@@ -27,6 +27,11 @@ class StandardSuite implements Suite
     protected $cn;
 
     /**
+     * @var array
+     */
+    protected $config;
+
+    /**
      * @var string
      */
     protected $name;
@@ -43,11 +48,13 @@ class StandardSuite implements Suite
 
     /**
      * @param string $cn
+     * @param array  $config
      */
-    public function __construct($cn)
+    public function __construct($cn, array $config)
     {
-        $this->cn    = $cn;
-        $this->tasks = array();
+        $this->cn     = $cn;
+        $this->config = $config;
+        $this->tasks  = array();
     }
 
     /**
@@ -130,5 +137,16 @@ class StandardSuite implements Suite
         }
 
         return $this->wrappers[$cn];
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        return json_encode(
+            $this->config,
+            JSON_PRETTY_PRINT
+        );
     }
 }

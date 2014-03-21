@@ -75,7 +75,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getTaskStatus($task)->willReturn(Result::PASSED);
-        $result->getElapsedTaskTime($task)->willReturn(123456789);
+        $result->getElapsedTaskTime($task)->willReturn(12345678);
 
         $this->onTaskFinished($event);
 
@@ -93,7 +93,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getTaskStatus($task)->willReturn(Result::FAILED);
-        $result->getElapsedTaskTime($task)->willReturn(123456789);
+        $result->getElapsedTaskTime($task)->willReturn(12345678);
 
         $this->onTaskFinished($event);
 
@@ -111,7 +111,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getTaskStatus($task)->willReturn(Result::BORKED);
-        $result->getElapsedTaskTime($task)->willReturn(123456789);
+        $result->getElapsedTaskTime($task)->willReturn(12345678);
 
         $this->onTaskFinished($event);
 
@@ -127,7 +127,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getBuildStatus()->willReturn(Result::PASSED);
-        $result->getElapsedBuildTime()->willReturn(123456789);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 
@@ -143,7 +143,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getBuildStatus()->willReturn(Result::FAILED);
-        $result->getElapsedBuildTime()->willReturn(123456789);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 
@@ -159,7 +159,7 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         $event->getResult()->willReturn($result);
 
         $result->getBuildStatus()->willReturn(Result::BORKED);
-        $result->getElapsedBuildTime()->willReturn(123456789);
+        $result->getElapsedBuildTime()->willReturn(12345678);
 
         $this->onBuildFinished($event);
 

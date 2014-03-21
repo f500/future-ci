@@ -65,10 +65,10 @@ class Doubler
         $hash = spl_object_hash($command);
 
         $this->accumulatedCommandArgs[$hash] = array();
-        $accumulatedArgs = &$this->accumulatedCommandArgs[$hash];
+        $accumulatedArgs                     = & $this->accumulatedCommandArgs[$hash];
 
         $this->accumulatedCommandEnvs[$hash] = array();
-        $accumulatedEnvs = &$this->accumulatedCommandEnvs[$hash];
+        $accumulatedEnvs                     = & $this->accumulatedCommandEnvs[$hash];
 
         $command->getArgs()->willReturn(array());
         $command->addArg(Argument::type('string'))->will(

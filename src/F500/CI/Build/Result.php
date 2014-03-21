@@ -222,4 +222,19 @@ class Result
 
         return $this->elapsedTimes['tasks'][$task->getCn()];
     }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        return json_encode(
+            array(
+                'build_dir'     => $this->buildDir,
+                'results'       => $this->results,
+                'elapsed_times' => $this->elapsedTimes
+            ),
+            JSON_PRETTY_PRINT
+        );
+    }
 }

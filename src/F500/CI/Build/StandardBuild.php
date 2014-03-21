@@ -43,7 +43,7 @@ class StandardBuild implements Build
     {
         $this->date     = new \DateTimeImmutable();
         $this->suite    = $suite;
-        $this->buildDir = sprintf('%s/%s.%s', $buildsDir, $this->getSuiteCn(), $this->getCn());
+        $this->buildDir = sprintf('%s/%s/%s', $buildsDir, $this->getSuiteCn(), $this->getCn());
     }
 
     /**
@@ -99,5 +99,13 @@ class StandardBuild implements Build
     public function getTasks()
     {
         return $this->suite->getTasks();
+    }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        return $this->suite->toJson();
     }
 }

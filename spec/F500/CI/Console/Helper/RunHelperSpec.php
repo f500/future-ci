@@ -28,30 +28,23 @@ use Symfony\Component\Console\Output\OutputInterface;
 class RunHelperSpec extends ObjectBehavior
 {
 
-    function let(\Pimple $container, Configurator $configurator, BuildRunner $buildRunner, Filesystem $filesystem)
-    {
+    function let(
+        \Pimple $container,
+        InputInterface $input,
+        Configurator $configurator,
+        BuildRunner $buildRunner,
+        Filesystem $filesystem,
+        Suite $suite,
+        Build $build,
+        Task $task
+    ) {
         /** @noinspection PhpParamsInspection */
         $this->beConstructedWith($container);
 
         $container->offsetGet('f500ci.configurator')->willReturn($configurator);
         $container->offsetGet('f500ci.build_runner')->willReturn($buildRunner);
         $container->offsetGet('filesystem')->willReturn($filesystem);
-    }
 
-    function it_is_initializable()
-    {
-        $this->shouldHaveType('F500\CI\Console\Helper\RunHelper');
-    }
-
-    function it_can_run_a_build(
-        InputInterface $input,
-        OutputInterface $output,
-        Configurator $configurator,
-        BuildRunner $buildRunner,
-        Suite $suite,
-        Build $build,
-        Task $task
-    ) {
         $input->getArgument('suite')->willReturn('some_suite.yml');
         $input->getArgument('params')->willReturn(array());
 
@@ -67,6 +60,24 @@ class RunHelperSpec extends ObjectBehavior
         $configurator->createBuild(Argument::type('string'), Argument::type('F500\CI\Suite\Suite'))
             ->willReturn($build);
 
+        $build->getCn()->willReturn('a1b2c3d4');
+        $build->getDate()->willReturn(new \DateTimeImmutable());
+        $build->getBuildDir()->willReturn('/path/to/builds/some_suite/a1b2c3d4');
+        $build->getSuiteCn()->willReturn('some_suite');
+        $build->getSuiteName()->willReturn('Some Suite');
+        $build->getTasks()->willReturn(array('some_task' => $task));
+
+        $task->getCn()->willReturn('some_task');
+        $task->getName()->willReturn('Some Task');
+    }
+
+    function it_is_initializable()
+    {
+        $this->shouldHaveType('F500\CI\Console\Helper\RunHelper');
+    }
+
+    function it_runs_a_build(InputInterface $input, OutputInterface $output, BuildRunner $buildRunner)
+    {
         $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
             ->willReturn(true)
             ->shouldBeCalled();
@@ -77,15 +88,40 @@ class RunHelperSpec extends ObjectBehavior
             ->willReturn(true)
             ->shouldBeCalled();
 
-        $build->getCn()->willReturn('a1b2c3d4');
-        $build->getDate()->willReturn(new \DateTimeImmutable());
-        $build->getBuildDir()->willReturn('/path/to/builds/some_suite/a1b2c3d4');
-        $build->getSuiteCn()->willReturn('some_suite');
-        $build->getSuiteName()->willReturn('Some Suite');
-        $build->getTasks()->willReturn(array('some_task' => $task));
+        $this->execute($input, $output);
+    }
 
-        $task->getCn()->willReturn('some_task');
-        $task->getName()->willReturn('Some Task');
+    function it_still_cleans_a_build_up_if_initialize_failed(
+        InputInterface $input,
+        OutputInterface $output,
+        BuildRunner $buildRunner
+    ) {
+        $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
+            ->willReturn(false)
+            ->shouldBeCalled();
+        $buildRunner->run(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->shouldNotBeCalled();
+        $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->willReturn(true)
+            ->shouldBeCalled();
+
+        $this->execute($input, $output);
+    }
+
+    function it_still_cleans_a_build_up_if_run_failed(
+        InputInterface $input,
+        OutputInterface $output,
+        BuildRunner $buildRunner
+    ) {
+        $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
+            ->willReturn(true)
+            ->shouldBeCalled();
+        $buildRunner->run(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->willReturn(false)
+            ->shouldBeCalled();
+        $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->willReturn(true)
+            ->shouldBeCalled();
 
         $this->execute($input, $output);
     }

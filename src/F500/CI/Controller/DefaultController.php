@@ -20,17 +20,14 @@ class DefaultController extends Controller
     /**
      * @return string
      */
-    public function indexAction()
+    public function appAction()
     {
-        return $this->app['f500ci.renderer']->render(
-            'php',
-            'index',
-            array(
-                'baseUrl'        => '',
-                'minify'         => !$this->app['debug'],
-                'copyrightYears' => $this->getCopyrightYears('2014')
-            )
+        $params = array(
+            'minify'         => !$this->app['debug'],
+            'copyrightYears' => $this->getCopyrightYears('2014')
         );
+
+        return $this->app['f500ci.renderer']->render('php', 'app', $params);
     }
 
     /**

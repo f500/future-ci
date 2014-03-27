@@ -28,7 +28,10 @@ module.exports = function(grunt) {
             },
             f500ci: {
                 src: [
-                    'app/assets/js/app.js'
+                    'app/assets/js/prototypes.js',
+                    'app/assets/js/app.js',
+                    'app/assets/js/controllers.js',
+                    'app/assets/js/directives.js'
                 ],
                 dest: 'web/assets/js/<%= pkg.name %>.js'
             }

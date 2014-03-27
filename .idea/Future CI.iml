@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/lib/phlack" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/lib/reactphp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/finder" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/guzzle/guzzle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/igorw/config-service-provider" />
@@ -31,6 +32,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/process" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/routing" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/yaml" />
+      <excludeFolder url="file://$MODULE_DIR$/web/assets" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

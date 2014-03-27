@@ -1,0 +1,19 @@
+<div class="container">
+
+    <h1 class="page-header">
+        <fci-status data-ng-model="statuses.build"></fci-status>
+        {{ metadata.suite.name }} [{{ metadata.build.cn }}]
+        <small>{{ metadata.build.date | date:'medium' }}</small>
+    </h1>
+
+    <accordion close-others="true">
+        <accordion-group data-ng-repeat="task in tasks">
+            <accordion-heading>
+                <fci-status data-ng-model="statuses.tasks[task]"></fci-status>
+                {{ metadata.tasks[task].name }}
+            </accordion-heading>
+            <pre data-ng-repeat="command in results[task].commands">{{ command.output }}</pre>
+        </accordion-group>
+    </accordion>
+
+</div>

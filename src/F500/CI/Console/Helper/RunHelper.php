@@ -74,20 +74,14 @@ class RunHelper
 
         $result = new Result($build, $filesystem);
 
-        if (!$buildRunner->initialize($build)) {
+        if ($buildRunner->initialize($build)) {
+            $buildRunner->run($build, $result);
+        } else {
             $output->writeln("<bg=red>\xE2\x9C\x98 Initializing build failed!</bg=red>");
-
-            return;
-        }
-
-        if (!$buildRunner->run($build, $result)) {
-            return;
         }
 
         if (!$buildRunner->cleanup($build, $result)) {
             $output->writeln("<fg=magenta>\xE2\x9C\x98 Cleaning up build failed!</fg=magenta>");
-
-            return;
         }
     }
 }

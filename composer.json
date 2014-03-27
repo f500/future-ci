@@ -15,6 +15,7 @@
         "psr-0": {
             "F500": "src",
             "F500\\Provider\\FilesystemServiceProvider": "lib/filesystem",
+            "F500\\Provider\\FinderServiceProvider": "lib/finder",
             "F500\\Provider\\PheanstalkServiceProvider": "lib/pheanstalk",
             "F500\\Provider\\PhlackServiceProvider": "lib/phlack"
         }
@@ -25,17 +26,18 @@
         "cilex/console-service-provider": "~1.0",
         "igorw/config-service-provider": "~1.2",
         "mcrumm/phlack": "~0.5@dev",
-        "monolog/monolog": "~1.7",
+        "monolog/monolog": "~1.8",
         "pda/pheanstalk": "~2.1",
         "silex/silex": "~1.1",
-        "symfony/console": "~2.4",
-        "symfony/filesystem": "~2.4",
-        "symfony/process": "~2.4"
+        "symfony/console": "2.4.*",
+        "symfony/filesystem": "2.4.*",
+        "symfony/finder": "2.4.*",
+        "symfony/process": "2.4.*"
     },
     "require-dev": {
         "jamesmoss/toml": "~0.1",
         "phpspec/phpspec": "2.0.*@dev",
-        "symfony/yaml": "~2.4"
+        "symfony/yaml": "2.4.*"
     },
     "suggest": {
         "jakub-onderka/php-parallel-lint": "Linting Tool",

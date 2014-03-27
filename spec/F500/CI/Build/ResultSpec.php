@@ -30,7 +30,7 @@ class ResultSpec extends ObjectBehavior
         /** @noinspection PhpParamsInspection */
         $this->beConstructedWith($build, $filesystem);
 
-        $date->format('r')->willReturn('Fri, 21 Mar 2014 17:04:10 +0100');
+        $date->format('c')->willReturn('1970-01-01T00:00:00+00:00');
 
         $build->getCn()->willReturn('a1b2c3d4');
         $build->getDate()->willReturn($date);
@@ -209,7 +209,7 @@ class ResultSpec extends ObjectBehavior
         },
         "build": {
             "cn": "a1b2c3d4",
-            "date": "Fri, 21 Mar 2014 17:04:10 +0100",
+            "date": "1970-01-01T00:00:00+00:00",
             "dir": "\/path\/to\/builds\/some_suite\/a1b2c3d4",
             "time": 12345678
         },

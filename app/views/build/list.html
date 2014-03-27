@@ -1,0 +1,23 @@
+<div class="container">
+
+    <h1 class="page-header">Builds</h1>
+
+    <div class="row">
+        <div class="col-md-6" data-ng-repeat="builds in buildSets">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{ builds.first().suiteName }}</h3>
+                </div>
+                <ul class="list-group">
+                    <li class="list-group-item" data-ng-repeat="build in builds">
+                        <fci-status data-ng-model="build.status"></fci-status>
+                        [<a href="/build/{{ build.suiteCn }}/{{ build.cn }}">{{ build.cn }}</a>] <small>{{ build.date | date:'medium' }}</small>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</div>

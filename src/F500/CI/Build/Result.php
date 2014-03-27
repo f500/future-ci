@@ -69,7 +69,7 @@ class Result
             ),
             'build' => array(
                 'cn'   => $build->getCn(),
-                'date' => $build->getDate()->format('r'),
+                'date' => $build->getDate()->format('c'),
                 'dir'  => $build->getBuildDir(),
                 'time' => null
             ),

@@ -44,7 +44,6 @@ class QueueWorkerCommand extends QueueCommand
         $processFactory = $app['f500ci.process_factory'];
 
         while (true) {
-
             $job = $this->pheanstalk
                 ->watch('poolz-app')
                 ->reserve();
@@ -52,9 +51,11 @@ class QueueWorkerCommand extends QueueCommand
             $payload = json_decode($job->getData(), true);
 
             if (!$this->isPayloadValid($payload)) {
+                $output->writeln(sprintf('Buried job <comment>%s</comment> because of an invalid payload.', $job->getId()));
                 $this->pheanstalk->bury($job);
+
             } else {
-                $args = array('exec', 'app/console', 'run', $payload['suite']);
+                $args = array('exec', 'app/console', '--ansi', 'run', $payload['suite']);
 
                 if (!empty($payload['params'])) {
                     foreach ($payload['params'] as $key => $value) {
@@ -62,12 +63,12 @@ class QueueWorkerCommand extends QueueCommand
                     }
                 }
 
-                var_dump($args);
-
                 $process = $processFactory->createProcess($args, $rootDir);
-                $process->run();
-
-                var_dump($process->isSuccessful(), $process->getOutput(), $process->getErrorOutput());
+                $process->run(
+                    function ($type, $buffer) use ($output) {
+                        $output->write($buffer, false, OutputInterface::OUTPUT_RAW);
+                    }
+                );
 
                 $this->pheanstalk->delete($job);
             }

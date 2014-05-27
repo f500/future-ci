@@ -58,7 +58,7 @@ class QueueStatusCommand extends QueueCommand
 
         if ($listening) {
             foreach ($this->pheanstalk->listTubes() as $tube) {
-                $stats = $this->pheanstalk->statsTube('default');
+                $stats = $this->pheanstalk->statsTube($tube);
 
                 $output->writeln(
                     sprintf(

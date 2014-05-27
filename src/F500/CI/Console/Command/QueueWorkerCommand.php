@@ -58,7 +58,7 @@ class QueueWorkerCommand extends QueueCommand
 
                 if (!empty($payload['params'])) {
                     foreach ($payload['params'] as $key => $value) {
-                        $args[] = "--param={$key}:{$value}";
+                        $args[] = "{$key}:{$value}";
                     }
                 }
 

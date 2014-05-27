@@ -164,6 +164,7 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
 
         $this->output->writeln(sprintf("\n<fg=%s>%s Build has %s</fg=%s>", $color, $icon, $text, $color));
         $this->output->writeln(sprintf('(took %s)', $this->stringifyElapsedTime($result->getElapsedBuildTime())));
+        $this->output->writeln('');
     }
 
     /**

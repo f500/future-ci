@@ -42,16 +42,23 @@ class QueuePushCommand extends QueueCommand
                 'Extra parameters for the suite. (key:value)'
             )
             ->addOption(
+                'tube',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The tube to push this job to.',
+                'poolz-app'
+            )
+            ->addOption(
                 'priority',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'The priority for this job.',
                 \Pheanstalk_PheanstalkInterface::DEFAULT_PRIORITY
             )
             ->addOption(
                 'ttr',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'The time to run for this job (in seconds).',
                 900
             );
@@ -79,12 +86,35 @@ class QueuePushCommand extends QueueCommand
         }
 
         $this->pheanstalk
-            ->useTube('poolz-app')
+            ->useTube($input->getOption('tube'))
             ->put(
                 json_encode($payload),
                 $input->getOption('priority'),
                 \Pheanstalk_PheanstalkInterface::DEFAULT_DELAY,
                 $input->getOption('ttr')
             );
+
+        // output
+
+        $offset = 10;
+        foreach(array_keys($payload['params']) as $key) {
+            $offset = max($offset, strlen($key) + 2);
+        }
+
+        $output->writeln(
+            sprintf(
+                'Pushed job to tube <comment>%s</comment> on server <comment>%s</comment>:<comment>%s</comment>',
+                $input->getOption('tube'),
+                $input->getOption('server'),
+                $input->getOption('port')
+            )
+        );
+
+        $output->writeln(sprintf('  Suite:%s<comment>%s</comment>', str_repeat(' ', $offset - 6), $payload['suite']));
+        foreach($payload['params'] as $key => $value) {
+            $output->writeln(sprintf('  %s:%s<comment>%s</comment>', ucfirst($key), str_repeat(' ', $offset - strlen($key) - 1), $value));
+        }
+        $output->writeln(sprintf('  Priority:%s<comment>%s</comment>', str_repeat(' ', $offset - 9), $input->getOption('priority')));
+        $output->writeln(sprintf('  TTR:%s<comment>%s</comment>', str_repeat(' ', $offset - 4), $input->getOption('ttr')));
     }
 }

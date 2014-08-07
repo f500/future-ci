@@ -22,22 +22,22 @@
     },
 
     "require": {
-        "php": ">=5.3.3",
+        "php": ">=5.4",
         "cilex/console-service-provider": "~1.0",
         "igorw/config-service-provider": "~1.2",
-        "mcrumm/phlack": "~0.5@dev",
-        "monolog/monolog": "~1.8",
-        "pda/pheanstalk": "~2.1",
-        "silex/silex": "~1.1",
-        "symfony/console": "2.4.*",
-        "symfony/filesystem": "2.4.*",
-        "symfony/finder": "2.4.*",
-        "symfony/process": "2.4.*"
+        "mcrumm/phlack": "~0.5",
+        "monolog/monolog": "~1.10",
+        "pda/pheanstalk": "~3.0",
+        "silex/silex": "~1.2",
+        "symfony/console": "2.5.*",
+        "symfony/filesystem": "2.5.*",
+        "symfony/finder": "2.5.*",
+        "symfony/process": "2.5.*"
     },
     "require-dev": {
-        "jamesmoss/toml": "~0.1",
-        "phpspec/phpspec": "2.0.*@dev",
-        "symfony/yaml": "2.4.*"
+        "jamesmoss/toml": "~1.1",
+        "phpspec/phpspec": "~2.0",
+        "symfony/yaml": "2.5.*"
     },
     "suggest": {
         "jakub-onderka/php-parallel-lint": "Linting Tool",

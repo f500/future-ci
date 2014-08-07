@@ -7,6 +7,7 @@
 
 namespace F500\CI\Console\Command;
 
+use Pheanstalk\Connection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +23,7 @@ class QueueCommand extends Command
 {
 
     /**
-     * @var \Pheanstalk_Pheanstalk
+     * @var \Pheanstalk\PheanstalkInterface
      */
     protected $pheanstalk;
 
@@ -48,7 +49,7 @@ class QueueCommand extends Command
                 't',
                 InputOption::VALUE_OPTIONAL,
                 'The connection timeout to use (in seconds).',
-                \Pheanstalk_Connection::DEFAULT_CONNECT_TIMEOUT
+                Connection::DEFAULT_CONNECT_TIMEOUT
             );
     }
 

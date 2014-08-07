@@ -15,6 +15,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/mcrumm/phlack" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/monolog/monolog" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/pda/pheanstalk" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/phpdocumentor/reflection-docblock" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpspec/php-diff" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpspec/phpspec" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/phpspec/prophecy" />
@@ -32,13 +33,13 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/process" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/routing" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/yaml" />
-      <excludeFolder url="file://$MODULE_DIR$/web/assets" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
+          <root url="file://$MODULE_DIR$/vendor/phpdocumentor/reflection-docblock" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/phpspec/phpspec" />
           <root url="file://$MODULE_DIR$/vendor/symfony/debug" />
@@ -64,6 +65,7 @@
           <root url="file://$MODULE_DIR$/vendor/mcrumm/phlack" />
         </CLASSES>
         <SOURCES>
+          <root url="file://$MODULE_DIR$/vendor/phpdocumentor/reflection-docblock" />
           <root url="file://$MODULE_DIR$/vendor/symfony/process" />
           <root url="file://$MODULE_DIR$/vendor/phpspec/phpspec" />
           <root url="file://$MODULE_DIR$/vendor/symfony/debug" />

@@ -7,6 +7,7 @@
 
 namespace F500\CI\Console\Command;
 
+use Pheanstalk\PheanstalkInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -53,7 +54,7 @@ class QueuePushCommand extends QueueCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The priority for this job.',
-                \Pheanstalk_PheanstalkInterface::DEFAULT_PRIORITY
+                PheanstalkInterface::DEFAULT_PRIORITY
             )
             ->addOption(
                 'ttr',
@@ -90,7 +91,7 @@ class QueuePushCommand extends QueueCommand
             ->put(
                 json_encode($payload),
                 $input->getOption('priority'),
-                \Pheanstalk_PheanstalkInterface::DEFAULT_DELAY,
+                PheanstalkInterface::DEFAULT_DELAY,
                 $input->getOption('ttr')
             );
 

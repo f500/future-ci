@@ -7,6 +7,7 @@
 
 namespace F500\Provider;
 
+use Pheanstalk\PheanstalkInterface;
 use Silex\Application;
 use Silex\ServiceProviderInterface;
 
@@ -25,9 +26,9 @@ class PheanstalkServiceProvider implements ServiceProviderInterface
      */
     public function register(Application $app)
     {
-        $app['pheanstalk.class']           = 'Pheanstalk_Pheanstalk';
+        $app['pheanstalk.class']           = 'Pheanstalk\Pheanstalk';
         $app['pheanstalk.server']          = '127.0.0.1';
-        $app['pheanstalk.port']            = \Pheanstalk_PheanstalkInterface::DEFAULT_PORT;
+        $app['pheanstalk.port']            = PheanstalkInterface::DEFAULT_PORT;
         $app['pheanstalk.connect_timeout'] = null;
 
         $app['pheanstalk'] = $app->share(

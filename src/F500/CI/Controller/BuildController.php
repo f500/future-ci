@@ -43,7 +43,11 @@ class BuildController extends Controller
             $buildFinder
                 ->directories()
                 ->in($suiteDir->getRealPath())
-                ->sortByName();
+                ->sort(
+                    function ($a, $b) {
+                        return strcmp($b->getFilename(), $a->getFilename());
+                    }
+                );
 
             /** @var SplFileInfo $buildDir */
             foreach ($buildFinder as $buildDir) {
@@ -55,7 +59,7 @@ class BuildController extends Controller
 
                 $buildResult = json_decode($filesystem->readFile($resultFile), true);
 
-                $data[$suiteDir->getFilename()][$buildDir->getFilename()] = array(
+                $data[$suiteDir->getFilename()][] = array(
                     'cn'        => $buildResult['metadata']['build']['cn'],
                     'date'      => $buildResult['metadata']['build']['date'],
                     'status'    => $buildResult['statuses']['build'],

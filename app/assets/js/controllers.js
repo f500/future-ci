@@ -28,7 +28,7 @@ fciControllers.controller('BuildShowCtrl',
 
         $http.get('/api/build/' + suiteCn + '/' + buildCn).success(function (buildResult) {
             $scope.metadata = buildResult.metadata;
-            $scope.results = buildResult.results;
+            $scope.results  = buildResult.results;
             $scope.statuses = buildResult.statuses;
 
             $scope.tasks = Object.keys($scope.metadata.tasks);

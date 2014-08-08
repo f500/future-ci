@@ -47,7 +47,7 @@ class QueuePushCommand extends QueueCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The tube to push this job to.',
-                'poolz-app'
+                'ci-builds'
             )
             ->addOption(
                 'priority',

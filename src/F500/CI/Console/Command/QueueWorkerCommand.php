@@ -45,7 +45,7 @@ class QueueWorkerCommand extends QueueCommand
 
         while (true) {
             $job = $this->pheanstalk
-                ->watch('poolz-app')
+                ->watch('ci-builds')
                 ->reserve();
 
             $payload = json_decode($job->getData(), true);

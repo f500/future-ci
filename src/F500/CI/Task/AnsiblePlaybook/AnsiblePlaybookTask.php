@@ -67,6 +67,10 @@ class AnsiblePlaybookTask extends BaseTask
             $command->addArg('--extra-vars=' . escapeshellarg(ltrim($extraVars, ' ')));
         }
 
+        if (!empty($options['verbose'])) {
+            $command->addArg('-' . str_repeat('v', $options['verbose']));
+        }
+
         $command->addArg(escapeshellarg($options['playbook']));
 
         if (!empty($options['cwd'])) {
@@ -94,7 +98,8 @@ class AnsiblePlaybookTask extends BaseTask
             'playbook'   => '',
             'inventory'  => null,
             'limit'      => null,
-            'extra_vars' => array()
+            'extra_vars' => array(),
+            'verbose'    => 0
         );
     }
 }

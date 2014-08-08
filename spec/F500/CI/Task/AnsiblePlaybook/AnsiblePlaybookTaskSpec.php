@@ -39,7 +39,8 @@ class AnsiblePlaybookTaskSpec extends TaskSpec
             'playbook'   => '',
             'inventory'  => null,
             'limit'      => null,
-            'extra_vars' => array()
+            'extra_vars' => array(),
+            'verbose'    => 0
         );
 
         $this->getOptions()->shouldReturn($options);
@@ -55,6 +56,7 @@ class AnsiblePlaybookTaskSpec extends TaskSpec
             'inventory'  => null,
             'limit'      => null,
             'extra_vars' => array(),
+            'verbose'    => 0,
             'foo'        => 'bar'
         );
 

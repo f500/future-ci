@@ -24,6 +24,11 @@ Install and watch assets:
     $ grunt
     $ grunt watch
 
+Configure the application by copying the skeleton file and editing it:
+
+    $ cp app/config/parameters.yml.dist app/config/parameters.yml
+    $ vi app/config/parameters.yml
+
 License
 -------
 

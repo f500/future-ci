@@ -11,6 +11,7 @@ Development
 Clone the repository:
 
     $ git clone git@github.com:f500/future-ci.git future-ci
+    $ cd future-ci
     $ git checkout develop
 
 Install dependencies:

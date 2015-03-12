@@ -153,7 +153,9 @@ class Configurator
         $config = $driver->load($filename);
         $config = $this->parseConfig($config, $parameters);
 
-        $config['suite']['cn'] = $suiteCn;
+        $config['suite']['cn'] = isset($config['suite']['name'])
+            ? strtolower(str_replace(' ', '_', $config['suite']['name']))
+            : $suiteCn;
 
         if (empty($config['suite']['class'])) {
             $config['suite']['class'] = self::DEFAULT_SUITE_CLASS;

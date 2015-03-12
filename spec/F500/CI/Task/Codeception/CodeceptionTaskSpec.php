@@ -123,7 +123,7 @@ class CodeceptionTaskSpec extends TaskSpec
                 '--no-ansi',
                 '--no-interaction',
                 'run',
-                '--json',
+                '--xml',
                 '--silent',
                 '--no-exit'
             )

@@ -23,51 +23,37 @@ use spec\F500\CI\Task\ResultParserSpec;
 class CodeceptionResultParserSpec extends ResultParserSpec
 {
 
-    protected $passedReport = <<<'EOT'
-{
-    "event": "suiteStart",
-    "suite": "acceptance",
-    "tests": 1
-}{
-    "event": "testStart",
-    "suite": "acceptance",
-    "test": "some_test (SomeTest.php)"
-}{
-    "event": "test",
-    "suite": "acceptance",
-    "test": "some_test (SomeTest.php)",
-    "status": "pass",
-    "time": 1.2345678909876,
-    "trace": [
+    protected $passedReport = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="unit" tests="10" assertions="11" failures="1" errors="1" time="0.141928">
+    <testcase name="testTypesCanBeRetrievedByName" class="Notification\\ManagerTest" file="/vagrant-poolz-app/tests/unit/Notification/ManagerTest.php" line="62" assertions="2" time="0.005319"/>
+  </testsuite>
+</testsuites>
+XML;
 
-    ],
-    "message": "",
-    "output": ""
-}
-EOT;
 
-    protected $failedReport = <<<'EOT'
-{
-    "event": "suiteStart",
-    "suite": "acceptance",
-    "tests": 1
-}{
-    "event": "testStart",
-    "suite": "acceptance",
-    "test": "some_test (SomeTest.php)"
-}{
-    "event": "test",
-    "suite": "acceptance",
-    "test": "some_test (SomeTest.php)",
-    "status": "fail",
-    "time": 1.2345678909876,
-    "trace": [
+    protected $failedReport = <<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="unit" tests="10" assertions="11" failures="1" errors="1" time="0.141928">
+    <testcase name="testTypesCanBeRegistered" class="Notification\\ManagerTest" file="/vagrant-poolz-app/tests/unit/Notification/ManagerTest.php" line="36" assertions="1" time="0.061458">
+      <failure type="PHPUnit_Framework_ExpectationFailedException">Notification\\ManagerTest::testTypesCanBeRegistered
+Failed asserting that actual size 0 matches expected size 1.
 
-    ],
-    "message": "",
-    "output": ""
-}
-EOT;
+/vagrant-poolz-app/tests/unit/Notification/ManagerTest.php:38
+</failure>
+    </testcase>
+    <testcase name="testTypesCanBeRetrieved" class="Notification\\ManagerTest" file="/vagrant-poolz-app/tests/unit/Notification/ManagerTest.php" line="49" assertions="0" time="0.005097">
+      <error type="PHPUnit_Framework_ExceptionWrapper">Notification\\ManagerTest::testTypesCanBeRetrieved
+Exception:
+
+</error>
+    </testcase>
+    <testcase name="testTypesCanBeRetrievedByName" class="Notification\\ManagerTest" file="/vagrant-poolz-app/tests/unit/Notification/ManagerTest.php" line="62" assertions="2" time="0.005319"/>
+  </testsuite>
+</testsuites>
+XML;
 
     function it_is_initializable()
     {
@@ -79,7 +65,6 @@ EOT;
     {
         $filesystem->exists(Argument::type('string'))->willReturn(true);
         $filesystem->readFile(Argument::type('string'))->willReturn($this->passedReport);
-        $filesystem->dumpFile(Argument::type('string'), Argument::type('string'))->willReturn();
 
         $result->getBuildDir($task)->willReturn('/path/to/build');
         $result->getFilesystem()->willReturn($filesystem);
@@ -94,7 +79,6 @@ EOT;
     {
         $filesystem->exists(Argument::type('string'))->willReturn(true);
         $filesystem->readFile(Argument::type('string'))->willReturn($this->failedReport);
-        $filesystem->dumpFile(Argument::type('string'), Argument::type('string'))->willReturn();
 
         $result->getBuildDir($task)->willReturn('/path/to/build');
         $result->getFilesystem()->willReturn($filesystem);

@@ -61,7 +61,7 @@ class CodeceptionTask extends BaseTask
 
         $command = $this->createCommand($commandFactory);
         $command->addArg('run');
-        $command->addArg('--json');
+        $command->addArg('--xml');
         $command->addArg('--silent');
         $command->addArg('--no-exit');
 

@@ -10,6 +10,7 @@ namespace spec\F500\CI\Task\Exec;
 use F500\CI\Build\Build;
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Command\StoreResultCommand;
 use F500\PhpSpec\Doubler;
 use Prophecy\Argument;
 use spec\F500\CI\Task\TaskSpec;
@@ -34,6 +35,7 @@ class ExecTaskSpec extends TaskSpec
     {
         $options = array(
             'cwd'         => '',
+            'log_dir'     => '',
             'env'         => array(),
             'bin'         => null,
             'args'        => array(),
@@ -46,6 +48,7 @@ class ExecTaskSpec extends TaskSpec
     {
         $options = array(
             'cwd'         => '',
+            'log_dir'     => '',
             'env'         => array(),
             'bin'         => 'ls',
             'args'        => array('-v'),
@@ -62,8 +65,12 @@ class ExecTaskSpec extends TaskSpec
         $this->getOptions()->shouldReturn($options);
     }
 
-    function it_builds_commands(Build $build, CommandFactory $commandFactory, Command $command)
-    {
+    function it_builds_commands(
+        Build $build,
+        CommandFactory $commandFactory,
+        Command $command,
+        StoreResultCommand $storeResultCommand
+    ) {
         $commandFactory->createCommand()->will(
             function () use ($command) {
                 $this->createCommand()->willReturn($command);
@@ -71,16 +78,21 @@ class ExecTaskSpec extends TaskSpec
                 return $command;
             }
         );
+        $commandFactory->createStoreResultCommand()->willReturn($storeResultCommand);
+        $build->getBuildDir($this->getWrappedObject())->willReturn('/path/to/builds/some_build/some_task');
 
         Doubler::get()->stubCommand($command);
 
-        $this->setOptions(array('bin' => 'ls', 'args' => array('-lha')));
+        $this->setOptions(array('bin' => 'ls', 'args' => array('-lha'), 'log_dir' => '/path/to/project/tests/_log'));
 
         $commands = $this->buildCommands($build, $commandFactory);
-        $commands->shouldBe(array($command));
+        $commands->shouldBe(array($command, $storeResultCommand));
 
         $commands[0]->getArgs()->shouldReturn(
             array('ls', '-lha')
         );
+        $storeResultCommand
+            ->setResultDirs('/path/to/project/tests/_log', '/path/to/builds/some_build/some_task')
+            ->shouldHaveBeenCalled();
     }
 }

@@ -10,6 +10,7 @@ namespace F500\CI\Task\Exec;
 use F500\CI\Build\Build;
 use F500\CI\Command\Command;
 use F500\CI\Command\CommandFactory;
+use F500\CI\Command\StoreResultCommand;
 use F500\CI\Task\BaseTask;
 
 /**
@@ -32,7 +33,13 @@ class ExecTask extends BaseTask
      */
     public function buildCommands(Build $build, CommandFactory $commandFactory)
     {
-        return array($this->createCommand($commandFactory));
+        $commands = array($this->createCommand($commandFactory));
+        $storeResultCommand = $this->createStoreResultCommand($commandFactory, $build->getBuildDir($this));
+        if ($storeResultCommand instanceof StoreResultCommand) {
+            $commands[] = $storeResultCommand;
+        }
+
+        return $commands;
     }
 
     /**
@@ -76,6 +83,28 @@ class ExecTask extends BaseTask
     }
 
     /**
+     * @param CommandFactory $commandFactory
+     * @param string         $buildDir
+     *
+     * @return StoreResultCommand|null
+     */
+    protected function createStoreResultCommand(CommandFactory $commandFactory, $buildDir)
+    {
+        $options = $this->getOptions();
+        $sourceDir = $options['log_dir'];
+        if (! $sourceDir) {
+            return null;
+        }
+
+        $destinationDir = $buildDir;
+
+        $command = $commandFactory->createStoreResultCommand();
+        $command->setResultDirs($sourceDir, $destinationDir);
+
+        return $command;
+    }
+
+    /**
      * Returns the defaults for all supported options.
      *
      * @return mixed[]
@@ -84,6 +113,7 @@ class ExecTask extends BaseTask
     {
         return array(
             'cwd'         => '',      // Current working directory for this task.
+            'log_dir'     => '',      // from which location to copy the resulting artifacts to the build folder
             'env'         => array(), // environment in which to run.
             'bin'         => null,    // the full path to the binary that needs to be run; use /usr/bin/env if unsure
                                       // where it is

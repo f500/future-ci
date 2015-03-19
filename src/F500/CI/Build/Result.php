@@ -150,26 +150,32 @@ class Result
 
     /**
      * @param Task $task
+     * @param string $message
      */
-    public function markTaskAsPassed(Task $task)
+    public function markTaskAsPassed(Task $task, $message = '')
     {
         $this->statuses['tasks'][$task->getCn()] = self::PASSED;
+        $this->addAdditionalResult($task, 'message', $message);
     }
 
     /**
-     * @param Task $task
+     * @param Task   $task
+     * @param string $message
      */
-    public function markTaskAsFailed(Task $task)
+    public function markTaskAsFailed(Task $task, $message = '')
     {
         $this->statuses['tasks'][$task->getCn()] = self::FAILED;
+        $this->addAdditionalResult($task, 'message', $message);
     }
 
     /**
      * @param Task $task
+     * @param string $message
      */
-    public function markTaskAsBorked(Task $task)
+    public function markTaskAsBorked(Task $task, $message = '')
     {
         $this->statuses['tasks'][$task->getCn()] = self::BORKED;
+        $this->addAdditionalResult($task, 'message', $message);
     }
 
     /**
@@ -194,6 +200,20 @@ class Result
         }
 
         return $this->statuses['tasks'][$task->getCn()];
+    }
+
+    /**
+     * Returns the message that came with the build status for the given task.
+     *
+     * @param Task $task
+     *
+     * @return string
+     */
+    public function getTaskMessage(Task $task)
+    {
+        return isset($this->results[$task->getCn()]['message'])
+            ? $this->results[$task->getCn()]['message']
+            : '';
     }
 
     /**

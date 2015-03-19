@@ -113,13 +113,12 @@ class SlackSubscriber implements EventSubscriberInterface
             ->setText($text)
             ->setColor($color);
 
-//        foreach ($build->getTasks() as $task) {
-//            $attachmentBuilder->addField(
-//                $task->getName(),
-//                $this->resultTextMap[$result->getTaskStatus($task)],
-//                false
-//            );
-//        }
+        foreach ($build->getTasks() as $task) {
+            $message = $result->getTaskMessage($task);
+            if ($message) {
+                $attachmentBuilder->addField($task->getName(), $message, false);
+            }
+        }
 
         $attachmentBuilder->end();
 

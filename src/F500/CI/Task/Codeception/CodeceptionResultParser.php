@@ -33,8 +33,14 @@ final class CodeceptionResultParser extends BaseResultParser
     {
         $report = $this->loadReport($task, $result);
 
-        if (count($this->fetchAllFailuresAndErrors($report)) > 0) {
-            $result->markTaskAsFailed($task);
+        $failuresAndErrors = $this->fetchAllFailuresAndErrors($report);
+        if (count($failuresAndErrors) > 0) {
+            $messages = '';
+            foreach($failuresAndErrors as $message) {
+                $messages .= (string)$message . "\n";
+            }
+
+            $result->markTaskAsFailed($task, $messages);
         } else {
             $result->markTaskAsPassed($task);
         }

@@ -237,7 +237,8 @@ class ResultSpec extends ObjectBehavior
                     "result_code": 0,
                     "output": "Some output..."
                 }
-            }
+            },
+            "message": ""
         }
     }
 }

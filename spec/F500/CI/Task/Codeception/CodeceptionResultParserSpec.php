@@ -82,10 +82,10 @@ XML;
 
         $result->getBuildDir($task)->willReturn('/path/to/build');
         $result->getFilesystem()->willReturn($filesystem);
-        $result->markTaskAsFailed($task)->willReturn();
+        $result->markTaskAsFailed($task, Argument::type('string'))->willReturn();
 
         $this->parse($task, $result);
 
-        $result->markTaskAsFailed($task)->shouldHaveBeenCalled();
+        $result->markTaskAsFailed($task, Argument::type('string'))->shouldHaveBeenCalled();
     }
 }

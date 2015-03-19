@@ -49,53 +49,6 @@
     };
 
     /**
-     * @returns {*}
-     */
-    Object.prototype.first = function () {
-        var first = undefined;
-
-        this.foreach(function (current) {
-            first = current;
-            return false;
-        });
-
-        return first;
-    };
-
-    /**
-     * @returns {*}
-     */
-    Object.prototype.last = function () {
-        var last = undefined;
-
-        this.foreach(function (current) {
-            last = current;
-        });
-
-        return last;
-    };
-
-    /**
-     * @param   {function} callback
-     * @returns {object}
-     */
-    Object.prototype.foreach = function (callback) {
-        var result,
-            i;
-
-        for (i in this) {
-            if (this.hasOwnProperty(i)) {
-                result = callback.call(this, this[i], i);
-                if (result === false) {
-                    break;
-                }
-            }
-        }
-
-        return this;
-    };
-
-    /**
      * @returns {number}
      */
     Date.prototype.getIsoWeek = function () {

@@ -39,7 +39,7 @@ fciDirectives.directive('fciNavbar', ['$location',
                 var routeItem,
                     path = $location.path();
 
-                patternMap.foreach(function (item, pattern) {
+                jQuery.each(patternMap, function (pattern, item) {
                     pattern = new RegExp(pattern);
 
                     if (pattern.test(path)) {
@@ -52,6 +52,7 @@ fciDirectives.directive('fciNavbar', ['$location',
                     if (activeItem) {
                         activeItem.removeClass('active');
                     }
+
                     activeItem = routeItem;
                     activeItem.addClass('active');
                 }

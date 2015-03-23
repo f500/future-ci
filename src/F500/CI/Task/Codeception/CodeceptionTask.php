@@ -72,6 +72,10 @@ class CodeceptionTask extends BaseTask
         if (!empty($options['suite'])) {
             $specificSuite = $options['suite'];
         } elseif (!empty($options['skip_suites'])) {
+            if (!is_array($options['skip_suites'])) {
+                $options['skip_suites'] = array($options['skip_suites']);
+            }
+            
             foreach ($options['skip_suites'] as $suite) {
                 $command->addArg('--skip=' . $suite);
             }

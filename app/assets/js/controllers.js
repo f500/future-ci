@@ -32,6 +32,9 @@ fciControllers.controller('BuildShowCtrl',
             $scope.statuses = buildResult.statuses;
 
             $scope.tasks = Object.keys($scope.metadata.tasks);
+            $scope.tabs = [
+                //{ title: "Tab title", content: "Tab Content", disabled: false, active: false }
+            ];
         });
     }]
 );

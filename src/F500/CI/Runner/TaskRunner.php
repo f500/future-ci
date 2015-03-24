@@ -90,6 +90,10 @@ class TaskRunner
             $parser->parse($task, $result);
         }
 
+        foreach ($task->getFormatters() as $formatter) {
+            $formatter->format($task, $result);
+        }
+
         return true;
     }
 }

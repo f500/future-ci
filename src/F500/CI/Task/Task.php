@@ -64,6 +64,17 @@ interface Task
     public function getResultParsers();
 
     /**
+     * @param string    $cn
+     * @param Formatter $formatter
+     */
+    public function addFormatter($cn, Formatter $formatter);
+
+    /**
+     * @return Formatter[]
+     */
+    public function getFormatters();
+
+    /**
      * @param string                           $cn
      * @param \F500\CI\Command\Wrapper\Wrapper $wrapper
      */

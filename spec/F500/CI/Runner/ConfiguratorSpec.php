@@ -13,6 +13,8 @@ use F500\CI\Command\Wrapper\Wrapper;
 use F500\CI\Command\Wrapper\WrapperFactory;
 use F500\CI\Suite\Suite;
 use F500\CI\Suite\SuiteFactory;
+use F500\CI\Task\Formatter;
+use F500\CI\Task\FormatterFactory;
 use F500\CI\Task\ResultParser;
 use F500\CI\Task\ResultParserFactory;
 use F500\CI\Task\Task;
@@ -37,6 +39,8 @@ class ConfiguratorSpec extends ObjectBehavior
         Suite $suite,
         TaskFactory $taskFactory,
         Task $task,
+        FormatterFactory $formatterFactory,
+        Formatter $formatter,
         ResultParserFactory $resultParserFactory,
         ResultParser $resultParser,
         WrapperFactory $wrapperFactory,
@@ -48,6 +52,7 @@ class ConfiguratorSpec extends ObjectBehavior
         $suiteFactory->createSuite($stringArg, $stringArg, Argument::type('array'))->willReturn($suite);
         $taskFactory->createTask($stringArg, $stringArg)->willReturn($task);
         $resultParserFactory->createResultParser($stringArg, $stringArg)->willReturn($resultParser);
+        $formatterFactory->createFormatter($stringArg, $stringArg)->willReturn($formatter);
         $wrapperFactory->createWrapper($stringArg, $stringArg)->willReturn($wrapper);
 
         $suite->setName($stringArg)->willReturn();
@@ -66,6 +71,7 @@ class ConfiguratorSpec extends ObjectBehavior
             $suiteFactory,
             $taskFactory,
             $resultParserFactory,
+            $formatterFactory,
             $wrapperFactory
         );
     }
@@ -210,8 +216,13 @@ class ConfiguratorSpec extends ObjectBehavior
         $this->loadConfig($filename, null, $parameters)->shouldReturn($config);
     }
 
-    function it_creates_a_suite(Suite $suite, Task $task, ResultParser $resultParser, Wrapper $wrapper)
-    {
+    function it_creates_a_suite(
+        Suite $suite,
+        Task $task,
+        ResultParser $resultParser,
+        Formatter $formatter,
+        Wrapper $wrapper
+    ) {
         $config = array(
             'suite' => array(
                 'name'     => 'Some Suite',
@@ -229,6 +240,12 @@ class ConfiguratorSpec extends ObjectBehavior
                             'some_parser' => array(
                                 'class' => 'F500\CI\Task\ResultParser',
                                 'foo'   => 'bar'
+                            )
+                        ),
+                        'formatters'  => array(
+                            'some_formatter' => array(
+                                'class' => 'F500\CI\Task\Formatter',
+                                'fizz'  => 'buzz'
                             )
                         ),
                         'wrappers' => array('some_wrapper'),
@@ -256,10 +273,11 @@ class ConfiguratorSpec extends ObjectBehavior
         $task->setName('Some Task')->shouldHaveBeenCalled();
         $task->setOptions(array('foo' => 'bar'))->shouldHaveBeenCalled();
         $task->addResultParser('some_parser', $resultParser)->shouldHaveBeenCalled();
+        $task->addFormatter('some_formatter', $formatter)->shouldHaveBeenCalled();
         $task->addWrapper('some_wrapper', $wrapper)->shouldHaveBeenCalled();
 
+        $formatter->setOptions(array('fizz' => 'buzz'))->shouldHaveBeenCalled();
         $resultParser->setOptions(array('foo' => 'bar'))->shouldHaveBeenCalled();
-
         $wrapper->setOptions(array('foo' => 'bar'))->shouldHaveBeenCalled();
     }
 
@@ -625,6 +643,91 @@ class ConfiguratorSpec extends ObjectBehavior
                             )
                         ),
                         'wrappers' => 'not an array',
+                        'foo'      => 'bar'
+                    )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
+        );
+
+        $this->shouldThrow('\RuntimeException')->during(
+            'createSuite',
+            array(
+                'F500\CI\Suite\StandardSuite',
+                'some_suite',
+                $config
+            )
+        );
+    }
+
+    function it_fails_creating_a_suite_when_formatters_is_not_an_array()
+    {
+        $config = array(
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'class' => 'F500\CI\Command\Wrapper\Wrapper',
+                        'foo'   => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'formatters' => 'not an array',
+                        'foo'      => 'bar'
+                    )
+                ),
+                'cn'       => 'some_suite',
+                'class'    => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
+        );
+
+        $this->shouldThrow('\RuntimeException')->during(
+            'createSuite',
+            array(
+                'F500\CI\Suite\StandardSuite',
+                'some_suite',
+                $config
+            )
+        );
+    }
+
+    function it_fails_creating_a_suite_when_formatter_class_is_missing()
+    {
+        $config = array(
+            'suite' => array(
+                'name'     => 'Some Suite',
+                'wrappers' => array(
+                    'some_wrapper' => array(
+                        'foo' => 'bar'
+                    )
+                ),
+                'tasks'    => array(
+                    'some_task' => array(
+                        'class'    => 'F500\CI\Task\Task',
+                        'name'     => 'Some Task',
+                        'parsers'  => array(
+                            'some_parser' => array(
+                                'class' => 'F500\CI\Task\ResultParser',
+                                'foo'   => 'bar'
+                            )
+                        ),
+                        'formatters' => array('some_formatter'),
                         'foo'      => 'bar'
                     )
                 ),

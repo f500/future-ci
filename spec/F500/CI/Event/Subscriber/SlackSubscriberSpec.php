@@ -160,4 +160,31 @@ class SlackSubscriberSpec extends ObjectBehavior
         $ab->setColor('danger')->shouldHaveBeenCalled();
         $ab->addField(self::TASK_NAME, $message, false)->shouldHaveBeenCalled();
     }
+
+    function it_truncates_task_messages_if_more_than_three_lines(
+        BuildRunEvent $event,
+        Result $result,
+        Phlack $phlack,
+        MessageBuilder $mb,
+        AttachmentBuilder $ab
+    ) {
+        $event->getResult()->willReturn($result);
+
+        $givenMessage = "This is line 1\nThis is line 2\nThis is line 3\nThis is line 4";
+        $receivedMessage = "This is line 1\nThis is line 2\nThis is line 3\n...";
+        $result->getBuildStatus()->willReturn(Result::PASSED);
+        $result->getTaskStatus(Argument::type('F500\CI\Task\Task'))->willReturn(Result::PASSED);
+        $result->getTaskMessage(Argument::type('F500\CI\Task\Task'))->willReturn($givenMessage);
+        $result->getElapsedBuildTime()->willReturn(12345678);
+
+        $this->onBuildFinished($event);
+
+        $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->shouldHaveBeenCalled();
+
+        $mb->setText(Argument::type('string'))->shouldHaveBeenCalled();
+
+        $ab->setFallback(Argument::containingString('Passed'))->shouldHaveBeenCalled();
+        $ab->setColor('good')->shouldHaveBeenCalled();
+        $ab->addField(self::TASK_NAME, $receivedMessage, false)->shouldHaveBeenCalled();
+    }
 }

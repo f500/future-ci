@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class SlackSubscriber implements EventSubscriberInterface
 {
+    const MAX_LINES_IN_MESSAGE = 3;
 
     /**
      * @var Phlack
@@ -116,6 +117,9 @@ class SlackSubscriber implements EventSubscriberInterface
         foreach ($build->getTasks() as $task) {
             $message = $result->getTaskMessage($task);
             if ($message) {
+                // limit number of lines to self::MAX_LINES_IN_MESSAGE and append an ellipsis
+                $message = implode("\n", array_slice(explode("\n", $message), 0, self::MAX_LINES_IN_MESSAGE)) . ' ...';
+
                 $attachmentBuilder->addField($task->getName(), $message, false);
             }
         }

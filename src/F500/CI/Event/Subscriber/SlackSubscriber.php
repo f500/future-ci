@@ -117,11 +117,12 @@ class SlackSubscriber implements EventSubscriberInterface
         foreach ($build->getTasks() as $task) {
             $message = $result->getTaskMessage($task);
             if ($message) {
-                // limit number of lines to self::MAX_LINES_IN_MESSAGE and append an ellipsis
-                $message = implode(
-                    "\n",
-                    array_slice(explode("\n", $message), 0, self::MAX_LINES_IN_MESSAGE)
-                ) . " \n...";
+                // limit number of lines to MAX_LINES_IN_MESSAGE and append an ellipsis if more
+                // than MAX_LINES_IN_MESSAGE
+                $messageLines = explode("\n", $message);
+                if (count($messageLines) > self::MAX_LINES_IN_MESSAGE) {
+                    $message = implode("\n", array_slice($messageLines, 0, self::MAX_LINES_IN_MESSAGE)) . "\n...";
+                }
 
                 $attachmentBuilder->addField($task->getName(), $message, false);
             }

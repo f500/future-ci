@@ -31,7 +31,12 @@ final class CodeceptionResultParser extends BaseResultParser
      */
     public function parse(Task $task, Result $result)
     {
-        $report = $this->loadReport($task, $result);
+        try {
+            $report = $this->loadReport($task, $result);
+        } catch (\Exception $e) {
+            $result->markTaskAsBorked($task, $e->getMessage());
+            return;
+        }
 
         $failuresAndErrors = $this->fetchAllFailuresAndErrors($report);
         if (count($failuresAndErrors) > 0) {
@@ -63,7 +68,15 @@ final class CodeceptionResultParser extends BaseResultParser
             throw new \InvalidArgumentException("The report '$filename' could not be found on the filesystem");
         }
 
-        return simplexml_load_string($filesystem->readFile($filename));
+        $xml = simplexml_load_string($filesystem->readFile($filename));
+        if ($xml === false) {
+            throw new \RuntimeException(
+                "The report '$filename' does not contain valid XML. It would seem something went wrong during the "
+                . " test execution; please check the logs for more information"
+            );
+        }
+
+        return $xml;
     }
 
     /**

@@ -88,4 +88,18 @@ XML;
 
         $result->markTaskAsFailed($task, Argument::type('string'))->shouldHaveBeenCalled();
     }
+
+    function it_should_fail_on_empty_xml(Task $task, Result $result, Filesystem $filesystem)
+    {
+        $filesystem->exists(Argument::type('string'))->willReturn(true);
+        $filesystem->readFile(Argument::type('string'))->willReturn("");
+
+        $result->getBuildDir($task)->willReturn('/path/to/build');
+        $result->getFilesystem()->willReturn($filesystem);
+        $result->markTaskAsBorked($task, Argument::type('string'))->willReturn();
+
+        $this->parse($task, $result);
+
+        $result->markTaskAsBorked($task, Argument::type('string'))->shouldHaveBeenCalled();
+    }
 }

@@ -97,5 +97,33 @@ class TaskRunnerSpec extends ObjectBehavior
         $commandExecutor->execute($commandTwo, Argument::type('Psr\Log\LoggerInterface'))->willReturn(false);
 
         $this->run($task, $build, $result)->shouldReturn(false);
+
+        $result->markTaskAsBorked($task)->shouldHaveBeenCalled();
+    }
+
+    function it_borks_if_a_parser_fails(
+        Task $task,
+        Build $build,
+        Result $result,
+        Wrapper $wrapper,
+        Command $commandOne,
+        CommandExecutor $commandExecutor,
+        ResultParser $resultParser
+    ) {
+        $task->getCn()->willReturn('some_task');
+        $task->buildCommands(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Command\CommandFactory'))
+            ->willReturn(array($commandOne));
+        $task->getWrappers()->willReturn(array('some_wrapper' => $wrapper));
+        $task->getResultParsers()->willReturn(array('some_parser' => $resultParser));
+
+        $resultParser->parse($task, $result)->willThrow('Exception');
+
+        $wrapper->wrap($commandOne, Argument::type('F500\CI\Command\CommandFactory'))->willReturn($commandOne);
+
+        $commandExecutor->execute($commandOne, Argument::type('Psr\Log\LoggerInterface'))->willReturn(true);
+
+        $this->run($task, $build, $result)->shouldReturn(false);
+
+        $result->markTaskAsBorked($task, Argument::type('string'))->shouldHaveBeenCalled();
     }
 }

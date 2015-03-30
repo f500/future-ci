@@ -86,8 +86,14 @@ class TaskRunner
             }
         }
 
-        foreach ($task->getResultParsers() as $parser) {
-            $parser->parse($task, $result);
+        try {
+            foreach ($task->getResultParsers() as $parser) {
+                $parser->parse($task, $result);
+            }
+        } catch (\Exception $e) {
+            $result->markTaskAsBorked($task, $e->getMessage());
+
+            return false;
         }
 
         return true;

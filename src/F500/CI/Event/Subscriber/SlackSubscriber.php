@@ -79,9 +79,14 @@ class SlackSubscriber implements EventSubscriberInterface
 
         $messageBuilder = $this->phlack->getMessageBuilder();
 
-        $messageBuilder->setText(
-            sprintf('Build [%s] (%s) started.', $build->getCn(), $build->getSuiteName())
-        );
+        $message = sprintf('Build [%s] (%s) started.', $build->getCn(), $build->getSuiteName());
+
+        $commit = $build->getCommit();
+        if ($commit) {
+            $message .= sprintf("\nAgainst commit [%s]", $commit->getId());
+        }
+
+        $messageBuilder->setText($message);
 
         $response = $this->phlack->send($messageBuilder->create());
     }

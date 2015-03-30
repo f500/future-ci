@@ -7,8 +7,10 @@
 
 namespace F500\CI\Build;
 
+use F500\CI\Suite\StandardSuite;
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
+use F500\CI\Vcs\Commit;
 
 /**
  * Class StandardBuild
@@ -34,6 +36,11 @@ class StandardBuild implements Build
      * @var Suite
      */
     protected $suite;
+
+    /**
+     * @var Commit
+     */
+    private $commit;
 
     /**
      * @param Suite  $suite
@@ -70,6 +77,12 @@ class StandardBuild implements Build
         return $this->suite->getCn();
     }
 
+    /** @return StandardSuite */
+    public function getSuite()
+    {
+        return $this->suite;
+    }
+
     /**
      * @return string
      */
@@ -92,6 +105,17 @@ class StandardBuild implements Build
 
         return $buildDir;
     }
+
+    public function setCommit(Commit $commit)
+    {
+        $this->commit = $commit;
+    }
+
+    public function getCommit()
+    {
+        return $this->commit;
+    }
+
 
     /**
      * @return \F500\CI\Task\Task[]

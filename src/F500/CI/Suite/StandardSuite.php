@@ -139,6 +139,11 @@ class StandardSuite implements Suite
         return $this->wrappers[$cn];
     }
 
+    public function getConfig()
+    {
+        return $this->config['suite'];
+    }
+
     /**
      * @return string
      */

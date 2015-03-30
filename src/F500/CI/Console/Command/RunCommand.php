@@ -9,6 +9,7 @@ namespace F500\CI\Console\Command;
 
 use F500\CI\Console\Helper\RunHelper;
 use F500\CI\Event\Subscriber\ConsoleOutputSubscriber;
+use F500\CI\Event\Subscriber\GitSubscriber;
 use F500\CI\Event\Subscriber\SlackSubscriber;
 use F500\CI\Event\Subscriber\TimerSubscriber;
 use Symfony\Component\Console\Input\InputArgument;
@@ -51,6 +52,7 @@ class RunCommand extends Command
         $dispatcher = $this->getService('dispatcher');
         $phlack     = $this->getService('phlack');
 
+        $dispatcher->addSubscriber(new GitSubscriber());
         $dispatcher->addSubscriber(new SlackSubscriber($phlack));
         $dispatcher->addSubscriber(new ConsoleOutputSubscriber($output));
         $dispatcher->addSubscriber(new TimerSubscriber());

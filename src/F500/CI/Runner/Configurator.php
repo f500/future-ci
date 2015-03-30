@@ -362,6 +362,7 @@ class Configurator
             }
         );
 
+        $config['suite']['root_dir'] = $parameters['root_dir'];
         unset($config['parameters']);
 
         return $config;

@@ -110,6 +110,13 @@ class ConsoleOutputSubscriber implements EventSubscriberInterface
                 $build->getSuiteName()
             )
         );
+
+        $commit = $build->getCommit();
+        if ($commit) {
+            $this->output->writeln(
+                sprintf('Against commit [<fg=yellow>%s</fg=yellow>]', $commit->getId())
+            );
+        }
     }
 
     /**

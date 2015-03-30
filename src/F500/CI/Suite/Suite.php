@@ -70,6 +70,8 @@ interface Suite
      */
     public function getWrapper($cn);
 
+    public function getConfig();
+
     /**
      * @return string
      */

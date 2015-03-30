@@ -8,6 +8,7 @@
 namespace F500\CI\Build;
 
 use F500\CI\Suite\Suite;
+use F500\CI\Vcs\Commit;
 
 /**
  * Interface Build
@@ -34,6 +35,10 @@ interface Build
      * @return \DateTimeImmutable
      */
     public function getDate();
+
+    public function setCommit(Commit $commit);
+
+    public function getCommit();
 
     /**
      * @return string

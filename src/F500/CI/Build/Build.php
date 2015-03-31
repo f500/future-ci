@@ -63,6 +63,13 @@ interface Build
     public function getSuiteName();
 
     /**
+     * Returns the name of the directory where the sources for this build are located.
+     *
+     * @return string
+     */
+    public function getProjectDir();
+
+    /**
      * @return string
      */
     public function getBuildDir();

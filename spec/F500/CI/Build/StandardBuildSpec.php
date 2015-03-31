@@ -22,6 +22,7 @@ use Prophecy\Argument;
  */
 class StandardBuildSpec extends ObjectBehavior
 {
+    const PROJECT_FOLDER = '/our/project/folder';
 
     protected $suiteJson = <<< EOT
 {
@@ -39,6 +40,7 @@ EOT;
     function let(Suite $suite, Task $task)
     {
         $suite->getCn()->willReturn('some_suite');
+        $suite->getConfig()->willReturn(array('root_dir' => self::PROJECT_FOLDER));
         $suite->getName()->willReturn('Some Suite');
         $suite->getTasks()->willReturn(array('some_task' => $task));
         $suite->toJson()->willReturn($this->suiteJson);
@@ -76,6 +78,11 @@ EOT;
     function it_has_a_build_dir()
     {
         $this->getBuildDir()->shouldMatch('|^/path/to/builds/some_suite/[a-z0-9]+$|');
+    }
+
+    function it_has_a_project_dir()
+    {
+        $this->getProjectDir()->shouldReturn(self::PROJECT_FOLDER);
     }
 
     function it_has_a_build_dir_for_a_task(Task $task)

@@ -77,10 +77,16 @@ class StandardBuild implements Build
         return $this->suite->getCn();
     }
 
-    /** @return StandardSuite */
-    public function getSuite()
+    /**
+     * Returns the name of the directory where the sources for this build are located.
+     *
+     * @return string
+     */
+    public function getProjectDir()
     {
-        return $this->suite;
+        $config = $this->suite->getConfig();
+
+        return isset($config['root_dir']) ? $config['root_dir'] : null;
     }
 
     /**

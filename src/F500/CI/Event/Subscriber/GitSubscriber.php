@@ -34,10 +34,8 @@ class GitSubscriber implements EventSubscriberInterface
      */
     public function onBuildStarted(BuildRunEvent $event)
     {
-        $config = $event->getBuild()->getSuite()->getConfig();
-        $rootDir = isset($config['root_dir']) ? $config['root_dir'] : null;
 
-        $commit = GitCommit::load($rootDir);
+        $commit = GitCommit::load($event->getBuild()->getProjectDir());
         $event->getBuild()->initiatedBy($commit);
     }
 }

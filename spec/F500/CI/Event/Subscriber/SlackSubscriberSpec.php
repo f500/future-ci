@@ -50,6 +50,7 @@ class SlackSubscriberSpec extends ObjectBehavior
         $build->getCn()->willReturn('a1b2c3d4');
         $build->getSuiteName()->willReturn('Some Suite');
         $build->getTasks()->willReturn(array('some_task' => $task));
+        $build->getCommit()->willReturn(null);
 
 //        $task->getCn()->willReturn('some_task');
 //        $task->getName()->willReturn('Some Task');

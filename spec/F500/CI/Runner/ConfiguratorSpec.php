@@ -78,18 +78,7 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_loads_a_json_config_file()
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite.json';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
 
         $this->loadConfig($filename)->shouldReturn($config);
     }
@@ -97,18 +86,7 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_loads_a_php_config_file()
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite.php';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
 
         $this->loadConfig($filename)->shouldReturn($config);
     }
@@ -116,18 +94,7 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_loads_a_toml_config_file()
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite.toml';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
 
         $this->loadConfig($filename)->shouldReturn($config);
     }
@@ -135,18 +102,7 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_loads_a_yaml_config_file()
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite.yml';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
 
         $this->loadConfig($filename)->shouldReturn($config);
     }
@@ -154,18 +110,7 @@ class ConfiguratorSpec extends ObjectBehavior
     function it_loads_a_config_file_with_relative_path()
     {
         $filename = 'some_suite.yml';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
 
         $this->loadConfig($filename)->shouldReturn($config);
     }
@@ -174,18 +119,8 @@ class ConfiguratorSpec extends ObjectBehavior
     {
         $filename = __DIR__ . '/../../../data/suites/some_suite';
         $format   = 'yml';
-        $config   = array(
-            'suite' => array(
-                'name'  => 'Some Suite',
-                'path'  => '/path/to/root/some/path',
-                'foo'   => array('bar', 'baz'),
-                'cn'    => 'some_suite',
-                'class' => 'F500\CI\Suite\StandardSuite'
-            ),
-            'build' => array(
-                'class' => 'F500\CI\Build\StandardBuild'
-            )
-        );
+        $config = $this->givenAnExpectedConfiguration();
+;
 
         $this->loadConfig($filename, $format)->shouldReturn($config);
     }
@@ -199,6 +134,7 @@ class ConfiguratorSpec extends ObjectBehavior
                 'name'  => 'Some Suite',
                 'path'  => '/path/to/root/some/path',
                 'foo'   => 'bar',
+                'root_dir' => '/path/to/root',
                 'cn'    => 'some_suite',
                 'class' => 'F500\CI\Suite\StandardSuite'
             ),
@@ -693,5 +629,26 @@ class ConfiguratorSpec extends ObjectBehavior
     {
         $this->createBuild('F500\CI\Build\StandardBuild', $suite)
             ->shouldReturnAnInstanceOf('F500\CI\Build\Build');
+    }
+
+    /**
+     * @return array
+     */
+    protected function givenAnExpectedConfiguration()
+    {
+        $config = array(
+            'suite' => array(
+                'name' => 'Some Suite',
+                'path' => '/path/to/root/some/path',
+                'foo' => array('bar', 'baz'),
+                'root_dir' => '/path/to/root',
+                'cn' => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            ),
+            'build' => array(
+                'class' => 'F500\CI\Build\StandardBuild'
+            )
+        );
+        return $config;
     }
 }

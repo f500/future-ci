@@ -1,24 +1,56 @@
 <?php
 
+/**
+ * This file is part of the Future CI package.
+ * Future CI is licensed under MIT (https://github.com/f500/future-ci/blob/master/LICENSE).
+ */
+
 namespace F500\CI\Vcs;
 
 use Symfony\Component\Process\Process;
 
+/**
+ * Class GitCommit
+ *
+ * @copyright 2015 Future500 B.V.
+ * @license   https://github.com/f500/future-ci/blob/master/LICENSE MIT
+ * @package   F500\CI\Vcs
+ */
 class GitCommit implements Commit
 {
-    /** @var CommitHash $id */
+    /**
+     * @var CommitHash $id
+     */
     private $id;
 
-    /** @var \DateTime */
+    /**
+     * @var \DateTime
+     */
     private $date;
 
-    /** @var string */
+    /**
+     * @var string
+     */
+    private $author;
+
+    /**
+     * @var string
+     */
     private $description;
 
-    public function __construct(CommitHash $id, \DateTime $date, $description)
+    /**
+     * Initializes this object with the required information.
+     *
+     * @param CommitHash $id
+     * @param \DateTime $date
+     * @param string $author
+     * @param string $description
+     */
+    public function __construct(CommitHash $id, \DateTime $date, $author, $description)
     {
-        $this->id = $id;
-        $this->date = $date;
+        $this->id          = $id;
+        $this->date        = $date;
+        $this->author      = $author;
         $this->description = $description;
     }
 
@@ -36,13 +68,43 @@ class GitCommit implements Commit
             );
         }
 
-        $output = $process->getOutput();
+        return self::fromLog($process->getOutput());
+    }
+
+    /**
+     * Interprets the log message and creates a new Commit object from it.
+     *
+     * This method assumes that you have used the `git log` command using the following parameters at least:
+     *
+     *     git log --format=medium --date=iso-strict
+     *
+     * These parameters will provide a parsable format where the date can be unambiguously parsed into a DateTime
+     * object.
+     *
+     * The above will generate a commit message that looks like this:
+     *
+     * ```
+     * commit 26fc986b53a293a48291b7bfe96534458e8d1f6e
+     * Author: Mike van Riel <mike@ingewikkeld.net>
+     * Date:   2015-03-31T10:01:09+02:00
+     *
+     *     Update spec for Build entity to include getProjectDir
+     * ```
+     *
+     * We can scan the above line by line and strip all unnecessary bits off.
+     *
+     * @param string $body
+     *
+     * @return static
+     */
+    public static function fromLog($body)
+    {
         $id          = null;
         $description = "";
         $author      = null;
         $date        = null;
 
-        foreach(explode("\n", $output) as $line) {
+        foreach (explode("\n", $body) as $line) {
             if ($id === null) {
                 $id = new CommitHash(substr($line, 7));
                 continue;
@@ -61,25 +123,46 @@ class GitCommit implements Commit
             $description .= substr($line, 4) . "\n";
         }
 
-        return new static($id, $date, $description);
+        return new static($id, $date, $author, $description);
     }
 
-    /** @return CommitId */
+    /**
+     * Returns the identifier for this commit.
+     *
+     * @return CommitId
+     */
     public function getId()
     {
         return $this->id;
     }
 
-    /** @return \DateTime */
+    /**
+     * Returns the date and time when this commit was made.
+     *
+     * @return \DateTime
+     */
     public function getDate()
     {
         return $this->date;
     }
 
-    public function getDescription()
+    /**
+     * Returns the author information for this VCS.
+     *
+     * @return string
+     */
+    public function getAuthor()
     {
-        return $this->id;
+        return $this->author;
     }
 
-
+    /**
+     * Returns the commit message for this commit.
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
 }

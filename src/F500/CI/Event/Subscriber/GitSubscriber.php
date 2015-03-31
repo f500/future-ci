@@ -30,12 +30,18 @@ class GitSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Registers the commit information of the current project directory with the build.
+     *
      * @param BuildRunEvent $event
+     *
+     * @return void
      */
     public function onBuildStarted(BuildRunEvent $event)
     {
-
-        $commit = GitCommit::load($event->getBuild()->getProjectDir());
-        $event->getBuild()->initiatedBy($commit);
+        $projectDirectory = $event->getBuild()->getProjectDir();
+        $commit = GitCommit::load($projectDirectory);
+        if ($commit) {
+            $event->getBuild()->initiatedBy($commit);
+        }
     }
 }

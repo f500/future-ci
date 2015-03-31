@@ -58,6 +58,17 @@ class StandardSuiteSpec extends ObjectBehavior
         $this->getName()->shouldReturn('Some Suite');
     }
 
+    function it_has_a_configuration()
+    {
+        $this->getConfig()->shouldReturn(
+            array(
+                'name'  => 'Some Suite',
+                'cn'    => 'some_suite',
+                'class' => 'F500\CI\Suite\StandardSuite'
+            )
+        );
+    }
+
     function it_can_add_a_task_to_itself(Task $task)
     {
         $this->addTask('some_task', $task);

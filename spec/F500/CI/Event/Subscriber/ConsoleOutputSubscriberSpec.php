@@ -12,6 +12,7 @@ use F500\CI\Build\Result;
 use F500\CI\Event\BuildRunEvent;
 use F500\CI\Event\TaskRunEvent;
 use F500\CI\Task\Task;
+use F500\CI\Vcs\Commit;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,16 +43,31 @@ class ConsoleOutputSubscriberSpec extends ObjectBehavior
         BuildRunEvent $event,
         Build $build,
         \DateTimeImmutable $date,
-        OutputInterface $output
+        OutputInterface $output,
+        Commit $commit
     ) {
+        // Arrange
+        $buildCn  = 'a1b2c3d4';
+        $commitId  = sha1('my_commit_hash');
+        $suiteName = 'Some Suite';
+
         $event->getBuild()->willReturn($build);
 
-        $build->getCn()->willReturn('a1b2c3d4');
-        $build->getSuiteName()->willReturn('Some Suite');
+        $build->getCn()->willReturn($buildCn);
+        $build->getSuiteName()->willReturn($suiteName);
+        $build->getCommit()->willReturn($commit);
 
+        $commit->getId()->willReturn($commitId);
+
+        // Act
         $this->onBuildStarted($event);
 
-        $output->writeln(Argument::type('string'))->shouldHaveBeenCalled();
+        // Assert
+        $line1 = sprintf('Running build [<fg=yellow>%s</fg=yellow>] (<fg=yellow>%s</fg=yellow>)', $buildCn, $suiteName);
+        $line2 = sprintf('Against commit [<fg=yellow>%s</fg=yellow>]', $commitId);
+
+        $output->writeln($line1)->shouldHaveBeenCalled();
+        $output->writeln($line2)->shouldHaveBeenCalled();
     }
 
     function it_writes_output_when_a_task_has_started(Task $task, TaskRunEvent $event, OutputInterface $output)

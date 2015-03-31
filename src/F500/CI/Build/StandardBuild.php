@@ -38,7 +38,7 @@ class StandardBuild implements Build
     protected $suite;
 
     /**
-     * @var Commit
+     * @var Commit|null The commit that initiated this build or null if this is unknown or not applicable.
      */
     private $commit;
 
@@ -106,16 +106,29 @@ class StandardBuild implements Build
         return $buildDir;
     }
 
-    public function setCommit(Commit $commit)
+    /**
+     * Registers information on the commit that initiated this build.
+     *
+     * @param Commit $commit
+     *
+     * @return $this;
+     */
+    public function initiatedBy(Commit $commit)
     {
         $this->commit = $commit;
+
+        return $this;
     }
 
+    /**
+     * Returns the commit that initiated this build or null if this is unknown or not applicable.
+     *
+     * @return Commit|null
+     */
     public function getCommit()
     {
         return $this->commit;
     }
-
 
     /**
      * @return \F500\CI\Task\Task[]

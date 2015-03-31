@@ -38,6 +38,6 @@ class GitSubscriber implements EventSubscriberInterface
         $rootDir = isset($config['root_dir']) ? $config['root_dir'] : null;
 
         $commit = GitCommit::load($rootDir);
-        $event->getBuild()->setCommit($commit);
+        $event->getBuild()->initiatedBy($commit);
     }
 }

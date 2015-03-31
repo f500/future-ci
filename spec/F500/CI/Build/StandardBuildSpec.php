@@ -9,6 +9,7 @@ namespace spec\F500\CI\Build;
 
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
+use F500\CI\Vcs\Commit;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -87,6 +88,15 @@ EOT;
     function it_has_tasks(Task $task)
     {
         $this->getTasks()->shouldReturn(array('some_task' => $task));
+    }
+
+    function it_can_optionally_have_a_commit_with_which_it_was_started(Commit $commit)
+    {
+        $this->getCommit()->shouldReturn(null);
+
+        $this->initiatedBy($commit)->shouldReturn($this);
+
+        $this->getCommit()->shouldReturn($commit);
     }
 
     function it_turns_itself_into_json()

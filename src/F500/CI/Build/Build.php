@@ -36,8 +36,20 @@ interface Build
      */
     public function getDate();
 
-    public function setCommit(Commit $commit);
+    /**
+     * Registers information on the commit that initiated this build.
+     *
+     * @param Commit $commit
+     *
+     * @return $this
+     */
+    public function initiatedBy(Commit $commit);
 
+    /**
+     * Returns the commit that initiated this build or null if this is unknown or not applicable.
+     *
+     * @return Commit|null
+     */
     public function getCommit();
 
     /**

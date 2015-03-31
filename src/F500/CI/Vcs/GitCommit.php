@@ -54,6 +54,13 @@ class GitCommit implements Commit
         $this->description = $description;
     }
 
+    /**
+     * Finds the latest commit in the given path and returns it.
+     *
+     * @param string $location
+     *
+     * @return static
+     */
     public static function load($location)
     {
         $process = new Process(

@@ -38,6 +38,14 @@ final class CodeceptionResultParser extends BaseResultParser
             return;
         }
 
+        if (count($this->fetchAllTestresults($report)) == 0) {
+            $result->markTaskAsFailed(
+                $task,
+                'No tests have been executed, please check your test suite configuration'
+            );
+            return;
+        }
+
         $failuresAndErrors = $this->fetchAllFailuresAndErrors($report);
         if (count($failuresAndErrors) > 0) {
             $messages = '';
@@ -90,6 +98,18 @@ final class CodeceptionResultParser extends BaseResultParser
     private function getReportFilename(Task $task, Result $result)
     {
         return $result->getBuildDir($task) . '/report.xml';
+    }
+
+    /**
+     * Returns all test case objects in the given report.
+     *
+     * @param \SimpleXMLElement $report
+     *
+     * @return \SimpleXMLElement[]
+     */
+    private function fetchAllTestresults(\SimpleXMLElement $report)
+    {
+        return $report->xpath('/testsuites/testsuite/testcase');
     }
 
     /**

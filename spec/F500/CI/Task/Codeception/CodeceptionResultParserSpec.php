@@ -102,4 +102,25 @@ XML;
 
         $result->markTaskAsBorked($task, Argument::type('string'))->shouldHaveBeenCalled();
     }
+
+    function it_should_fail_if_there_are_no_tests(Task $task, Result $result, Filesystem $filesystem)
+    {
+        $filesystem->exists(Argument::type('string'))->willReturn(true);
+        $filesystem->readFile(Argument::type('string'))->willReturn(<<<XML
+<?xml version="1.0"?>
+<testsuites/>
+XML
+);
+
+        $result->getBuildDir($task)->willReturn('/path/to/build');
+        $result->getFilesystem()->willReturn($filesystem);
+        $result->markTaskAsFailed($task, Argument::type('string'))->willReturn();
+
+        $this->parse($task, $result);
+
+        $result->markTaskAsFailed(
+            $task,
+            'No tests have been executed, please check your test suite configuration'
+        )->shouldHaveBeenCalled();
+    }
 }

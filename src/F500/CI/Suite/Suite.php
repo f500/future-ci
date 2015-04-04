@@ -71,6 +71,13 @@ interface Suite
     public function getWrapper($cn);
 
     /**
+     * Returns the suite's specific configuration.
+     *
+     * @return string[]
+     */
+    public function getConfig();
+
+    /**
      * @return string
      */
     public function toJson();

@@ -7,8 +7,10 @@
 
 namespace F500\CI\Build;
 
+use F500\CI\Suite\StandardSuite;
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
+use F500\CI\Vcs\Commit;
 
 /**
  * Class StandardBuild
@@ -34,6 +36,11 @@ class StandardBuild implements Build
      * @var Suite
      */
     protected $suite;
+
+    /**
+     * @var Commit|null The commit that initiated this build or null if this is unknown or not applicable.
+     */
+    private $commit;
 
     /**
      * @param Suite  $suite
@@ -71,6 +78,18 @@ class StandardBuild implements Build
     }
 
     /**
+     * Returns the name of the directory where the sources for this build are located.
+     *
+     * @return string
+     */
+    public function getProjectDir()
+    {
+        $config = $this->suite->getConfig();
+
+        return isset($config['root_dir']) ? $config['root_dir'] : null;
+    }
+
+    /**
      * @return string
      */
     public function getSuiteName()
@@ -91,6 +110,30 @@ class StandardBuild implements Build
         }
 
         return $buildDir;
+    }
+
+    /**
+     * Registers information on the commit that initiated this build.
+     *
+     * @param Commit $commit
+     *
+     * @return $this;
+     */
+    public function initiatedBy(Commit $commit)
+    {
+        $this->commit = $commit;
+
+        return $this;
+    }
+
+    /**
+     * Returns the commit that initiated this build or null if this is unknown or not applicable.
+     *
+     * @return Commit|null
+     */
+    public function getCommit()
+    {
+        return $this->commit;
     }
 
     /**

@@ -140,6 +140,16 @@ class StandardSuite implements Suite
     }
 
     /**
+     * Returns the suite's specific configuration.
+     *
+     * @return string[]
+     */
+    public function getConfig()
+    {
+        return $this->config['suite'];
+    }
+
+    /**
      * @return string
      */
     public function toJson()

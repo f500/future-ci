@@ -8,6 +8,7 @@
 namespace F500\CI\Build;
 
 use F500\CI\Suite\Suite;
+use F500\CI\Vcs\Commit;
 
 /**
  * Interface Build
@@ -36,6 +37,22 @@ interface Build
     public function getDate();
 
     /**
+     * Registers information on the commit that initiated this build.
+     *
+     * @param Commit $commit
+     *
+     * @return $this
+     */
+    public function initiatedBy(Commit $commit);
+
+    /**
+     * Returns the commit that initiated this build or null if this is unknown or not applicable.
+     *
+     * @return Commit|null
+     */
+    public function getCommit();
+
+    /**
      * @return string
      */
     public function getSuiteCn();
@@ -44,6 +61,13 @@ interface Build
      * @return string
      */
     public function getSuiteName();
+
+    /**
+     * Returns the name of the directory where the sources for this build are located.
+     *
+     * @return string
+     */
+    public function getProjectDir();
 
     /**
      * @return string

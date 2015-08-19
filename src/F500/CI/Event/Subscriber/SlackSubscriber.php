@@ -80,7 +80,7 @@ class SlackSubscriber implements EventSubscriberInterface
         $messageBuilder = $this->phlack->getMessageBuilder();
 
         $messageBuilder->setText(
-            sprintf('Build [%s] (%s) started.', $build->getCn(), $build->getSuiteName())
+            sprintf('Build [%s] (%s) started. (Reason: %s pushed a commit to %s: "%s")', $build->getCn(), $build->getSuiteName(), $build->getSuiteAuthor(), $build->getSuiteRepo(), $build->getSuiteComment())
         );
 
         $response = $this->phlack->send($messageBuilder->create());
@@ -98,7 +98,7 @@ class SlackSubscriber implements EventSubscriberInterface
         $attachmentBuilder = $messageBuilder->createAttachment();
 
         $messageBuilder->setText(
-            sprintf('Build [%s] (%s) finished.', $build->getCn(), $build->getSuiteName())
+            sprintf('Build [%s] (%s) finished.  (Reason: %s pushed a commit to %s)', $build->getCn(), $build->getSuiteName(), $build->getSuiteAuthor(), $build->getSuiteRepo())
         );
 
         $buildResult = $result->getBuildStatus();

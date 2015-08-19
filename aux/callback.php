@@ -69,6 +69,9 @@ if (empty($payload['head_commit']['id'])) {
 }
 
 $branch = $payload['head_commit']['id'];
+$comment = $payload['head_commit']['message'];
+$author = $payload['head_commit']['author']['name'];
+$repo = $payload['repository']['name'];
 
 // push job
 
@@ -81,7 +84,7 @@ if (!$fp) {
 
 $data = json_encode(array(
     'suite'  => $suite,
-    'params' => array('branch' => $branch)
+    'params' => array('branch' => $branch, 'comment'=>$comment, 'author'=>$author, 'repo'=>$repo)
 ));
 
 if (function_exists('mb_strlen')) {

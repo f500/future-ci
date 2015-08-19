@@ -173,4 +173,12 @@ class StandardSuite implements Suite
         }
         return $this->config['repo'];
     }
+
+    public function getCommithash($length = 40)
+    {
+        if (!isset($this->config['branch'])) {
+            return '';
+        }
+        return substr($this->config['branch'], 0, $length);
+    }
 }

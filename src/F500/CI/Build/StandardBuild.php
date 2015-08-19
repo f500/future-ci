@@ -123,4 +123,9 @@ class StandardBuild implements Build
     {
         return $this->suite->getRepo();
     }
+
+    public function getSuiteCommithash($length)
+    {
+        return $this->suite->getCommithash($length);
+    }
 }

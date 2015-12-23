@@ -59,4 +59,25 @@ interface Build
      * @return string
      */
     public function toJson();
+
+    /**
+     * @return string
+     */
+    public function getSuiteComment();
+
+    /**
+     * @return string
+     */
+    public function getSuiteAuthor();
+
+    /**
+     * @return string
+     */
+    public function getSuiteRepo();
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public function getSuiteCommithash($length);
 }

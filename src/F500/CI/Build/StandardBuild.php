@@ -108,4 +108,24 @@ class StandardBuild implements Build
     {
         return $this->suite->toJson();
     }
+
+    public function getSuiteComment()
+    {
+        return $this->suite->getComment();
+    }
+
+    public function getSuiteAuthor()
+    {
+        return $this->suite->getAuthor();
+    }
+
+    public function getSuiteRepo()
+    {
+        return $this->suite->getRepo();
+    }
+
+    public function getSuiteCommithash($length)
+    {
+        return $this->suite->getCommithash($length);
+    }
 }

@@ -149,4 +149,36 @@ class StandardSuite implements Suite
             JSON_PRETTY_PRINT
         );
     }
+
+    public function getComment()
+    {
+        if (!isset($this->config['comment'])) {
+            return '';
+        }
+        return $this->config['comment'];
+    }
+
+    public function getAuthor()
+    {
+        if (!isset($this->config['author'])) {
+            return '';
+        }
+        return $this->config['author'];
+    }
+
+    public function getRepo()
+    {
+        if (!isset($this->config['repo'])) {
+            return '';
+        }
+        return $this->config['repo'];
+    }
+
+    public function getCommithash($length = 40)
+    {
+        if (!isset($this->config['branch'])) {
+            return '';
+        }
+        return substr($this->config['branch'], 0, $length);
+    }
 }

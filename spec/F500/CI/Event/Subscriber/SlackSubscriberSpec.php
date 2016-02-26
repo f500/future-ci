@@ -49,10 +49,11 @@ class SlackSubscriberSpec extends ObjectBehavior
         $task->getName()->willReturn(self::TASK_NAME);
         $build->getCn()->willReturn('a1b2c3d4');
         $build->getSuiteName()->willReturn('Some Suite');
+        $build->getSuiteRepo()->willReturn('future-ci');
+        $build->getSuiteAuthor()->willReturn('Remi Woler');
+        $build->getSuiteCommithash(8)->willReturn('f0e266b1');
+        $build->getSuiteComment()->willReturn('Some comment');
         $build->getTasks()->willReturn(array('some_task' => $task));
-
-//        $task->getCn()->willReturn('some_task');
-//        $task->getName()->willReturn('Some Task');
 
         $phlack->getMessageBuilder()->willReturn($mb);
         $phlack->send(Argument::type('Crummy\Phlack\Message\Message'))->willReturn($response);

@@ -36,11 +36,18 @@ class CommandExecutor
     /**
      * @param Command         $command
      * @param LoggerInterface $logger
+     *
      * @return bool
      */
     public function execute(Command $command, LoggerInterface $logger)
     {
-        $process = $this->processFactory->createProcess($command->getArgs(), $command->getCwd(), $command->getEnv());
+        $process = $this->processFactory->createProcess(
+            $command->getArgs(),
+            $command->getCwd(),
+            $command->getEnv(),
+            null,
+            1200
+        );
 
         $logger->log(LogLevel::INFO, sprintf('[%s] Executing: %s', $command->getId(), $command->stringify(true)));
         $logger->log(LogLevel::DEBUG, sprintf('[%s] Raw command: %s', $command->getId(), $process->getCommandLine()));
@@ -57,11 +64,11 @@ class CommandExecutor
                 $process->isSuccessful() ? 'Succeeded' : 'Failed',
                 $command->stringify(true)
             ),
-            array(
+            [
                 'rc'  => $process->getExitCode(),
                 'out' => $this->formatOutput($process->getOutput()),
-                'err' => $this->formatOutput($process->getErrorOutput())
-            )
+                'err' => $this->formatOutput($process->getErrorOutput()),
+            ]
         );
 
         return $process->isSuccessful();
@@ -69,6 +76,7 @@ class CommandExecutor
 
     /**
      * @param string $errors
+     *
      * @return string|array
      */
     protected function formatOutput($errors)

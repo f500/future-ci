@@ -62,8 +62,7 @@ class QueueWorkerCommand extends QueueCommand
                         $args[] = "{$key}:{$value}";
                     }
                 }
-
-                $process = $processFactory->createProcess($args, $rootDir);
+                $process = $processFactory->createProcess($args, $rootDir, null, null, 1200);
                 $process->run(
                     function ($type, $buffer) use ($output) {
                         $output->write($buffer, false, OutputInterface::OUTPUT_RAW);

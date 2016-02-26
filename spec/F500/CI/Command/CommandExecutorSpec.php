@@ -84,8 +84,13 @@ class CommandExecutorSpec extends ObjectBehavior
         $logger->log(Argument::type('string'), Argument::type('string'))->willReturn(true);
         $logger->log(Argument::type('string'), Argument::type('string'), Argument::type('array'))->willReturn(true);
 
-        $processFactory->createProcess(Argument::type('array'), Argument::type('string'), Argument::type('array'))
-            ->willReturn($process);
+        $processFactory->createProcess(
+            Argument::type('array'),
+            Argument::type('string'),
+            Argument::type('array'),
+            null,
+            Argument::type('int')
+        )->willReturn($process);
 
         $process->run()->willReturn();
         $process->getCommandLine()->willReturn('ls -l');

@@ -68,13 +68,13 @@ if (empty($payload['head_commit']['id'])) {
     exit(1);
 }
 
-$branch     = $payload['head_commit']['id'];
+$branch     = str_replace('refs/heads','',$payload['ref']);
+$compare    = $payload['compare'];
 $comment    = $payload['head_commit']['message'];
 $author     = $payload['head_commit']['author']['name'];
 $repo       = $payload['repository']['name'];
 
 // push job
-
 $fp = fsockopen('127.0.0.1', 11300, $errno, $errstr);
 
 if (!$fp) {
@@ -86,6 +86,7 @@ $data = json_encode(array(
     'suite'  => $suite,
     'params' => array(
         'branch'  => $branch,
+        'compare' => $compare,
         'comment' => $comment,
         'author'  => $author,
         'repo'    => $repo
@@ -100,7 +101,7 @@ if (function_exists('mb_strlen')) {
 
 fwrite($fp, sprintf("use %s\r\n", $tube));
 $useOutput = fread($fp, 512);
-fwrite($fp, sprintf("put 1024 0 900 %d\r\n%s\r\n", $dataLength, $data));
+fwrite($fp, sprintf("put 1024 0 1200 %d\r\n%s\r\n", $dataLength, $data));
 $putOutput = fread($fp, 512);
 
 fclose($fp);

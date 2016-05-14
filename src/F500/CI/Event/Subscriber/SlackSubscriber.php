@@ -48,12 +48,22 @@ class SlackSubscriber implements EventSubscriberInterface
     );
 
     /**
+     * @var array
+     */
+    protected $resultEmojiMap = array(
+        Result::PASSED => ':tada:',
+        Result::FAILED => ':unamused:',
+        Result::BORKED => ':astonished:'
+    );
+
+
+    /**
      * @return array
      */
     public static function getSubscribedEvents()
     {
         return array(
-            Events::BuildStarted  => array(
+            Events::BuildStarted => array(
                 array('onBuildStarted', 10)
             ),
             Events::BuildFinished => array(
@@ -80,7 +90,15 @@ class SlackSubscriber implements EventSubscriberInterface
         $messageBuilder = $this->phlack->getMessageBuilder();
 
         $messageBuilder->setText(
-            sprintf('Build [%s] (%s) started. (Reason: %s pushed %s to %s: "%s")', $build->getCn(), $build->getSuiteName(), $build->getSuiteAuthor(), $build->getSuiteCommithash(8), $build->getSuiteRepo(), $build->getSuiteComment())
+            sprintf(
+                "*%1\$s* build [%2\$s] started.\n%3\$s pushed *%4\$s* to *%5\$s*\n\n%6\$s\n```%7\$s```",
+                $build->getSuiteName(),
+                $build->getCn(),
+                $build->getAuthor(),
+                $build->getBranch(),
+                $build->getRepo(),
+                $build->getCompare(),
+                $build->getComment())
         );
 
         $response = $this->phlack->send($messageBuilder->create());
@@ -91,22 +109,30 @@ class SlackSubscriber implements EventSubscriberInterface
      */
     public function onBuildFinished(BuildRunEvent $event)
     {
-        $build  = $event->getBuild();
+        $build = $event->getBuild();
         $result = $event->getResult();
 
-        $messageBuilder    = $this->phlack->getMessageBuilder();
+        $messageBuilder = $this->phlack->getMessageBuilder();
         $attachmentBuilder = $messageBuilder->createAttachment();
 
+        $buildResult = $result->getBuildStatus();
         $messageBuilder->setText(
-            sprintf('Build [%s] (%s) finished.  (Reason: %s pushed %s to %s)', $build->getCn(), $build->getSuiteName(), $build->getSuiteAuthor(), $build->getSuiteCommithash(8), $build->getSuiteRepo())
+            sprintf(
+                "*%1\$s* build [%2\$s] finished: http://ci.future500.nl/build/%1\$s/%2\$s\n%3\$s pushed *%4\$s* to *%5\$s*",
+                $build->getSuiteName(),
+                $build->getCn(),
+                $build->getAuthor(),
+                $build->getBranch(),
+                $build->getRepo()
+            )
         );
 
-        $buildResult = $result->getBuildStatus();
-        $color       = $this->resultColorMap[$buildResult];
-        $text        = sprintf(
-            '%s in %s.',
+        $color = $this->resultColorMap[$buildResult];
+        $text = sprintf(
+            "%s in %s\n\n%s",
             $this->resultTextMap[$buildResult],
-            $this->stringifyElapsedTime($result->getElapsedBuildTime())
+            $this->stringifyElapsedTime($result->getElapsedBuildTime()),
+            $this->resultEmojiMap[$buildResult]
         );
 
         $attachmentBuilder
@@ -142,22 +168,22 @@ class SlackSubscriber implements EventSubscriberInterface
         $formatted = array();
 
         if ($milliseconds >= 86400000) {
-            $days        = floor($milliseconds / 86400000);
+            $days = floor($milliseconds / 86400000);
             $formatted[] = $days . ' day' . ($days == 1 ? '' : 's');
             $milliseconds %= 86400000;
         }
         if ($milliseconds >= 3600000) {
-            $hours       = floor($milliseconds / 3600000);
+            $hours = floor($milliseconds / 3600000);
             $formatted[] = $hours . ' hour' . ($hours == 1 ? '' : 's');
             $milliseconds %= 3600000;
         }
         if ($milliseconds >= 60000) {
-            $minutes     = floor($milliseconds / 60000);
+            $minutes = floor($milliseconds / 60000);
             $formatted[] = $minutes . ' minute' . ($minutes == 1 ? '' : 's');
             $milliseconds %= 60000;
         }
         if ($milliseconds >= 1000) {
-            $seconds     = floor($milliseconds / 1000);
+            $seconds = floor($milliseconds / 1000);
             $formatted[] = $seconds . ' second' . ($seconds == 1 ? '' : 's');
             $milliseconds %= 1000;
         }

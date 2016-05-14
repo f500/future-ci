@@ -13,6 +13,7 @@ use F500\CI\Event\Subscriber\SlackSubscriber;
 use F500\CI\Event\Subscriber\TimerSubscriber;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -39,17 +40,23 @@ class RunCommand extends Command
                 'params',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
                 'Extra parameters for the suite. (key:value)'
+            )
+            ->addOption(
+                'build_info',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Extra infornation for the build. (base64 encoded json)'
             );
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $dispatcher = $this->getService('dispatcher');
-        $phlack     = $this->getService('phlack');
+        $phlack = $this->getService('phlack');
 
         $dispatcher->addSubscriber(new SlackSubscriber($phlack));
         $dispatcher->addSubscriber(new ConsoleOutputSubscriber($output));
@@ -57,7 +64,7 @@ class RunCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      * @param OutputInterface $output
      * @return void
      * @throws \RuntimeException

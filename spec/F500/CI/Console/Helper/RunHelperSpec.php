@@ -46,7 +46,9 @@ class RunHelperSpec extends ObjectBehavior
         $container->offsetGet('filesystem')->willReturn($filesystem);
 
         $input->getArgument('suite')->willReturn('some_suite.yml');
-        $input->getArgument('params')->willReturn(array());
+        $input->getArgument('params')->willReturn([]);
+        
+        $input->getOption('build_info')->willReturn(null);
 
         $configurator->loadConfig(Argument::type('string'), null, Argument::type('array'))
             ->willReturn(
@@ -57,7 +59,7 @@ class RunHelperSpec extends ObjectBehavior
             );
         $configurator->createSuite(Argument::type('string'), Argument::type('string'), Argument::type('array'))
             ->willReturn($suite);
-        $configurator->createBuild(Argument::type('string'), Argument::type('F500\CI\Suite\Suite'))
+        $configurator->createBuild(Argument::type('string'), Argument::type('F500\CI\Suite\Suite'), Argument::type('array'))
             ->willReturn($build);
 
         $build->getCn()->willReturn('a1b2c3d4');
@@ -76,8 +78,11 @@ class RunHelperSpec extends ObjectBehavior
         $this->shouldHaveType('F500\CI\Console\Helper\RunHelper');
     }
 
-    function it_runs_a_build(InputInterface $input, OutputInterface $output, BuildRunner $buildRunner)
-    {
+    function it_runs_a_build_without_build_info(
+        InputInterface $input,
+        OutputInterface $output,
+        BuildRunner $buildRunner
+    ) {
         $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
             ->willReturn(true)
             ->shouldBeCalled();
@@ -89,6 +94,35 @@ class RunHelperSpec extends ObjectBehavior
             ->shouldBeCalled();
 
         $this->execute($input, $output);
+    }
+
+    function it_runs_a_build_with_correct_build_info(InputInterface $input, OutputInterface $output, BuildRunner $buildRunner)
+    {
+        /**
+         * Build info is
+         * ['aap' => 'noot']
+         */
+        $input->getOption('build_info')->willReturn('eyJhYXAiOiJub290In0=');
+
+        $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
+            ->willReturn(true)
+            ->shouldBeCalled();
+        $buildRunner->run(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->willReturn(true)
+            ->shouldBeCalled();
+        $buildRunner->cleanup(Argument::type('F500\CI\Build\Build'), Argument::type('F500\CI\Build\Result'))
+            ->willReturn(true)
+            ->shouldBeCalled();
+
+        $this->execute($input, $output);
+    }
+
+    function it_fails_with_unencoded_build_info(InputInterface $input, OutputInterface $output)
+    {
+        $input->getOption('build_info')->willReturn('not properly encoded');
+        
+        $this->shouldThrow(\RuntimeException::class)
+            ->during('execute', [$input, $output]);
     }
 
     function it_still_cleans_a_build_up_if_initialize_failed(

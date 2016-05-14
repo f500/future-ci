@@ -44,7 +44,10 @@ class ConfiguratorSpec extends ObjectBehavior
     ) {
         $stringArg = Argument::type('string');
 
-        $buildFactory->createBuild($stringArg, Argument::type('F500\CI\Suite\Suite'), $stringArg)->willReturn($build);
+        $buildFactory->createBuild(
+            $stringArg, Argument::type('F500\CI\Suite\Suite'), $stringArg, Argument::type('array')
+        )->willReturn($build);
+
         $suiteFactory->createSuite($stringArg, $stringArg, Argument::type('array'))->willReturn($suite);
         $taskFactory->createTask($stringArg, $stringArg)->willReturn($task);
         $resultParserFactory->createResultParser($stringArg, $stringArg)->willReturn($resultParser);
@@ -691,7 +694,7 @@ class ConfiguratorSpec extends ObjectBehavior
 
     function it_creates_a_build(Suite $suite)
     {
-        $this->createBuild('F500\CI\Build\StandardBuild', $suite)
-            ->shouldReturnAnInstanceOf('F500\CI\Build\Build');
+        $this->createBuild('F500\CI\Build\StandardBuild', $suite, [])
+             ->shouldReturnAnInstanceOf('F500\CI\Build\Build');
     }
 }

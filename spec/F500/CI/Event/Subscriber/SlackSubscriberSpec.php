@@ -49,6 +49,7 @@ class SlackSubscriberSpec extends ObjectBehavior
         $task->getName()->willReturn(self::TASK_NAME);
         $build->getCn()->willReturn('a1b2c3d4');
         $build->getSuiteName()->willReturn('Some Suite');
+        $build->getSuiteCn()->willReturn('some-suite');
         $build->getRepo()->willReturn('future-ci');
         $build->getAuthor()->willReturn('Remi Woler');
         $build->getBranch()->willReturn('feature/some-shiny-feature');

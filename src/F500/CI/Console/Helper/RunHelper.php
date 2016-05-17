@@ -62,7 +62,7 @@ class RunHelper
         }
 
         $buildInfo = array();
-        foreach ($this->unpackBuildInfo($input->getOption('build_info')) as $name => $value) {
+        foreach ($this->unpackBuildInfo($input->getOption('build-info')) as $name => $value) {
             $buildInfo[$name] = $value;
         }
 

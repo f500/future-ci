@@ -42,7 +42,7 @@ class RunCommand extends Command
                 'Extra parameters for the suite. (key:value)'
             )
             ->addOption(
-                'build_info',
+                'build-info',
                 'b',
                 InputOption::VALUE_REQUIRED,
                 'Extra infornation for the build. (base64 encoded json)'

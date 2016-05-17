@@ -69,7 +69,7 @@ class QueueWorkerCommand extends QueueCommand
                 $args = array('exec', 'app/console', '--ansi', 'run', $payload['suite']);
 
                 if (!empty($payload['params'])) {
-                    $args[] = "--build_info " . base64_encode(json_encode($payload['params']));
+                    $args[] = "--build-info " . base64_encode(json_encode($payload['params']));
                 }
                 
                 $process = $processFactory->createProcess($args, $rootDir, null, null, 1200);

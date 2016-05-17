@@ -48,7 +48,7 @@ class RunHelperSpec extends ObjectBehavior
         $input->getArgument('suite')->willReturn('some_suite.yml');
         $input->getArgument('params')->willReturn([]);
         
-        $input->getOption('build_info')->willReturn(null);
+        $input->getOption('build-info')->willReturn(null);
 
         $configurator->loadConfig(Argument::type('string'), null, Argument::type('array'))
             ->willReturn(
@@ -102,7 +102,7 @@ class RunHelperSpec extends ObjectBehavior
          * Build info is
          * ['aap' => 'noot']
          */
-        $input->getOption('build_info')->willReturn('eyJhYXAiOiJub290In0=');
+        $input->getOption('build-info')->willReturn('eyJhYXAiOiJub290In0=');
 
         $buildRunner->initialize(Argument::type('F500\CI\Build\Build'))
             ->willReturn(true)
@@ -119,7 +119,7 @@ class RunHelperSpec extends ObjectBehavior
 
     function it_fails_with_unencoded_build_info(InputInterface $input, OutputInterface $output)
     {
-        $input->getOption('build_info')->willReturn('not properly encoded');
+        $input->getOption('build-info')->willReturn('not properly encoded');
         
         $this->shouldThrow(\RuntimeException::class)
             ->during('execute', [$input, $output]);

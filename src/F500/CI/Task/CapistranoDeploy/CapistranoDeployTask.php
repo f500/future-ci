@@ -49,8 +49,8 @@ class CapistranoDeployTask extends BaseTask
         if (empty($options['stage'])) {
             throw new \RuntimeException(sprintf('Task "%s" has no "stage" configured.', $this->getCn()));
         }
-        if (empty($options['branch'])) {
-            throw new \RuntimeException(sprintf('Task "%s" has no "branch" configured.', $this->getCn()));
+        if (empty($options['commit'])) {
+            throw new \RuntimeException(sprintf('Task "%s" has no "commit" configured.', $this->getCn()));
         }
 
         $command = $commandFactory->createCommand();
@@ -60,7 +60,7 @@ class CapistranoDeployTask extends BaseTask
         $command->addArg('cap');
         $command->addArg($options['stage']);
         $command->addArg('deploy');
-        $command->addArg('branch=' . $options['branch']);
+        $command->addArg('commit=' . $options['commit']);
 
         if (!empty($options['cwd'])) {
             $command->setCwd($options['cwd']);
@@ -84,7 +84,7 @@ class CapistranoDeployTask extends BaseTask
             'cwd'    => '',
             'env'    => array(),
             'bin'    => '/usr/bin/env bundle',
-            'branch' => ''
+            'commit' => ''
         );
     }
 }

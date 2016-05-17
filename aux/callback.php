@@ -68,7 +68,9 @@ if (empty($payload['head_commit']['id'])) {
     exit(1);
 }
 
-$branch  = str_replace('refs/heads', '', $payload['ref']);
+$commit  = $payload['head_commit']['id'];
+
+$branch  = str_replace('refs/heads/', '', $payload['ref']);
 $compare = $payload['compare'];
 $comment = $payload['head_commit']['message'];
 $author  = $payload['head_commit']['author']['name'];
@@ -84,9 +86,9 @@ if (!$fp) {
 
 $data = json_encode(
     [
-        'suite'             => $suite,
-        'params'            => [
-            'branch'  => $branch,
+        'suite'      => $suite,
+        'params'     => [
+            'commit' => $commit,
         ],
         'build-info' => [
             'branch'  => $branch,

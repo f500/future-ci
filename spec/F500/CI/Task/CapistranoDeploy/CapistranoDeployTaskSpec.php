@@ -36,7 +36,7 @@ class CapistranoDeployTaskSpec extends TaskSpec
             'cwd'    => '',
             'env'    => array(),
             'bin'    => '/usr/bin/env bundle',
-            'branch' => ''
+            'commit' => ''
         );
 
         $this->getOptions()->shouldReturn($options);
@@ -48,12 +48,12 @@ class CapistranoDeployTaskSpec extends TaskSpec
             'cwd'    => '',
             'env'    => array(),
             'bin'    => '/usr/bin/env bundle',
-            'branch' => 'develop',
+            'commit' => 'develop',
             'foo'    => 'bar'
         );
 
         $newoptions = array(
-            'branch' => 'develop',
+            'commit' => 'develop',
             'foo'    => 'bar'
         );
 
@@ -68,7 +68,7 @@ class CapistranoDeployTaskSpec extends TaskSpec
     ) {
         Doubler::get()->stubCommand($command, $commandFactory);
 
-        $this->setOptions(array('stage' => 'testing', 'branch' => 'testing'));
+        $this->setOptions(array('stage' => 'testing', 'commit' => 'testing'));
 
         $commands = $this->buildCommands($build, $commandFactory);
         $commands->shouldBe(array($command));
@@ -80,7 +80,7 @@ class CapistranoDeployTaskSpec extends TaskSpec
                 'cap',
                 'testing',
                 'deploy',
-                'branch=testing'
+                'commit=testing'
             )
         );
     }

@@ -46,7 +46,7 @@ class QueueWorkerCommand extends QueueCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $app = $this->getContainer();
+        $app     = $this->getContainer();
         $rootDir = $app['root_dir'];
 
         /** @var \F500\CI\Command\Process\ProcessFactory $processFactory */
@@ -61,17 +61,27 @@ class QueueWorkerCommand extends QueueCommand
             $payload = json_decode($job->getData(), true);
 
             if (!$this->isPayloadValid($payload)) {
-                $output->writeln(sprintf('Buried job <comment>%s</comment> because of an invalid payload.',
-                    $job->getId()));
+                $output->writeln(
+                    sprintf(
+                        'Buried job <comment>%s</comment> because of an invalid payload.',
+                        $job->getId()
+                    )
+                );
                 $this->pheanstalk->bury($job);
 
             } else {
                 $args = array('exec', 'app/console', '--ansi', 'run', $payload['suite']);
 
                 if (!empty($payload['params'])) {
-                    $args[] = "--build-info " . base64_encode(json_encode($payload['params']));
+                    foreach ($payload['params'] as $key => $value) {
+                        $args[] = "'{$key}:{$value}'";
+                    }
                 }
-                
+
+                if (!empty($payload['build-info'])) {
+                    $args[] = "--build-info " . base64_encode(json_encode($payload['build-info']));
+                }
+
                 $process = $processFactory->createProcess($args, $rootDir, null, null, 1200);
                 $process->run(
                     function ($type, $buffer) use ($output) {

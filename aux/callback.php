@@ -14,7 +14,7 @@ $repoToConfMap = array(
         'suite'  => 'poolz.yml',
         'secret' => 'secret'
     ),
-    'poolz-app' => array(
+    'poolz-app'    => array(
         'suite'  => 'poolz.yml',
         'secret' => 'secret'
     )
@@ -68,11 +68,11 @@ if (empty($payload['head_commit']['id'])) {
     exit(1);
 }
 
-$branch     = str_replace('refs/heads','',$payload['ref']);
-$compare    = $payload['compare'];
-$comment    = $payload['head_commit']['message'];
-$author     = $payload['head_commit']['author']['name'];
-$repo       = $payload['repository']['name'];
+$branch  = str_replace('refs/heads', '', $payload['ref']);
+$compare = $payload['compare'];
+$comment = $payload['head_commit']['message'];
+$author  = $payload['head_commit']['author']['name'];
+$repo    = $payload['repository']['name'];
 
 // push job
 $fp = fsockopen('127.0.0.1', 11300, $errno, $errstr);
@@ -82,16 +82,21 @@ if (!$fp) {
     exit(1);
 }
 
-$data = json_encode(array(
-    'suite'  => $suite,
-    'params' => array(
-        'branch'  => $branch,
-        'compare' => $compare,
-        'comment' => $comment,
-        'author'  => $author,
-        'repo'    => $repo
-    )
-));
+$data = json_encode(
+    [
+        'suite'             => $suite,
+        'params'            => [
+            'branch'  => $branch,
+        ],
+        'build-info' => [
+            'branch'  => $branch,
+            'compare' => $compare,
+            'comment' => $comment,
+            'author'  => $author,
+            'repo'    => $repo
+        ]
+    ]
+);
 
 if (function_exists('mb_strlen')) {
     $dataLength = mb_strlen($data, '8bit');

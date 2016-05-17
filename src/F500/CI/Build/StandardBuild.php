@@ -34,16 +34,22 @@ class StandardBuild implements Build
      * @var Suite
      */
     protected $suite;
+    /**
+     * @var BuildInfo
+     */
+    private $buildInfo;
 
     /**
-     * @param Suite  $suite
+     * @param Suite $suite
      * @param string $buildsDir
+     * @param BuildInfo $buildInfo
      */
-    public function __construct(Suite $suite, $buildsDir)
+    public function __construct(Suite $suite, $buildsDir, BuildInfo $buildInfo)
     {
-        $this->date     = new \DateTimeImmutable();
-        $this->suite    = $suite;
-        $this->buildDir = sprintf('%s/%s/%s', $buildsDir, $this->getSuiteCn(), $this->getCn());
+        $this->date      = new \DateTimeImmutable();
+        $this->suite     = $suite;
+        $this->buildDir  = sprintf('%s/%s/%s', $buildsDir, $this->getSuiteCn(), $this->getCn());
+        $this->buildInfo = $buildInfo;
     }
 
     /**
@@ -109,23 +115,29 @@ class StandardBuild implements Build
         return $this->suite->toJson();
     }
 
-    public function getSuiteComment()
+    public function getAuthor()
     {
-        return $this->suite->getComment();
+        return $this->buildInfo->getAuthor();
     }
 
-    public function getSuiteAuthor()
+    public function getBranch()
     {
-        return $this->suite->getAuthor();
+        return $this->buildInfo->getBranch();
     }
 
-    public function getSuiteRepo()
+    public function getComment()
     {
-        return $this->suite->getRepo();
+        return $this->buildInfo->getComment();
     }
 
-    public function getSuiteCommithash($length)
+    public function getCompare()
     {
-        return $this->suite->getCommithash($length);
+        return $this->buildInfo->getCompare();
     }
+
+    public function getRepo()
+    {
+        return $this->buildInfo->getRepo();
+    }
+
 }

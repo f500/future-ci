@@ -75,24 +75,4 @@ interface Suite
      */
     public function toJson();
 
-    /**
-     * @return string
-     */
-    public function getComment();
-
-    /**
-     * @return string
-     */
-    public function getAuthor();
-
-    /**
-     * @return string
-     */
-    public function getRepo();
-
-    /**
-     * @param int $length
-     * @return string
-     */
-    public function getCommithash($length);
 }

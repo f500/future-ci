@@ -7,6 +7,7 @@
 
 namespace spec\F500\CI\Build;
 
+use F500\CI\Build\BuildInfo;
 use F500\CI\Suite\Suite;
 use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
@@ -35,7 +36,7 @@ class StandardBuildSpec extends ObjectBehavior
 }
 EOT;
 
-    function let(Suite $suite, Task $task)
+    function let(Suite $suite, Task $task, BuildInfo $buildInfo)
     {
         $suite->getCn()->willReturn('some_suite');
         $suite->getName()->willReturn('Some Suite');
@@ -43,7 +44,7 @@ EOT;
         $suite->toJson()->willReturn($this->suiteJson);
 
         /** @noinspection PhpParamsInspection */
-        $this->beConstructedWith($suite, '/path/to/builds');
+        $this->beConstructedWith($suite, '/path/to/builds', $buildInfo);
     }
 
     function it_is_initializable()

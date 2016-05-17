@@ -61,6 +61,11 @@ class RunHelper
             $params[$split[0]] = $split[1];
         }
 
+        $buildInfo = array();
+        foreach ($this->unpackBuildInfo($input->getOption('build-info')) as $name => $value) {
+            $buildInfo[$name] = $value;
+        }
+
         try {
             $config = $configurator->loadConfig($filename, null, $params);
         } catch (\InvalidArgumentException $e) {
@@ -70,7 +75,7 @@ class RunHelper
         }
 
         $suite = $configurator->createSuite($config['suite']['class'], $config['suite']['cn'], $config);
-        $build = $configurator->createBuild($config['build']['class'], $suite);
+        $build = $configurator->createBuild($config['build']['class'], $suite, $buildInfo);
 
         $result = new Result($build, $filesystem);
 
@@ -83,5 +88,22 @@ class RunHelper
         if (!$buildRunner->cleanup($build, $result)) {
             $output->writeln("<fg=magenta>\xE2\x9C\x98 Cleaning up build failed!</fg=magenta>");
         }
+    }
+
+    private function unpackBuildInfo($encodedBuildInfo)
+    {
+        if ($encodedBuildInfo === null) {
+            return [];
+        }
+
+        if (!$encodedBuildInfo = base64_decode($encodedBuildInfo)) {
+            throw new \RuntimeException(sprintf('Build info should be base64 encoded.', $encodedBuildInfo));
+        }
+
+        if (!$encodedBuildInfo = json_decode($encodedBuildInfo)) {
+            throw new \RuntimeException(sprintf('Build info is not valid json.', $encodedBuildInfo));
+        }
+
+        return $encodedBuildInfo;
     }
 }

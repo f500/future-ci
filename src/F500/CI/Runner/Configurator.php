@@ -183,12 +183,13 @@ class Configurator
 
     /**
      * @param string $class
-     * @param Suite  $suite
+     * @param Suite $suite
+     * @param array $buildInfo
      * @return Build
      */
-    public function createBuild($class, Suite $suite)
+    public function createBuild($class, Suite $suite, array $buildInfo)
     {
-        $build = $this->buildFactory->createBuild($class, $suite, $this->buildsDir);
+        $build = $this->buildFactory->createBuild($class, $suite, $this->buildsDir, $buildInfo);
 
         return $build;
     }

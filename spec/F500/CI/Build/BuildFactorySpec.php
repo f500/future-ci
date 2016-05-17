@@ -28,7 +28,7 @@ class BuildFactorySpec extends ObjectBehavior
 
     function it_creates_a_build(Suite $suite)
     {
-        $build = $this->createBuild('F500\CI\Build\StandardBuild', $suite, '/path/to/builds');
+        $build = $this->createBuild('F500\CI\Build\StandardBuild', $suite, '/path/to/builds', []);
 
         $build->shouldHaveType('F500\CI\Build\StandardBuild');
         $build->shouldImplement('F500\CI\Build\Build');
@@ -38,7 +38,7 @@ class BuildFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'createBuild',
-            array('NonExistent\Build', $suite, '/path/to/builds')
+            array('NonExistent\Build', $suite, '/path/to/builds', [])
         );
     }
 
@@ -46,7 +46,7 @@ class BuildFactorySpec extends ObjectBehavior
     {
         $this->shouldThrow('InvalidArgumentException')->during(
             'createBuild',
-            array('StdClass', $suite, '/path/to/builds')
+            array('StdClass', $suite, '/path/to/builds', [])
         );
     }
 }

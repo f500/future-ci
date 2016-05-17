@@ -20,10 +20,11 @@ interface Build
 {
 
     /**
-     * @param Suite  $suite
+     * @param Suite $suite
      * @param string $buildsDir
+     * @param $buildInfo
      */
-    public function __construct(Suite $suite, $buildsDir);
+    public function __construct(Suite $suite, $buildsDir, BuildInfo $buildInfo);
 
     /**
      * @return string
@@ -63,21 +64,27 @@ interface Build
     /**
      * @return string
      */
-    public function getSuiteComment();
+    public function getAuthor();
 
     /**
      * @return string
      */
-    public function getSuiteAuthor();
+    public function getBranch();
 
     /**
      * @return string
      */
-    public function getSuiteRepo();
+    public function getComment();
 
     /**
-     * @param int $length
      * @return string
      */
-    public function getSuiteCommithash($length);
+    public function getCompare();
+
+    /**
+     * @return string
+     */
+    public function getRepo();
+
+
 }

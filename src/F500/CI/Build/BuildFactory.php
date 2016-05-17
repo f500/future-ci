@@ -21,18 +21,18 @@ class BuildFactory
 
     /**
      * @param string $class
-     * @param Suite  $suite
+     * @param Suite $suite
      * @param string $buildsDir
+     * @param array $buildInfo
      * @return Build
-     * @throws \InvalidArgumentException
      */
-    public function createBuild($class, Suite $suite, $buildsDir)
+    public function createBuild($class, Suite $suite, $buildsDir, array $buildInfo)
     {
         if (!class_exists($class)) {
             throw new \InvalidArgumentException(sprintf('Cannot create build, class "%s" does not exist.', $class));
         }
-
-        $build = new $class($suite, $buildsDir);
+        
+        $build = new $class($suite, $buildsDir, new BuildInfo($buildInfo));
 
         if (!$build instanceof Build) {
             throw new \InvalidArgumentException(

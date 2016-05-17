@@ -118,8 +118,9 @@ class SlackSubscriber implements EventSubscriberInterface
         $buildResult = $result->getBuildStatus();
         $messageBuilder->setText(
             sprintf(
-                "*%1\$s* build [%2\$s] finished: http://ci.future500.nl/build/%1\$s/%2\$s\n%3\$s pushed *%4\$s* to *%5\$s*",
+                "*%1\$s* build [%3\$s] finished: http://ci.future500.nl/build/%2\$s/%3\$s\n%4\$s pushed *%5\$s* to *%6\$s*",
                 $build->getSuiteName(),
+                $build->getSuiteCn(),
                 $build->getCn(),
                 $build->getAuthor(),
                 $build->getBranch(),

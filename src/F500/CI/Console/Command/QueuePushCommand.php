@@ -61,7 +61,7 @@ class QueuePushCommand extends QueueCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The time to run for this job (in seconds).',
-                900
+                1200
             );
     }
 

@@ -10,13 +10,13 @@
 $tube = 'ci-builds';
 
 $repoToConfMap = array(
-    'gh-hook-test' => array(
-        'suite'  => 'poolz.yml',
-        'secret' => 'secret'
+    'poolz-app' => array(
+        'suite'  => '/home/ramon/poolz-app/future-ci.yml',
+        'secret' => 'Y,Z8KRG8i(g$Q^86'
     ),
-    'poolz-app'    => array(
-        'suite'  => 'poolz.yml',
-        'secret' => 'secret'
+    'sportcity-api' => array(
+        'suite'  => '/home/ramon/sportcity-api/future-ci.yml',
+        'secret' => 'Y,Z8KRG8i(g$Q^86'
     )
 );
 
@@ -63,20 +63,21 @@ if ($generatedSignature !== $githubSignature) {
 
 // find commit (branch)
 
-if (empty($payload['head_commit']['id'])) {
+if (empty($payload['pull_request']['head']['sha'])) {
     echo sprintf('[FAILED] %s: no commit-hash found', $payload['repository']['name']);
     exit(1);
 }
 
-$commit  = $payload['head_commit']['id'];
+$commit  = $payload['pull_request']['head']['sha'];
 
-$branch  = str_replace('refs/heads/', '', $payload['ref']);
-$compare = $payload['compare'];
-$comment = $payload['head_commit']['message'];
-$author  = $payload['head_commit']['author']['name'];
-$repo    = $payload['repository']['name'];
+$branch     = str_replace('refs/heads/','',$payload['pull_request']['head']['ref']);
+$compare    = $payload['pull_request']['url'];
+$comment    = $payload['pull_request']['title'];
+$author     = $payload['pull_request']['user']['login'];
+$repo       = $payload['repository']['name'];
 
 // push job
+
 $fp = fsockopen('127.0.0.1', 11300, $errno, $errstr);
 
 if (!$fp) {
@@ -86,9 +87,9 @@ if (!$fp) {
 
 $data = json_encode(
     [
-        'suite'      => $suite,
-        'params'     => [
-            'commit' => $commit,
+        'suite'             => $suite,
+        'params'            => [
+            'commit'  => $commit,
         ],
         'build-info' => [
             'branch'  => $branch,

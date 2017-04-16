@@ -96,6 +96,10 @@ class TaskRunner
             return false;
         }
 
+        foreach ($task->getFormatters() as $formatter) {
+            $formatter->format($task, $result);
+        }
+
         return true;
     }
 }

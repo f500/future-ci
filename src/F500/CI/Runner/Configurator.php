@@ -13,6 +13,8 @@ use F500\CI\Command\Wrapper\Wrapper;
 use F500\CI\Command\Wrapper\WrapperFactory;
 use F500\CI\Suite\Suite;
 use F500\CI\Suite\SuiteFactory;
+use F500\CI\Task\Formatter;
+use F500\CI\Task\FormatterFactory;
 use F500\CI\Task\ResultParser;
 use F500\CI\Task\ResultParserFactory;
 use F500\CI\Task\Task;
@@ -77,6 +79,11 @@ class Configurator
     protected $wrapperFactory;
 
     /**
+     * @var FormatterFactory
+     */
+    private $formatterFactory;
+
+    /**
      * @param string              $rootDir
      * @param string              $buildsDir
      * @param string              $suitesDir
@@ -84,6 +91,7 @@ class Configurator
      * @param SuiteFactory        $suiteFactory
      * @param TaskFactory         $taskFactory
      * @param ResultParserFactory $resultParserFactory
+     * @param FormatterFactory    $formatterFactory
      * @param WrapperFactory      $wrapperFactory
      */
     public function __construct(
@@ -94,6 +102,7 @@ class Configurator
         SuiteFactory $suiteFactory,
         TaskFactory $taskFactory,
         ResultParserFactory $resultParserFactory,
+        FormatterFactory $formatterFactory,
         WrapperFactory $wrapperFactory
     ) {
         $this->rootDir   = $rootDir;
@@ -105,6 +114,7 @@ class Configurator
         $this->taskFactory         = $taskFactory;
         $this->resultParserFactory = $resultParserFactory;
         $this->wrapperFactory      = $wrapperFactory;
+        $this->formatterFactory    = $formatterFactory;
     }
 
     /**
@@ -281,6 +291,8 @@ class Configurator
             $task->addResultParser($parserCn, $parser);
         }
 
+        $this->addFormattersToTask($task, $config);
+
         if (!empty($config['wrappers'])) {
             if (!is_array($config['wrappers'])) {
                 throw new \RuntimeException(sprintf('Wrappers in task "%s" should be an array.', $task->getCn()));
@@ -305,7 +317,13 @@ class Configurator
             $task->setStopOnFailure(true);
         }
 
-        unset($config['name'], $config['parsers'], $config['wrappers'], $config['stop_on_failure']);
+        unset(
+            $config['name'],
+            $config['parsers'],
+            $config['formatters'],
+            $config['wrappers'],
+            $config['stop_on_failure']
+        );
 
         $task->setOptions($config);
     }
@@ -327,6 +345,15 @@ class Configurator
     protected function configureResultParser(ResultParser $resultParser, array $config)
     {
         $resultParser->setOptions($config);
+    }
+
+    /**
+     * @param Formatter $formatter
+     * @param array     $config
+     */
+    protected function configureFormatter(Formatter $formatter, array $config)
+    {
+        $formatter->setOptions($config);
     }
 
     /**
@@ -366,5 +393,38 @@ class Configurator
         unset($config['parameters']);
 
         return $config;
+    }
+
+    /**
+     * Retrieves the formatters from the 'formatters' element in the config, retrieves them from the formatter factory
+     * and registers them to the provided task.
+     *
+     * @param Task             $task
+     * @param string[]|array[] $config
+     *
+     * @return void
+     */
+    protected function addFormattersToTask(Task $task, array $config)
+    {
+        if (empty($config['formatters'])) {
+            return;
+        }
+
+        if (!is_array($config['formatters'])) {
+            throw new \RuntimeException(sprintf('Formatters in task "%s" should be an array.', $task->getCn()));
+        }
+
+        foreach ($config['formatters'] as $formatterCn => $formatterConfig) {
+            if (empty($formatterConfig['class'])) {
+                throw new \RuntimeException(sprintf('Formatter "%s" has no class configured.', $formatterCn));
+            }
+
+            $formatterClass = $formatterConfig['class'];
+            unset($formatterConfig['class']);
+
+            $formatter = $this->formatterFactory->createFormatter($formatterClass, $formatterCn);
+            $this->configureFormatter($formatter, $formatterConfig);
+            $task->addFormatter($formatterCn, $formatter);
+        }
     }
 }

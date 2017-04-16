@@ -32,33 +32,34 @@ abstract class BaseTask implements Task
     /**
      * @var array
      */
-    protected $options;
+    protected $options = array();
 
     /**
      * @var ResultParser[]
      */
-    protected $resultParsers;
+    protected $resultParsers = array();
+
+    /**
+     * @var Formatter[]
+     */
+    protected $formatters = array();
 
     /**
      * @var \F500\CI\Command\Wrapper\Wrapper[]
      */
-    protected $wrappers;
+    protected $wrappers = array();
 
     /**
      * @var bool
      */
-    protected $stopOnFailure;
+    protected $stopOnFailure = false;
 
     /**
      * @param string $cn
      */
     public function __construct($cn)
     {
-        $this->cn            = $cn;
-        $this->options       = array();
-        $this->resultParsers = array();
-        $this->wrappers      = array();
-        $this->stopOnFailure = false;
+        $this->cn = $cn;
     }
 
     /**
@@ -119,6 +120,23 @@ abstract class BaseTask implements Task
     public function getResultParsers()
     {
         return $this->resultParsers;
+    }
+
+    /**
+     * @param string    $cn
+     * @param Formatter $formatter
+     */
+    public function addFormatter($cn, Formatter $formatter)
+    {
+        $this->formatters[$cn] = $formatter;
+    }
+
+    /**
+     * @return Formatter[]
+     */
+    public function getFormatters()
+    {
+        return $this->formatters;
     }
 
     /**

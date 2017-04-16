@@ -6,14 +6,21 @@
         <small>{{ metadata.build.date | date:'medium' }}</small>
     </h1>
 
-    <accordion close-others="true">
-        <accordion-group data-ng-repeat="task in tasks">
-            <accordion-heading>
-                <fci-status data-ng-model="statuses.tasks[task]"></fci-status>
-                {{ metadata.tasks[task].name }}
-            </accordion-heading>
-            <pre data-ng-repeat="command in results[task].commands">{{ command.output }}</pre>
-        </accordion-group>
-    </accordion>
+    <tabset class="build-tabs">
+        <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
+            {{tab.content}}
+        </tab>
+        <tab heading="Log">
+            <accordion close-others="true">
+                <accordion-group data-ng-repeat="task in tasks">
+                    <accordion-heading>
+                        <fci-status data-ng-model="statuses.tasks[task]"></fci-status>
+                        {{ metadata.tasks[task].name }}
+                    </accordion-heading>
+                    <pre data-ng-repeat="command in results[task].commands">{{ command.output }}</pre>
+                </accordion-group>
+            </accordion>
+        </tab>
+    </tabset>
 
 </div>

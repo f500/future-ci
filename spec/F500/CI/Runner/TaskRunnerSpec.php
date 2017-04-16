@@ -13,6 +13,7 @@ use F500\CI\Command\Command;
 use F500\CI\Command\CommandExecutor;
 use F500\CI\Command\CommandFactory;
 use F500\CI\Command\Wrapper\Wrapper;
+use F500\CI\Task\Formatter;
 use F500\CI\Task\ResultParser;
 use F500\CI\Task\Task;
 use PhpSpec\ObjectBehavior;
@@ -46,6 +47,7 @@ class TaskRunnerSpec extends ObjectBehavior
         Result $result,
         Wrapper $wrapper,
         ResultParser $resultParser,
+        Formatter $formatter,
         Command $commandOne,
         Command $commandTwo,
         CommandExecutor $commandExecutor
@@ -58,6 +60,8 @@ class TaskRunnerSpec extends ObjectBehavior
             ->willReturn(array('some_wrapper' => $wrapper));
         $task->getResultParsers()
             ->willReturn(array('some_parser' => $resultParser));
+        $task->getFormatters()
+            ->willReturn(array('some_formater' => $formatter));
 
         $wrapper->wrap($commandOne, Argument::type('F500\CI\Command\CommandFactory'))->willReturn($commandOne);
         $wrapper->wrap($commandTwo, Argument::type('F500\CI\Command\CommandFactory'))->willReturn($commandTwo);
@@ -72,6 +76,8 @@ class TaskRunnerSpec extends ObjectBehavior
         $result->addCommandResult($task, Argument::type('F500\CI\Command\Command'))
             ->shouldHaveBeenCalled();
         $resultParser->parse($task, $result)
+            ->shouldHaveBeenCalled();
+        $formatter->format($task, $result)
             ->shouldHaveBeenCalled();
     }
 

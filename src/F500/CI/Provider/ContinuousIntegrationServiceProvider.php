@@ -16,6 +16,7 @@ use F500\CI\Runner\BuildRunner;
 use F500\CI\Runner\Configurator;
 use F500\CI\Runner\TaskRunner;
 use F500\CI\Suite\SuiteFactory;
+use F500\CI\Task\FormatterFactory;
 use F500\CI\Task\ResultParserFactory;
 use F500\CI\Task\TaskFactory;
 use Silex\Application;
@@ -30,6 +31,8 @@ use Silex\ServiceProviderInterface;
  */
 class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
 {
+    const PARAM_FORMATTER_FACTORY_CLASS = 'f500ci.formatter_factory.class';
+    const SERVICE_FORMATTER_FACTORY = 'f500ci.formatter_factory';
 
     /**
      * @param Application $app
@@ -59,6 +62,7 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
                     $app['f500ci.suite_factory'],
                     $app['f500ci.task_factory'],
                     $app['f500ci.result_parser_factory'],
+                    $app['f500ci.formatter_factory'],
                     $app['f500ci.wrapper_factory']
                 );
 
@@ -242,6 +246,8 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
             }
         );
 
+        $app = $this->addFormatterFactory($app);
+
         $app['f500ci.suite_factory.class'] = 'F500\CI\Suite\SuiteFactory';
         $app['f500ci.suite_factory']       = $app->share(
             function () use ($app) {
@@ -308,5 +314,38 @@ class ContinuousIntegrationServiceProvider implements ServiceProviderInterface
      */
     public function boot(Application $app)
     {
+    }
+
+    /**
+     * Adds the Factory for the Result Formatters to the container.
+     *
+     * @param Application $app
+     *
+     * @return Application
+     */
+    protected function addFormatterFactory(Application $app)
+    {
+        $app[self::PARAM_FORMATTER_FACTORY_CLASS] = 'F500\CI\Task\FormatterFactory';
+        $app[self::SERVICE_FORMATTER_FACTORY] = $app->share(
+            function () use ($app) {
+                if (empty($app[self::PARAM_FORMATTER_FACTORY_CLASS])) {
+                    throw new \RuntimeException('"' . self::PARAM_FORMATTER_FACTORY_CLASS . '" should be configured.');
+                }
+
+                $class = $app[self::PARAM_FORMATTER_FACTORY_CLASS];
+                $instance = new $class();
+
+                if (!$instance instanceof FormatterFactory) {
+                    throw new \RuntimeException(
+                        '"' . self::SERVICE_FORMATTER_FACTORY . '" should be an instance of '
+                        . 'F500\CI\Task\FormatterFactory.'
+                    );
+                }
+
+                return $instance;
+            }
+        );
+
+        return $app;
     }
 }

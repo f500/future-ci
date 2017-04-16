@@ -8,6 +8,7 @@
 namespace spec\F500\CI\Task;
 
 use F500\CI\Command\Wrapper\Wrapper;
+use F500\CI\Task\Formatter;
 use F500\CI\Task\ResultParser;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -49,6 +50,17 @@ abstract class TaskSpec extends ObjectBehavior
     {
         $this->addResultParser('some_parser', $resultParser);
         $this->getResultParsers()->shouldReturn(array('some_parser' => $resultParser));
+    }
+
+    function it_does_not_have_formatters_initially()
+    {
+        $this->getFormatters()->shouldReturn(array());
+    }
+
+    function its_formatters_can_be_added_to(Formatter $formatter)
+    {
+        $this->addFormatter('some_formatter', $formatter);
+        $this->getFormatters()->shouldReturn(array('some_formatter' => $formatter));
     }
 
     function it_does_not_have_wrappers_initially()
